@@ -3,6 +3,14 @@ import discord
 from discord.ext import commands
 
 
+token_dict = {}
+with open("tokens.txt", 'r') as f:
+    for line in f:
+        (key, val) = line.split()
+        token_dict[key] = val
+TOKEN = token_dict['WillaBot']
+print(TOKEN)
+TOKEN = 'NDYzMzk4NjAxNTUzMzQ2NTgx.Dh1FVA.BAuihlsGDEgMGA8cNma-9oKIx_w'
 
 client = discord.Client()
 
