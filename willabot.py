@@ -21,7 +21,7 @@ async def on_message(message):
         
         if command in commands_lst:
             if command == 'hello' and msg_rest == '':
-                await message.channel.send('Hello {0.author.mention}!'.format(message))
+                await client.send_message(message.channel, content = 'Hello {0.author.mention}!'.format(message))
 
             elif command == 'help' and msg_rest == '':
                 await message.channel.send(help_msg)
