@@ -19,13 +19,14 @@ async def on_message(message):
         if space_ind == -1:
             space_ind = len(msg_full)
         command = msg_full[2:space_ind]
+        msg_rest = msg_full[space_ind:]
 
         
         if command in commands_lst:
-            if command == 'hello':
+            if command == 'hello' and msg_rest == '':
                 await message.channel.send('Hello {0.author.mention}!'.format(message))
 
-            elif command == 'help':
+            elif command == 'help' and msg_rest == '':
                 await message.channel.send(help_msg)
 
             elif command == 'echo':
@@ -33,7 +34,7 @@ async def on_message(message):
                 if 0 < len(msg_echo) < 50:
                     await message.channel.send(msg_echo)
 
-            elif command == 'invite':
+            elif command == 'invite' and msg_rest == '':
                 await message.channel.send('**Invite link for WillaBot:**\nhttps://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot')
 
             elif command == 'roles':
@@ -43,8 +44,12 @@ async def on_message(message):
         else:
             await message.channel.send("Oops, wrong command! Try 'w.help' for a list of commands!")
 
-    if client.user.mentioned_in(message) and not message.author.bot:
+    elif client.user.mentioned_in(message) and not message.author.bot:
         await message.channel.send("Please don't ping me {0.author.mention}, I'm a busy bot. Try 'w.help' instead.".format(message))
+
+    elif message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
+        await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
+
 
 
 @client.event
