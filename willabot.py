@@ -1,9 +1,7 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
-
-load_dotenv()
+from settings import token
 
 client = discord.Client()
 
@@ -59,4 +57,4 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-client.run(TOKEN)
+client.run(token)
