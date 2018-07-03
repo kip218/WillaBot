@@ -4,4 +4,3 @@ python-dotenv
 aiohttp
 websockets
 PyNaCl
-libffi-dev
