@@ -3,11 +3,12 @@ import discord
 from discord.ext import commands
 
 TOKEN = 'NDYzMzk4NjAxNTUzMzQ2NTgx.Dhv1Vw.QzH5NH35pc0R3OV8dpGIlKyoobU'
+TOKEN2 = 'NDYzNDE3NDAzMDcwNDgwNDE0.Dhzvmg.xDLPYzGYnexTXX3zSM5DzffOmK8'
 
 client = discord.Client()
 
 commands_lst = ['hello', 'help', 'echo', 'invite', 'roles']
-help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.hello**\nGreet WillaBot\n\n**w.help**\n~~You're looking at it right now c:~~\n\n**w.echo [message]**\nMakes WillaBot repeat message\n\n**w.invite**\nInvite link for WillaBot"
+help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.hello**\nGreet WillaBot\n\n**w.help**\n~~You're looking right at it c:~~\n\n**w.echo [message]**\nMakes WillaBot repeat message\n\n**w.invite**\nInvite link for WillaBot"
 
 
 @client.event
@@ -32,7 +33,7 @@ async def on_message(message):
                 if 0 < len(msg_echo) < 50:
                     await message.channel.send(msg_echo)
 
-            elif command == 'invite':
+            elif command == 'invite':„
                 await message.channel.send('**Invite link for WillaBot:**\nhttps://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot')
 
             elif command == 'roles':
