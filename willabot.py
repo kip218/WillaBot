@@ -2,8 +2,7 @@
 import discord
 from discord.ext import commands
 
-TOKEN = 'NDYzMzk4NjAxNTUzMzQ2NTgx.Dhv1Vw.QzH5NH35pc0R3OV8dpGIlKyoobU'
-TOKEN2 = 'NDYzNDE3NDAzMDcwNDgwNDE0.Dhzvmg.xDLPYzGYnexTXX3zSM5DzffOmK8'
+
 
 client = discord.Client()
 
