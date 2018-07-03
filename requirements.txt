@@ -1,5 +1,4 @@
 discord
 discord.py
-discord.ext
 dotenv
 os
