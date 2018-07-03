@@ -33,7 +33,7 @@ async def on_message(message):
                 if 0 < len(msg_echo) < 50:
                     await message.channel.send(msg_echo)
 
-            elif command == 'invite':„
+            elif command == 'invite':
                 await message.channel.send('**Invite link for WillaBot:**\nhttps://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot')
 
             elif command == 'roles':
