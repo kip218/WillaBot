@@ -1,12 +1,9 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 import discord
 from discord.ext import commands
-require('dotenv').config()
+from dotenv import load_dotenv
 
-
-with open('token.env', 'r') as f:
-    TOKEN = f.readline()
-print(TOKEN)
+load_dotenv()
 
 client = discord.Client()
 
