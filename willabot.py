@@ -2,6 +2,8 @@
 import discord
 from settings import token
 
+print(discord.__version__)
+
 client = discord.Client()
 
 commands_lst = ['hello', 'help', 'echo', 'invite', 'roles']
