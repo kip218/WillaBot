@@ -3,9 +3,8 @@ import discord
 from discord.ext import commands
 
 
-with open('tokens.py', 'r') as f:
-    from f import *
-TOKEN = token_dict['WillaBot']
+with open('token.txt', 'r') as f:
+    TOKEN = f.readline()
 print(TOKEN)
 
 client = discord.Client()
