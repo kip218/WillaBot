@@ -1,3 +1,7 @@
 discord
 discord.py
 python-dotenv
+aiohttp
+websockets
+PyNaCl
+libffi-dev

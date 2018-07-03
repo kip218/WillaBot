@@ -1,6 +1,5 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 import discord
-from discord.ext import commands
 from settings import token
 
 client = discord.Client()
