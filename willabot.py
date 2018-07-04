@@ -1,12 +1,13 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 import discord
+import time
 from settings import token
 
 print(discord.__version__)
 
 client = discord.Client()
 
-commands_lst = ['hello', 'help', 'echo', 'invite']
+commands_lst = ['ping', 'hello', 'help', 'echo', 'invite']
 help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.hello**\nGreet WillaBot\n\n**w.help**\n~~You're looking right at it c:~~\n\n**w.echo [message]**\nMakes WillaBot repeat message\n\n**w.invite**\nInvite link for WillaBot"
 
 
@@ -22,7 +23,10 @@ async def on_message(message):
 
         
         if command in commands_lst:
-            if command == 'hello' and msg_rest == '':
+            if command == 'ping' and msg_rest == '':
+                await message.channel.send('PONG'.format(message))
+
+            elif command == 'hello' and msg_rest == '':
                 await message.channel.send('Hello {0.author.mention}!'.format(message))
 
             elif command == 'help' and msg_rest == '':
@@ -36,7 +40,6 @@ async def on_message(message):
             elif command == 'invite' and msg_rest == '':
                 await message.channel.send('**Invite link for WillaBot:**\nhttps://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot')
 
-
         else:
             await message.channel.send("Oops, wrong command! Try 'w.help' for a list of commands!")
 
@@ -45,7 +48,6 @@ async def on_message(message):
 
     elif message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
         await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
-
 
 
 @client.event
