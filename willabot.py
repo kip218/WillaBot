@@ -13,6 +13,10 @@ help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.
 bot.launch_time = datetime.utcnow()
 
 
+@bot.command()
+async def help(ctx):
+    await cts.send("Help menu in the works")
+
 
 @bot.command()
 async def hello(ctx):
@@ -67,8 +71,18 @@ async def invite(ctx):
     '''
     Invite link for WillaBot. Help WillaBot explore different servers!
     '''
-    embed = discord.Embed(title="Help WillaBot explore a new discord server!", description="*'Nothing is pleasanter to me than exploring different discord servers.'\n- WillaBot*", color=0x48d1cc, url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot")
+    embed = discord.Embed(title="Help WillaBot explore a new discord server!", url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot", description="*\"Nothing is pleasanter to me than exploring different discord servers.\"\n- WillaBot*", color=0x48d1cc)
+    embed.set_thumbnail(url="https://www.eastbaytimes.com/wp-content/uploads/2016/07/20080622_025925_walle.jpg?w=360")
     await ctx.send(embed=embed)
+
+
+@bot.command()
+async def mimic(ctx, user_id: str=None):
+    '''
+    Make WillaBot mimic [user]
+    '''
+
+    await ctx.send(user)
 
 
 @bot.event
@@ -84,8 +98,8 @@ async def on_message(message):
 async def on_ready():
     print(discord.__version__)
     print('Logged in as')
-    #print(client.user.name)
-    #print(client.user.id)
+    print(bot.user.name)
+    print(bot.user.id)
     print('------')
     game = discord.Game("w.help")
     await bot.change_presence(status=discord.Status.online, activity=game)
