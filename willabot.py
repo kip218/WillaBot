@@ -32,7 +32,7 @@ async def hello(ctx):
 @bot.command()
 async def ping(ctx):
     '''
-    Get the latency of the bot.
+    Latency of WillaBot
     '''
     latency = int(bot.latency*1000)
     msg_lst = ['Pong! ', str(latency), 'ms']
@@ -76,7 +76,7 @@ async def on_ready():
     #print(client.user.id)
     print('------')
     game = discord.Game("w.help")
-    await bot.change_presence(status=discord.Status.idle, activity=game)
+    await bot.change_presence(status=discord.Status.online, activity=game)
 
 
 bot.run(token)
