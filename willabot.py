@@ -53,6 +53,15 @@ async def uptime(ctx):
 
 
 @bot.command()
+async def servers(ctx):
+    '''
+    The number of servers using WillaBot
+    '''
+    num = len(bot.guilds)
+    await ctx.send("WillaBot is currently exploring " + str(num) + " different servers!")
+
+
+@bot.command()
 async def echo(ctx, *, content:str):
     '''
     Makes WillaBot repeat message.
@@ -65,7 +74,8 @@ async def invite(ctx):
     '''
     Invite link for WillaBot. Help WillaBot explore different servers!
     '''
-    await ctx.send('**Invite link for WillaBot:**\nhttps://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot')
+    embed = discord.Embed(title="__Invite link for WillaBot__", description="*'Nothing is pleasanter to me than exploring discord servers.'\n- WillaBot*", color=0x40e0d0, url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot")
+    await ctx.send(embed=embed)
 
 
 @bot.event
