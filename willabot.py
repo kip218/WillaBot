@@ -54,13 +54,13 @@ help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.
 @bot.command()
 async def ping(ctx):
     '''
-    This text will be shown in the help command
+    Get the latency of the bot.
     '''
+    latency = int(bot.latency*1000)
+    msg_lst = ['Pong! ', str(latency), 'ms']
+    msg = ''.join(msg_lst)
+    await ctx.send(msg)
 
-    # Get the latency of the bot
-    latency = bot.latency  # Included in the Discord.py library
-    # Send it to the user
-    await ctx.send(latency)
 
 @bot.command()
 async def echo(ctx, *, content:str):
