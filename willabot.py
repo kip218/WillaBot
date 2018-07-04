@@ -6,7 +6,7 @@ print(discord.__version__)
 
 client = discord.Client()
 
-commands_lst = ['hello', 'help', 'echo', 'invite', 'roles']
+commands_lst = ['hello', 'help', 'echo', 'invite']
 help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.hello**\nGreet WillaBot\n\n**w.help**\n~~You're looking right at it c:~~\n\n**w.echo [message]**\nMakes WillaBot repeat message\n\n**w.invite**\nInvite link for WillaBot"
 
 
@@ -30,15 +30,12 @@ async def on_message(message):
 
             elif command == 'echo':
                 msg_echo = msg_full[space_ind+1:]
-                if 0 < len(msg_echo) < 50:
+                if 0 < len(msg_echo) < 100:
                     await message.channel.send(msg_echo)
 
             elif command == 'invite' and msg_rest == '':
                 await message.channel.send('**Invite link for WillaBot:**\nhttps://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot')
 
-            elif command == 'roles':
-                roles_lst = guild.roles
-                await message.channel.send(roles_lst)
 
         else:
             await message.channel.send("Oops, wrong command! Try 'w.help' for a list of commands!")
