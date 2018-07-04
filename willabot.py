@@ -74,7 +74,7 @@ async def invite(ctx):
     '''
     Invite link for WillaBot. Help WillaBot explore different servers!
     '''
-    embed = discord.Embed(title="__Invite link for WillaBot__", description="*'Nothing is pleasanter to me than exploring discord servers.'\n- WillaBot*", color=0x48d1cc, url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot")
+    embed = discord.Embed(title="__Help WillaBot explore a new discord server__", description="*'Nothing is pleasanter to me than exploring different discord servers.'\n- WillaBot*", color=0x48d1cc, url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot")
     await ctx.send(embed=embed)
 
 
