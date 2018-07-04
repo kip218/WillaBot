@@ -7,18 +7,11 @@ bot = commands.Bot(command_prefix=prefix)
 from settings import token
 
 
-commands_lst = ['ping', 'hello', 'help', 'echo', 'invite']
 help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.help**\n~~You're looking right at it c:~~\n"
+
 
 bot.launch_time = datetime.utcnow()
 
-
-
-#     #elif client.user.mentioned_in(message) and not message.author.bot:
-#     #   await message.channel.send("Please don't ping me {0.author.mention}, I'm a busy bot. Try 'w.help' instead.".format(message))
-
-#     elif message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
-#         await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
 
 
 @bot.command()
@@ -76,6 +69,15 @@ async def invite(ctx):
     '''
     embed = discord.Embed(title="Help WillaBot explore a new discord server!", description="*'Nothing is pleasanter to me than exploring different discord servers.'\n- WillaBot*", color=0x48d1cc, url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot")
     await ctx.send(embed=embed)
+
+
+@bot.event
+async def on_message(message):
+    if message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
+        await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
+    elif bot.user.mentioned_in(message) and not message.author.bot:
+        await message.channel.send("Please don't ping me, " + message.author.mention + "I'm a busy bot. Try 'w.help' instead.")
+    await bot.process_commands(message)
 
 
 @bot.event
