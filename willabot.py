@@ -13,9 +13,9 @@ help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.
 bot.launch_time = datetime.utcnow()
 
 
-@bot.command()
-async def help(ctx):
-    await cts.send("Help menu in the works")
+# @bot.command()
+# async def help(ctx):
+#     await cts.send("Help menu in the works")
 
 
 @bot.command()
@@ -68,7 +68,7 @@ async def echo(ctx, *, content:str):
 
 @bot.command()
 async def invite(ctx):
-    '''
+    '''ß
     Invite link for WillaBot. Help WillaBot explore different servers!
     '''
     embed = discord.Embed(title="Help WillaBot explore a new discord server!", url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot", description="*\"Nothing is pleasanter to me than exploring different discord servers.\"\n- WillaBot*", color=0x48d1cc)
