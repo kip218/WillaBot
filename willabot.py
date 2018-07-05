@@ -86,15 +86,6 @@ def get_pfp(member):
     embed.set_image(url=pic_url)
     return embed
 
-#checks display_name for str
-# def check_display_name(str, display_name):
-#     slider = -1
-#     for i in len(str):
-#         if str[i] in display_name:
-#             ind = display_name.find(str[i])
-#             if ind > slider:
-#                 slider = ind
-
 @bot.command()
 async def pfp(ctx, user: str=None):
     '''
@@ -115,6 +106,7 @@ async def pfp(ctx, user: str=None):
         for member in lst_members:
             lst_display_names.append(member.display_name.lower())
             lst_member_names.append(member.name.lower())
+        #loop to search name
         ind = 0
         found = False
         while found == False and ind < len(lst_members):
@@ -134,6 +126,15 @@ async def pfp(ctx, user: str=None):
                 ind += 1
         if found == False:
             await ctx.send("Could not find user named \"" + user + "\"")
+
+
+@bot.event
+async def on_message_delete(message):
+    if not message.author.bot:
+        user = message.author
+        msg = message.content
+        await message.channel.send(str(user.mention) + " said \"" + msg + "\" and tried to delete it")
+
 
 @bot.event
 async def on_message(message):
