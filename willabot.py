@@ -76,7 +76,7 @@ async def serverinfo(ctx, num: int=None):
         embed.set_thumbnail(url=server.icon_url)
         await ctx.send(embed=embed)
     else:
-        ctx.send("Not a valid number. Please use a number between 0 and " + str(len(bot.guilds)))
+        await ctx.send("Not a valid number. Please use a number between 0 and " + str(len(bot.guilds)))
 
 
 @bot.command()
