@@ -62,10 +62,16 @@ async def servers(ctx):
 
 
 @bot.command()
-async def serverinfo(ctx, num: int=None):
+async def serverinfo(ctx, num: str=None):
     '''
     Gives info of a server WillaBot is in. Gives current server info if [server number] not specified. 
     '''
+    try:
+        num = int(num)
+    except:
+        await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(bot.guilds)))
+        return
+    
     if num is None:
         title = ctx.guild.name
         member_count = str(len(ctx.guild.members))
@@ -76,8 +82,7 @@ async def serverinfo(ctx, num: int=None):
         member_count = str(len(server.members))
         icon_url = server.icon_url
     else:
-        await ctx.send("Not a valid number. Please use a number between 0 and " + str(len(bot.guilds)))
-        return
+        await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(bot.guilds)))
     embed = discord.Embed(title=title, description="Member count: " + member_count, color=0x48d1cc)
     embed.set_thumbnail(url=icon_url)
     await ctx.send(embed=embed)
@@ -153,6 +158,9 @@ async def pfp(ctx, *, user: str=None):
 
 # @bot.command()
 # async def stfu(ctx):
+    '''
+    Toggles all commands that don't use the prefix
+    '''
 #     stfu_helper(mute)
 #     if mute == False:
 #         await ctx.send("WillaBot is now free to talk!")
