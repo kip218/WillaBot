@@ -12,6 +12,7 @@ from settings import token
 help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.help**\n~~You're looking right at it c:~~\n"
 
 launch_time = datetime.utcnow()
+mute = True
 
 # @bot.command()
 # async def help(ctx):
@@ -58,7 +59,7 @@ async def servers(ctx):
     total_users = 0
     for guild in bot.guilds:
         total_users += len(guild.members)
-    await ctx.send("WillaBot is currently exploring " + str(num) + " different servers and meeting " + str(total_users) + " users!")
+    await ctx.send("WillaBot is currently exploring " + str(num) + " different servers with " + str(total_users) + " users!")
 
 
 @bot.command()
@@ -66,33 +67,43 @@ async def serverinfo(ctx, num: str=None):
     '''
     Gives info of a server WillaBot is in. Gives current server info if [server number] not specified. 
     '''
-    try:
-        num = int(num)
-    except:
-        await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(bot.guilds)))
-        return
-    
     if num is None:
         title = ctx.guild.name
         member_count = str(len(ctx.guild.members))
         icon_url = ctx.guild.icon_url
-    elif 1 <= num <= len(bot.guilds):
-        server = bot.guilds[num-1]
-        title = server.name
-        member_count = str(len(server.members))
-        icon_url = server.icon_url
     else:
-        await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(bot.guilds)))
+        try:
+            num = int(num)
+        except:
+            await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(bot.guilds)))
+            return
+        else:
+            if 1 <= num <= len(bot.guilds):
+                server = bot.guilds[num-1]
+                title = server.name
+                member_count = str(len(server.members))
+                icon_url = server.icon_url
+            else:
+                await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(bot.guilds)))
     embed = discord.Embed(title=title, description="Member count: " + member_count, color=0x48d1cc)
     embed.set_thumbnail(url=icon_url)
     await ctx.send(embed=embed)
 
 
-@bot.command()
+@bot.group()
 async def echo(ctx, *, content: str):
     '''
     Repeats [message]
     '''
+    if ctx.invoked_subcommand is None:
+        await ctx.send(content)
+
+@echo.command()
+async def erase(ctx, *, content: str):
+    '''
+    Repeats [message] and deletes the original message
+    '''
+    await ctx.message.delete()
     await ctx.send(content)
 
 
