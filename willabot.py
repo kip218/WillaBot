@@ -1,4 +1,5 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
+import time
 from datetime import datetime
 import discord
 from discord.ext import commands
@@ -29,7 +30,7 @@ async def hello(ctx):
 @bot.command()
 async def ping(ctx):
     '''
-    Latency of WillaBot
+    WillaBot latency
     '''
     latency = int(bot.latency*1000)
     msg_lst = ['Pong! ', str(latency), 'ms']
@@ -40,7 +41,7 @@ async def ping(ctx):
 @bot.command()
 async def uptime(ctx):
     '''
-    Uptime of WillaBot
+    WillaBot uptime
     '''
     delta_uptime = datetime.utcnow() - bot.launch_time
     hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
@@ -61,14 +62,14 @@ async def servers(ctx):
 @bot.command()
 async def echo(ctx, *, content:str):
     '''
-    Makes WillaBot repeat message.
+    Repeats [message]
     '''
     await ctx.send(content)
 
 
 @bot.command()
 async def invite(ctx):
-    '''ß
+    '''
     Invite link for WillaBot. Help WillaBot explore different servers!
     '''
     embed = discord.Embed(title="Help WillaBot explore a new discord server!", url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot", description="*\"Nothing is pleasanter to me than exploring different discord servers.\"\n- WillaBot*", color=0x48d1cc)
@@ -77,12 +78,21 @@ async def invite(ctx):
 
 
 @bot.command()
-async def mimic(ctx, user_id: str=None):
+async def pfp(ctx, user_id: str=None):
     '''
-    Make WillaBot mimic [user]
+    Sends [user]'s proifle picture
     '''
-
-    await ctx.send(user)
+    if user_id is None:
+        pic_url = ctx.message.author.avatar_url
+        embed = discord.Embed(color=0x48d1cc)
+        embed.set_image(url=pic_url)
+        await ctx.send(embed=embed)
+    else:
+        user_member = ctx.message.mentions[0]
+        pic_url = user_member.avatar_url
+        embed = discord.Embed(color=0x48d1cc)
+        embed.set_image(url=pic_url)
+        await ctx.send(embed=embed)
 
 
 @bot.event
