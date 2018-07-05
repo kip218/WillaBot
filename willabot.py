@@ -91,20 +91,26 @@ async def serverinfo(ctx, num: str=None):
 
 
 @bot.group()
-async def echo(ctx, *, content: str):
+async def echo(ctx):
     '''
     Repeats [message]
     '''
     if ctx.invoked_subcommand is None:
+        content = ctx.message.content
+        space_ind = content.find(' ')
+        content = content[space_ind+1:]
         await ctx.send(content)
 
 @echo.command()
 async def erase(ctx, *, content: str):
     '''
-    Repeats [message] and deletes the original message
+    Repeats [message] and erases the original message
     '''
-    await ctx.message.delete()
-    await ctx.send(content)
+    try:
+        await ctx.message.delete()
+        await ctx.send(content)
+    except:
+        await ctx.send("I don't have permission to delete messages!")
 
 
 @bot.command()
