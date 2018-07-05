@@ -111,7 +111,7 @@ def get_pfp(member):
     return embed
 
 @bot.command()
-async def pfp(ctx, user: str=None):
+async def pfp(ctx, *, user: str=None):
     '''
     Sends [user]'s profile picture
     '''
