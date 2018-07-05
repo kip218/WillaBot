@@ -67,16 +67,20 @@ async def serverinfo(ctx, num: int=None):
     Gives current server info if [server number] not specified. 
     '''
     if num is None:
-        embed = discord.Embed(title=ctx.guild.name, description="Member count: " + str(len(ctx.guild.members)))
-        embed.set_thumbnail(url=ctx.guild.icon_url)
-        await ctx.send(embed=embed)
+        title = ctx.guild.name
+        member_count = str(len(ctx.guild.members))
+        icon_url = ctx.guild.icon_url
     elif 1 <= num <= len(bot.guilds):
         server = bot.guilds[num-1]
-        embed = discord.Embed(title=server.name, description="Member count: " + str(len(server.members)))
-        embed.set_thumbnail(url=server.icon_url)
-        await ctx.send(embed=embed)
+        title = server.name
+        member_count = str(len(server.members))
+        icon_url = server.icon_url
     else:
         await ctx.send("Not a valid number. Please use a number between 0 and " + str(len(bot.guilds)))
+        return
+    embed = discord.Embed(title=title, description="Member count: " + member_count, color=0x48d1cc)
+    embed.set_thumbnail(url=icon_url)
+    await ctx.send(embed=embed)
 
 
 @bot.command()
