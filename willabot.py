@@ -120,12 +120,12 @@ async def pfp(ctx, user: str=None):
         while found == False and ind < len(lst_members):
             curr_display_name = lst_display_names[ind]
             curr_member_name = lst_member_names[ind]
-            if user in curr_display_name:
+            if user.lower() in curr_display_name:
                 member = lst_members[ind]
                 embed = get_pfp(member)
                 await ctx.send(embed=embed)
                 found = True
-            elif user in curr_member_name:
+            elif user.lower() in curr_member_name:
                 member = lst_members[ind]
                 embed = get_pfp(member)
                 await ctx.send(embed=embed)
