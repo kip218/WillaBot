@@ -11,7 +11,7 @@ from settings import token
 
 help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.help**\n~~You're looking right at it c:~~\n"
 
-
+launch_time = datetime.utcnow()
 
 # @bot.command()
 # async def help(ctx):
@@ -42,7 +42,7 @@ async def uptime(ctx):
     '''
     WillaBot uptime
     '''
-    delta_uptime = datetime.utcnow() - bot.launch_time
+    delta_uptime = datetime.utcnow() - launch_time
     hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
     minutes, seconds = divmod(remainder, 60)
     days, hours = divmod(hours, 24)
@@ -64,7 +64,7 @@ async def servers(ctx):
 @bot.command()
 async def serverinfo(ctx, num: int=None):
     '''
-    Gives current server info if [server number] not specified. 
+    Gives info of a server WillaBot is in. Gives current server info if [server number] not specified. 
     '''
     if num is None:
         title = ctx.guild.name
