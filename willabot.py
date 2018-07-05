@@ -77,23 +77,63 @@ async def invite(ctx):
     await ctx.send(embed=embed)
 
 
+#gets embed msg of member's avatar
+def get_pfp(member):
+    pic_url = member.avatar_url
+    title = 'Profile picture of ' + str(member)
+    color = member.color
+    embed = discord.Embed(title=title, color=color)
+    embed.set_image(url=pic_url)
+    return embed
+
+#checks display_name for str
+# def check_display_name(str, display_name):
+#     slider = -1
+#     for i in len(str):
+#         if str[i] in display_name:
+#             ind = display_name.find(str[i])
+#             if ind > slider:
+#                 slider = ind
+
 @bot.command()
-async def pfp(ctx, user_id: str=None):
+async def pfp(ctx, user: str=None):
     '''
-    Sends [user]'s proifle picture
+    Sends [user]'s profile picture
     '''
-    if user_id is None:
-        pic_url = ctx.message.author.avatar_url
-        embed = discord.Embed(color=0x48d1cc)
-        embed.set_image(url=pic_url)
+    if user is None:
+        member = ctx.message.author
+        embed = get_pfp(member)
+        await ctx.send(embed=embed)
+    elif len(ctx.message.mentions) > 0:
+        member = ctx.message.mentions[0]
+        embed = get_pfp(member)
         await ctx.send(embed=embed)
     else:
-        user_member = ctx.message.mentions[0]
-        pic_url = user_member.avatar_url
-        embed = discord.Embed(color=0x48d1cc)
-        embed.set_image(url=pic_url)
-        await ctx.send(embed=embed)
-
+        lst_members = ctx.guild.members
+        lst_display_names = []
+        lst_member_names = []
+        for member in lst_members:
+            lst_display_names.append(member.display_name.lower())
+            lst_member_names.append(member.name.lower())
+        ind = 0
+        found = False
+        while found == False and ind < len(lst_members):
+            curr_display_name = lst_display_names[ind]
+            curr_member_name = lst_member_names[ind]
+            if user in curr_display_name:
+                member = lst_members[ind]
+                embed = get_pfp(member)
+                await ctx.send(embed=embed)
+                found = True
+            elif user in curr_member_name:
+                member = lst_members[ind]
+                embed = get_pfp(member)
+                await ctx.send(embed=embed)
+                found = True
+            else:
+                ind += 1
+        if found == False:
+            await ctx.send("Could not find user named \"" + user + "\"")
 
 @bot.event
 async def on_message(message):
