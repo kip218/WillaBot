@@ -52,14 +52,35 @@ async def uptime(ctx):
 @bot.command()
 async def servers(ctx):
     '''
-    The number of servers using WillaBot
-    '''
+    The number of servers and users using WillaBot
+    '''        
     num = len(bot.guilds)
-    await ctx.send("WillaBot is currently exploring " + str(num) + " different servers!")
+    total_users = 0
+    for guild in bot.guilds:
+        total_users += len(guild.members)
+    await ctx.send("WillaBot is currently exploring " + str(num) + " different servers and meeting " + str(total_users) + " users!")
 
 
 @bot.command()
-async def echo(ctx, *, content:str):
+async def serverinfo(ctx, num: int=None):
+    '''
+    Gives current server info if [server number] not specified. 
+    '''
+    if num is None:
+        embed = discord.Embed(title=ctx.guild.name, description="Member count: " + str(len(ctx.guild.members)))
+        embed.set_thumbnail(url=ctx.guild.icon_url)
+        await ctx.send(embed=embed)
+    elif 1 <= num <= len(bot.guilds):
+        server = bot.guilds[num-1]
+        embed = discord.Embed(title=server.name, description="Member count: " + str(len(server.members)))
+        embed.set_thumbnail(url=server.icon_url)
+        await ctx.send(embed=embed)
+    else:
+        ctx.send("Not a valid number. Please use a number between 0 and " + str(len(bot.guilds)))
+
+
+@bot.command()
+async def echo(ctx, *, content: str):
     '''
     Repeats [message]
     '''
