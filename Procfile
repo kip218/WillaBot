@@ -1,1 +1,1 @@
-worker: python willabot.py
+worker: python run.py
