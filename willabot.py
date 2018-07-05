@@ -1,4 +1,5 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
+import sqlite3
 import time
 from datetime import datetime
 import discord
@@ -10,8 +11,6 @@ from settings import token
 
 help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.help**\n~~You're looking right at it c:~~\n"
 
-
-bot.launch_time = datetime.utcnow()
 
 
 # @bot.command()
@@ -101,25 +100,17 @@ async def pfp(ctx, user: str=None):
         await ctx.send(embed=embed)
     else:
         lst_members = ctx.guild.members
-        lst_display_names = []
-        lst_member_names = []
-        for member in lst_members:
-            lst_display_names.append(member.display_name.lower())
-            lst_member_names.append(member.name.lower())
         #loop to search name
         ind = 0
         found = False
         while found == False and ind < len(lst_members):
-            curr_display_name = lst_display_names[ind]
-            curr_member_name = lst_member_names[ind]
-            if user.lower() in curr_display_name:
-                member = lst_members[ind]
-                embed = get_pfp(member)
+            curr_member = lst_members[ind]
+            if user.lower() in curr_member.display_name.lower():
+                embed = get_pfp(curr_member)
                 await ctx.send(embed=embed)
                 found = True
-            elif user.lower() in curr_member_name:
-                member = lst_members[ind]
-                embed = get_pfp(member)
+            elif user.lower() in curr_member.name.lower():
+                embed = get_pfp(curr_member)
                 await ctx.send(embed=embed)
                 found = True
             else:
@@ -128,9 +119,25 @@ async def pfp(ctx, user: str=None):
             await ctx.send("Could not find user named \"" + user + "\"")
 
 
+# mute = False
+# def stfu_helper(mute):
+#     if mute == False:
+#         mute = True
+#     else:
+#         mute = False
+
+# @bot.command()
+# async def stfu(ctx):
+#     stfu_helper(mute)
+#     if mute == False:
+#         await ctx.send("WillaBot is now free to talk!")
+#     elif mute == True:
+#         await ctx.send("WillaBot will now shut the fuck up.")
+
+
 @bot.event
 async def on_message_delete(message):
-    if not message.author.bot:
+    if not message.author.bot and not mute:
         user = message.author
         msg = message.content
         await message.channel.send(str(user.mention) + " said \"" + msg + "\" and tried to delete it")
@@ -140,8 +147,8 @@ async def on_message_delete(message):
 async def on_message(message):
     if message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
         await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
-    elif bot.user.mentioned_in(message) and not message.author.bot:
-        await message.channel.send("Please don't ping me, " + message.author.mention + "I'm a busy bot. Try 'w.help' instead.")
+    elif bot.user.mentioned_in(message) and not message.author.bot and not mute:
+        await message.channel.send("Please don't ping me " + message.author.mention + ", I'm a busy bot. Try 'w.help' instead.")
     await bot.process_commands(message)
 
 
