@@ -1,4 +1,5 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
+import random
 import sqlite3
 import time
 from datetime import datetime
@@ -13,10 +14,6 @@ help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.
 
 launch_time = datetime.utcnow()
 mute = True
-
-# @bot.command()
-# async def help(ctx):
-#     await cts.send("Help menu in the works")
 
 
 @bot.command()
@@ -98,8 +95,9 @@ async def echo(ctx):
     if ctx.invoked_subcommand is None:
         content = ctx.message.content
         space_ind = content.find(' ')
-        content = content[space_ind+1:]
-        await ctx.send(content)
+        if space_ind > 4:
+            content = content[space_ind+1:]
+            await ctx.send(content)
 
 @echo.command()
 async def erase(ctx, *, content: str):
