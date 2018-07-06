@@ -9,11 +9,7 @@ prefix = 'w.'
 bot = commands.Bot(command_prefix=prefix)
 from settings import token
 
-
-help_msg = "***WillaBot Commands***\nThe prefix for the WillaBot is `w.`\n\n**w.help**\n~~You're looking right at it c:~~\n"
-
 launch_time = datetime.utcnow()
-mute = True
 
 
 @bot.command()
@@ -51,7 +47,7 @@ async def uptime(ctx):
 async def servers(ctx):
     '''
     The number of servers and users using WillaBot
-    '''        
+    '''
     num = len(bot.guilds)
     total_users = 0
     for guild in bot.guilds:
@@ -95,8 +91,14 @@ async def serverinfo(ctx, search: str=None):
                 icon_url = server.icon_url
             else:
                 await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(bot.guilds)))
-    embed = discord.Embed(title=title, description="Member count: " + member_count, color=0x48d1cc)
-    embed.set_thumbnail(url=icon_url)
+    embed = discord.Embed(
+        title=title,
+        description="Member count: " + member_count,
+        color=0x48d1cc
+        )
+    embed.set_thumbnail(
+        url=icon_url
+        )
     await ctx.send(embed=embed)
 
 
@@ -112,6 +114,7 @@ async def echo(ctx):
             content = content[space_ind+1:]
             await ctx.send(content)
 
+
 @echo.command()
 async def erase(ctx, *, content: str=None):
     '''
@@ -120,9 +123,10 @@ async def erase(ctx, *, content: str=None):
     if len(ctx.message.mentions) == 0 and content is not None:
         try:
             await ctx.message.delete()
-            await ctx.send(content)
         except:
             await ctx.send("I don't have permission to delete messages!")
+        else:
+            await ctx.send(content)
     else:
         if content is None:
             return
@@ -132,11 +136,25 @@ async def erase(ctx, *, content: str=None):
             mentioned_msg = mentioned_msg[space_ind+1:]
             lst_members_mentions = [member.mention for member in ctx.message.mentions]
             description = ctx.message.author.mention + " pinged " + ', '.join(lst_members_mentions) + " and tried to run away"
-            embed = discord.Embed(description=description, color=0xff0000)
-            embed.set_thumbnail(url="http://www.pngall.com/wp-content/uploads/2017/05/Alert-Download-PNG.png")
-            embed.add_field(name="Message:", value="*\"" + mentioned_msg + "\"*", inline=True)
-            embed.set_author(name=str(ctx.message.author), icon_url=ctx.message.author.avatar_url)
-            embed.set_footer(text="*Pinging people and running away is a dick move.")
+            embed = discord.Embed(
+                description=description,
+                color=0xff0000
+                )
+            embed.set_thumbnail(
+                url="http://www.pngall.com/wp-content/uploads/2017/05/Alert-Download-PNG.png"
+                )
+            embed.add_field(
+                name="Message:",
+                value="*\"" + mentioned_msg + "\"*",
+                inline=True
+                )
+            embed.set_author(
+                name=str(ctx.message.author),
+                icon_url=ctx.message.author.avatar_url
+                )
+            embed.set_footer(
+                text="*Pinging people and running away is a dick move."
+                )
             await ctx.send(embed=embed)
 
 
@@ -145,12 +163,19 @@ async def invite(ctx):
     '''
     Invite link for WillaBot. Help WillaBot explore different servers!
     '''
-    embed = discord.Embed(title="Help WillaBot explore a new discord server!", url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot", description="*\"Nothing is pleasanter to me than exploring different discord servers.\"\n- WillaBot*", color=0x48d1cc)
-    embed.set_thumbnail(url="https://www.eastbaytimes.com/wp-content/uploads/2016/07/20080622_025925_walle.jpg?w=360")
+    embed = discord.Embed(
+        title="Help WillaBot explore a new discord server!",
+        url="https://discordapp.com/api/oauth2/authorize?client_id=463398601553346581&permissions=0&scope=bot",
+        description="*\"Nothing is pleasanter to me than exploring different discord servers.\"\n- WillaBot*",
+        color=0x48d1cc
+        )
+    embed.set_thumbnail(
+        url="https://www.eastbaytimes.com/wp-content/uploads/2016/07/20080622_025925_walle.jpg?w=360"
+        )
     await ctx.send(embed=embed)
 
 
-#gets embed msg of member's avatar
+# gets embed msg of member's avatar
 def get_pfp(member):
     pic_url = member.avatar_url
     title = 'Profile picture of ' + str(member)
@@ -194,6 +219,19 @@ async def pfp(ctx, *, user: str=None):
             await ctx.send("Could not find user named \"" + user + "\"")
 
 
+@bot.command()
+async def calc(ctx, *, equation: str=None):
+    '''
+    Calculates simple arithmetic operations used in python (+, -, *, /, **)
+    '''
+    try:
+        res = eval(equation)
+    except:
+        await ctx.send("Invalid input.")
+    else:
+        await ctx.send(res)
+
+
 @bot.event
 async def on_message(message):
     if message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
@@ -214,6 +252,9 @@ async def on_ready():
 
 @bot.command()
 async def shutdown(ctx):
+    '''
+    Shut down WillaBot
+    '''
     author_id = ctx.message.author.id
     if author_id == 161774631303249921:
         await ctx.send("I need to go take a shit")
@@ -224,7 +265,6 @@ async def shutdown(ctx):
             await ctx.send("y tho")
         elif num == 1:
             await ctx.send("no u")
-    
 
 
 bot.run(token)
