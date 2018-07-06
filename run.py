@@ -5,10 +5,9 @@ import time
 from datetime import datetime
 import discord
 from discord.ext import commands
-prefix = 'w.'
-bot = commands.Bot(command_prefix=prefix)
 from settings import token
 
+bot = commands.Bot(command_prefix='w.')
 launch_time = datetime.utcnow()
 
 
@@ -236,6 +235,8 @@ async def calc(ctx, *, equation: str=None):
 async def on_message(message):
     if message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
         await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
+    if "shrug" in message.content.lower():
+        await message.channel.send("¯\\_(ツ)_/¯")
     await bot.process_commands(message)
 
 
