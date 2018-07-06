@@ -44,7 +44,7 @@ async def uptime(ctx):
     hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
     minutes, seconds = divmod(remainder, 60)
     days, hours = divmod(hours, 24)
-    await ctx.send(f"{days}d, {hours}h, {minutes}m, {seconds}s")
+    await ctx.send(f"{days}d {hours}h {minutes}m {seconds}s")
 
 
 @bot.command()
@@ -60,23 +60,36 @@ async def servers(ctx):
 
 
 @bot.command()
-async def serverinfo(ctx, num: str=None):
+async def serverinfo(ctx, search: str=None):
     '''
     Gives info of a server WillaBot is in. Gives current server info if [server number] not specified. 
     '''
-    if num is None:
+    if search is None:
         title = ctx.guild.name
         member_count = str(len(ctx.guild.members))
         icon_url = ctx.guild.icon_url
     else:
         try:
-            num = int(num)
+            search = int(search)
         except:
-            await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(bot.guilds)))
-            return
+            server_lst = bot.guilds
+            ind = 0
+            found = False
+            while found == False and ind < len(server_lst):
+                curr_server = server_lst[ind]
+                if search.lower().replace(" ", "") in curr_server.name.lower().replace(" ", ""):
+                    title = curr_server.name
+                    member_count = str(len(ctx.guild.members))
+                    icon_url = curr_server.icon_url
+                    found = True
+                else:
+                    ind += 1
+            if found == False:
+                await ctx.send("Could not find server named \"" + search + "\"")
+                return
         else:
-            if 1 <= num <= len(bot.guilds):
-                server = bot.guilds[num-1]
+            if 1 <= search <= len(bot.guilds):
+                server = bot.guilds[search-1]
                 title = server.name
                 member_count = str(len(server.members))
                 icon_url = server.icon_url
@@ -100,15 +113,31 @@ async def echo(ctx):
             await ctx.send(content)
 
 @echo.command()
-async def erase(ctx, *, content: str):
+async def erase(ctx, *, content: str=None):
     '''
     Repeats [message] and erases the original message
     '''
-    try:
-        await ctx.message.delete()
-        await ctx.send(content)
-    except:
-        await ctx.send("I don't have permission to delete messages!")
+    if len(ctx.message.mentions) == 0 and content is not None:
+        try:
+            await ctx.message.delete()
+            await ctx.send(content)
+        except:
+            await ctx.send("I don't have permission to delete messages!")
+    else:
+        if content is None:
+            return
+        else:
+            mentioned_msg = ctx.message.content
+            space_ind = mentioned_msg.find(" ", 10)
+            mentioned_msg = mentioned_msg[space_ind+1:]
+            lst_members_mentions = [member.mention for member in ctx.message.mentions]
+            description = ctx.message.author.mention + " pinged " + ', '.join(lst_members_mentions) + " and tried to run away"
+            embed = discord.Embed(description=description, color=0xff0000)
+            embed.set_thumbnail(url="http://www.pngall.com/wp-content/uploads/2017/05/Alert-Download-PNG.png")
+            embed.add_field(name="Message:", value="*\"" + mentioned_msg + "\"*", inline=True)
+            embed.set_author(name=str(ctx.message.author), icon_url=ctx.message.author.avatar_url)
+            embed.set_footer(text="*Pinging people and running away is a dick move.")
+            await ctx.send(embed=embed)
 
 
 @bot.command()
@@ -129,6 +158,7 @@ def get_pfp(member):
     embed = discord.Embed(title=title, color=color)
     embed.set_image(url=pic_url)
     return embed
+
 
 @bot.command()
 async def pfp(ctx, *, user: str=None):
@@ -164,39 +194,10 @@ async def pfp(ctx, *, user: str=None):
             await ctx.send("Could not find user named \"" + user + "\"")
 
 
-# mute = False
-# def stfu_helper(mute):
-#     if mute == False:
-#         mute = True
-#     else:
-#         mute = False
-
-# @bot.command()
-# async def stfu(ctx):
-    '''
-    Toggles all commands that don't use the prefix
-    '''
-#     stfu_helper(mute)
-#     if mute == False:
-#         await ctx.send("WillaBot is now free to talk!")
-#     elif mute == True:
-#         await ctx.send("WillaBot will now shut the fuck up.")
-
-
-@bot.event
-async def on_message_delete(message):
-    if not message.author.bot and not mute:
-        user = message.author
-        msg = message.content
-        await message.channel.send(str(user.mention) + " said \"" + msg + "\" and tried to delete it")
-
-
 @bot.event
 async def on_message(message):
     if message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
         await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
-    elif bot.user.mentioned_in(message) and not message.author.bot and not mute:
-        await message.channel.send("Please don't ping me " + message.author.mention + ", I'm a busy bot. Try 'w.help' instead.")
     await bot.process_commands(message)
 
 
@@ -209,6 +210,21 @@ async def on_ready():
     print('------')
     game = discord.Game("w.help")
     await bot.change_presence(status=discord.Status.online, activity=game)
+
+
+@bot.command()
+async def shutdown(ctx):
+    author_id = ctx.message.author.id
+    if author_id == 161774631303249921:
+        await ctx.send("I need to go take a shit")
+        await bot.close()
+    else:
+        num = random.randint(0, 1)
+        if num == 0:
+            await ctx.send("y tho")
+        elif num == 1:
+            await ctx.send("no u")
+    
 
 
 bot.run(token)
