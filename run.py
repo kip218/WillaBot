@@ -1,6 +1,5 @@
 import random
 import sqlite3
-import time
 from datetime import datetime
 import discord
 from discord.ext import commands
@@ -56,7 +55,7 @@ async def servers(ctx):
 @bot.command(aliases=["server"])
 async def serverinfo(ctx, search: str=None):
     '''
-    Gives info of a server WillaBot is in. Gives current server info if [server number] not specified. 
+    Gives info of a server WillaBot is in. Gives current server info if [server number] not specified.
     '''
     if search is None:
         title = ctx.guild.name
@@ -65,7 +64,7 @@ async def serverinfo(ctx, search: str=None):
     else:
         try:
             search = int(search)
-        except:
+        except TypeError:
             server_lst = bot.guilds
             ind = 0
             found = False
@@ -121,7 +120,7 @@ async def erase(ctx, *, content: str=None):
     if len(ctx.message.mentions) == 0 and content is not None:
         try:
             await ctx.message.delete()
-        except:
+        except EnvironmentError:
             await ctx.send("I don't have permission to delete messages!")
         else:
             await ctx.send(content)
@@ -173,21 +172,20 @@ async def invite(ctx):
     await ctx.send(embed=embed)
 
 
-# gets embed msg of member's avatar
-def get_pfp(member):
-    pic_url = member.avatar_url
-    title = 'Profile picture of ' + str(member)
-    color = member.color
-    embed = discord.Embed(title=title, color=color)
-    embed.set_image(url=pic_url)
-    return embed
-
-
 @bot.command()
 async def pfp(ctx, *, user: str=None):
     '''
     Sends [user]'s profile picture
     '''
+    # gets embed msg of member's avatar
+    def get_pfp(member):
+        pic_url = member.avatar_url
+        title = 'Profile picture of ' + str(member)
+        color = member.color
+        embed = discord.Embed(title=title, color=color)
+        embed.set_image(url=pic_url)
+        return embed
+
     if user is None:
         member = ctx.message.author
         embed = get_pfp(member)
@@ -198,7 +196,7 @@ async def pfp(ctx, *, user: str=None):
         await ctx.send(embed=embed)
     else:
         lst_members = ctx.guild.members
-        #loop to search name
+        # loop to search name
         ind = 0
         found = False
         while found == False and ind < len(lst_members):
@@ -213,7 +211,7 @@ async def pfp(ctx, *, user: str=None):
                 found = True
             else:
                 ind += 1
-        if found == False:
+        if found is False:
             await ctx.send("Could not find user named \"" + user + "\"")
 
 
@@ -226,7 +224,7 @@ async def calc(ctx, *, equation: str=None):
     equation = equation.replace("x", "*")
     try:
         res = eval(equation)
-    except:
+    except SyntaxError:
         await ctx.send("Invalid input.")
     else:
         await ctx.send(res)
