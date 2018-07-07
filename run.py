@@ -53,7 +53,7 @@ async def servers(ctx):
     await ctx.send("WillaBot is currently exploring " + str(num) + " different servers with " + str(total_users) + " users!")
 
 
-@bot.command()
+@bot.command(aliases=["server"])
 async def serverinfo(ctx, search: str=None):
     '''
     Gives info of a server WillaBot is in. Gives current server info if [server number] not specified. 
@@ -220,7 +220,7 @@ async def pfp(ctx, *, user: str=None):
 @bot.command()
 async def calc(ctx, *, equation: str=None):
     '''
-    Calculates simple arithmetic operations used in python (+, -, x, /, ^)
+    Calculates simple arithmetic operations (+, -, x, /, ^)
     '''
     equation = equation.replace("^", "**")
     equation = equation.replace("x", "*")
@@ -285,7 +285,7 @@ async def shutdown(ctx):
     '''
     author_id = ctx.message.author.id
     if author_id == 161774631303249921:
-        await ctx.send("I need to go take a shit")
+        await ctx.send("I need to go take a shit brb")
         await bot.close()
     else:
         num = random.randint(0, 1)
