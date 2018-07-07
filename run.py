@@ -221,8 +221,10 @@ async def pfp(ctx, *, user: str=None):
 @bot.command()
 async def calc(ctx, *, equation: str=None):
     '''
-    Calculates simple arithmetic operations used in python (+, -, *, /, **)
+    Calculates simple arithmetic operations used in python (+, -, x, /, ^)
     '''
+    equation = equation.replace("^", "**")
+    equation = equation.replace("x", "*")
     try:
         res = eval(equation)
     except:
