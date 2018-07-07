@@ -235,11 +235,11 @@ async def calc(ctx, *, equation: str=None):
 @bot.event
 async def on_message(message):
     # logging
-    time = str(datetime.utcnow().replace(microsecond=0))
+    time = str(message.created_at.replace(microsecond=0))
     user = message.author.name
-    msg = message.content
+    msg = message.clean_content
     channel = message.channel.name
-    server = message.channel.guild.name
+    server = message.guild.name
     print(time + "| " + server + "| " + channel + "| " + user + ": " + msg)
     if not message.author.bot:
         if message.content.lower() in ('what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'):
@@ -257,13 +257,19 @@ async def on_message(message):
 
 @bot.event
 async def on_connect():
+    connect_time = str(datetime.utcnow().replace(microsecond=0))
+    print("-------------------")
+    print(connect_time)
     print("Connected")
-    print("----------")
+    print("-------------------")
 
 
 @bot.event
 async def on_ready():
-    print(discord.__version__)
+    ready_time = str(datetime.utcnow().replace(microsecond=0))
+    print("-------------------")
+    print(ready_time)
+    print("Version: " + discord.__version__)
     print("Logged in as")
     print(bot.user.name)
     print(bot.user.id)
