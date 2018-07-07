@@ -235,6 +235,8 @@ async def calc(ctx, *, equation: str=None):
 
 @bot.event
 async def on_message(message):
+    #logging
+    print(message.author.name + ": " + message.content)
     if message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
         await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
     if "shrug" in message.content.lower():
