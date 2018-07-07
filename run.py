@@ -236,11 +236,15 @@ async def calc(ctx, *, equation: str=None):
 @bot.event
 async def on_message(message):
     #logging
-    print(message.author.name + ": " + message.content)
+    print(message.author.name + ": " + str(message.content)
     if message.content.lower() in ['what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'] and not message.author.bot:
         await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
     if "shrug" in message.content.lower():
         await message.channel.send("¯\\_(ツ)_/¯")
+    if "sosig" in message.content.lower():
+        embed = discord.Embed(color= 0x48d1cc)
+        embed.set_image(url="https://static.tumblr.com/90c42824de11581fb88945e0988e7510/gsvg9km/c9kov82iq/tumblr_static_tumblr_static__640.png")
+        await message.channel.send(embed=embed)
     await bot.process_commands(message)
 
 
