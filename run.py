@@ -235,7 +235,7 @@ async def calc(ctx, *, equation: str=None):
 @bot.event
 async def on_message(message):
     # logging
-    time = str(datetime.now().replace(microsecond=0))
+    time = str(datetime.utcnow().replace(microsecond=0))
     user = message.author.name
     msg = message.content
     channel = message.channel.name
