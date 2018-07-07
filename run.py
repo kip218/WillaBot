@@ -236,11 +236,11 @@ async def calc(ctx, *, equation: str=None):
 async def on_message(message):
     # logging
     time = str(message.created_at.replace(microsecond=0))
-    user = message.author.name
+    user = str(message.author)
     msg = message.clean_content
     channel = message.channel.name
     server = message.guild.name
-    print(time + "| " + server + "| " + channel + "| " + user + ": " + msg)
+    print("UTC" + time + "| " + server + "| " + channel + "| " + user + ": " + msg)
     if not message.author.bot:
         if message.content.lower() in ('what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'):
             await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
