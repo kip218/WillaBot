@@ -27,7 +27,7 @@ class Bot:
     @commands.command(aliases=["server"])
     async def serverinfo(self, ctx, search: str=None):
         '''
-        Gives info of server.
+        Gives info of server
         Name of the server can be specified to show info of that server.
         WillaBot needs to be a member of the server.
         Gives current server info if [server] not specified.
@@ -104,7 +104,7 @@ class Bot:
     @commands.command()
     async def invite(self, ctx):
         '''
-        Invite link for WillaBot. 
+        Invite link for WillaBot
         Help WillaBot explore different servers!
         '''
         embed = discord.Embed(
