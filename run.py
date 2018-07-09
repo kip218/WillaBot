@@ -44,7 +44,7 @@ async def on_message(message):
 
         if "sosig" in message.content.lower():
             embed = discord.Embed(color=0x48d1cc)
-            embed.set_thumbnail(url="https://static.tumblr.com/90c42824de11581fb88945e0988e7510/gsvg9km/c9kov82iq/tumblr_static_tumblr_static__640.png")
+            embed.set_image(url="https://static.tumblr.com/90c42824de11581fb88945e0988e7510/gsvg9km/c9kov82iq/tumblr_static_tumblr_static__640.png")
             await message.channel.send(embed=embed)
     await bot.process_commands(message)
 
