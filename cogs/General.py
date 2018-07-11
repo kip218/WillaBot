@@ -13,7 +13,9 @@ class General:
     @commands.command()
     async def pfp(self, ctx, *, user: str=None):
         '''
-        Sends [user]'s profile picture
+        Sends profile picture
+        w.pfp [user]
+        Sends your profile picture if [user] not specified.
         '''
         # gets embed msg of member's avatar
         def get_pfp(member):
@@ -56,7 +58,9 @@ class General:
     @commands.command(aliases=["math"])
     async def calc(self, ctx, *, equation: str=None):
         '''
-        Calculates simple arithmetic operations (+, -, x, /, ^)
+        Calculator for simple arithmetic operations (+, -, x, /, ^)
+        w.calc <algebraic expression>
+        A quick simple calculator for when you're feeling lazy.
         '''
         equation = equation.replace("^", "**")
         equation = equation.replace("x", "*")

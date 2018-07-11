@@ -16,7 +16,9 @@ class Bot:
     @commands.command()
     async def servers(self, ctx):
         '''
-        The number of servers and users using WillaBot
+        The number of servers using WillaBot
+        w.servers
+        Shows the number of servers and users using WillaBot.
         '''
         num = len(self.bot.guilds)
         total_users = 0
@@ -28,9 +30,10 @@ class Bot:
     async def serverinfo(self, ctx, search: str=None):
         '''
         Gives info of server
+        w.serverinfo [server name]
         Name of the server can be specified to show info of that server.
         WillaBot needs to be a member of the server.
-        Gives current server info if [server] not specified.
+        Gives current server info if [server name] not specified.
         '''
         if search is None:
             title = ctx.guild.name
@@ -77,6 +80,8 @@ class Bot:
     async def hello(self, ctx):
         '''
         Greet WillaBot!
+        w.hello
+        Say hi to WillaBot!
         '''
         await ctx.send('Hello ' + ctx.message.author.mention + '!')
 
@@ -84,6 +89,8 @@ class Bot:
     async def ping(self, ctx):
         '''
         WillaBot latency
+        w.ping
+        Checks WillaBot latency from host server.
         '''
         latency = int(self.bot.latency*1000)
         msg_lst = ['Pong! ', str(latency), 'ms']
@@ -94,6 +101,8 @@ class Bot:
     async def uptime(self, ctx):
         '''
         WillaBot uptime
+        w.uptime
+        Shows how long WillaBot has been online for.
         '''
         delta_uptime = datetime.utcnow() - launch_time
         hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
@@ -105,7 +114,8 @@ class Bot:
     async def invite(self, ctx):
         '''
         Invite link for WillaBot
-        Help WillaBot explore different servers!
+        w.invite
+        Invite Willabot to your server and help WillaBot explore different servers!
         '''
         embed = discord.Embed(
             title="Help WillaBot explore a new discord server!",

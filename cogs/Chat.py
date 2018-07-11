@@ -13,7 +13,9 @@ class Chat:
     @commands.group()
     async def echo(self, ctx):
         '''
-        Repeats [message]
+        Repeats message
+        w.echo <message>
+        Makes WillaBot repeat the message.
         '''
         if ctx.invoked_subcommand is None:
             content = ctx.message.content
@@ -25,7 +27,8 @@ class Chat:
     @echo.command(aliases=["erase", "del"])
     async def delete(self, ctx, *, content: str=None):
         '''
-        Repeats [message] and deletes the original message
+        Repeats message and deletes original message
+        w.echo delete <message>
         '''
         if len(ctx.message.mentions) == 0 and content is not None:
             try:

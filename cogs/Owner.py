@@ -15,6 +15,7 @@ class Owner:
     async def shutdown(self, ctx):
         '''
         Shut down WillaBot
+        w.shutdown
         '''
         author_id = ctx.message.author.id
         if author_id == 161774631303249921:
