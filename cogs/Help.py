@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from datetime import datetime
+import asyncio
 
 
 def format_help_page(bot, cog_name, curr_page, max_page):
@@ -13,7 +14,7 @@ def format_help_page(bot, cog_name, curr_page, max_page):
     embed.set_author(name="WillaBot", icon_url="https://cdn.discordapp.com/avatars/463398601553346581/16918503e6313c71fc023ac37233d992.webp?size=1024")
     embed.set_footer(text="Prefix is 'w.'")
     for command in lst_commands:
-        embed.add_field(name=command.name, value=command.short_doc)
+        embed.add_field(name=command.name, value=command.short_doc, inline=False)
     return embed
 
 
@@ -52,8 +53,8 @@ class Help:
         timeout = False
         while timeout is False:
             try:
-                reaction, user = await self.bot.wait_for('reaction_add', check=check)
-                time_now = datetime.utcnow()
+                done, pending = await asyncio.wait([self.bot.wait_for('reaction_add', check=check), self.bot.wait_for('reaction_remove', check=check)], return_when=asyncio.FIRST_COMPLETED)
+                reaction = done.pop().result()[0]
                 delta = datetime.utcnow() - start_time
                 if delta.total_seconds() > 120:
                     timeout = True
@@ -75,8 +76,6 @@ class Help:
                 new_ind = new_page_num - 1
                 new_embed = self.lst_cogs_embed[new_ind]
                 await help_page.edit(embed=new_embed)
-                await help_page.remove_reaction(emoji='\U0001F448', member=user)
-                await help_page.remove_reaction(emoji='\U0001F449', member=user)
 
     @help.error
     async def help_on_cooldown(self, ctx, error):
@@ -86,8 +85,6 @@ class Help:
             error_msg = error_msg[T_ind:]
             user = ctx.message.author
             await ctx.send("Slow down " + user.mention + "! The command is on cooldown! " + error_msg + ".")
-        elif isinstance(error, commands.CommandInvokeError):
-            await ctx.send("I don't have permission to edit messages!")
         else:
             await ctx.send("Unknown error. Please tell Willa.")
 

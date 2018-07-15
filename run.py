@@ -1,4 +1,3 @@
-import random
 import sqlite3
 from datetime import datetime
 import discord
@@ -7,11 +6,13 @@ from settings import token
 import sys
 import traceback
 
+
 initial_extensions = ['cogs.Chat',
                       'cogs.Bot',
                       'cogs.Owner',
                       'cogs.General',
-                      'cogs.Help']
+                      'cogs.Help',
+                      'cogs.Challonge']
 
 bot = commands.Bot(command_prefix='w.')
 bot.remove_command("help")
@@ -32,8 +33,12 @@ async def on_message(message):
     time = str(message.created_at.replace(microsecond=0))
     user = str(message.author)
     msg = message.clean_content
-    channel = message.channel.name
-    server = message.guild.name
+    if isinstance(message.channel, discord.TextChannel):
+        channel = message.channel.name
+        server = message.guild.name
+    elif isinstance(message.channel, discord.DMChannel):
+        channel = str(message.channel.recipient)
+        server = "DMChannel"
     print("UTC" + time + "| " + server + "| " + channel + "| " + user + ": " + msg)
     if not message.author.bot:
         if message.content.lower() in ('what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'):
