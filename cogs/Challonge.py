@@ -110,7 +110,7 @@ class Challonge:
                 else:
                     time_now = datetime.datetime.now(tz=tzlocal)
                     start_time = datetime.datetime(year, month, day, hour, minute, tzinfo=tzlocal)
-                    if start_time - time_now < 0:
+                    if (start_time - time_now).total_seconds() < 0:
                         await ctx.send("The starting time of the tournament must be in the future!")
                     else:
                         await question.edit(content="```Start time: " + answer.content + "```")
