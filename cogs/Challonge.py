@@ -108,7 +108,7 @@ class Challonge:
                 except:
                     await ctx.send("Invalid input. Please make sure you're following the format.")
                 else:
-                    time_now = datetime.datetime.utcnow()
+                    time_now = datetime.datetime.now(tz=tzlocal)
                     start_time = datetime.datetime(year, month, day, hour, minute, tzinfo=tzlocal)
                     if start_time - time_now < 0:
                         await ctx.send("The starting time of the tournament must be in the future!")
