@@ -53,6 +53,15 @@ class Challonge:
         def check(m):
             return not m.author.bot and m.channel == ctx.message.author.dm_channel
 
+        question = await ctx.message.author.send("What game is the tournament for?\n\n**Game name:** ")
+        try:
+            answer = await self.bot.wait_for('message', check=check, timeout=1800)
+        except:
+            await ctx.message.author.send("Sorry, something went wrong. Please tell Willa.")
+        else:
+            await question.edit(content="'''Game name: " + answer.content + "```")
+            game_name = answer.content
+
         question = await ctx.message.author.send("What is the name of the tournament?\n\n**Tournament name:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=1800)
@@ -144,7 +153,8 @@ class Challonge:
                                             description=description,
                                             start_at=start_time,
                                             check_in_duration=check_in,
-                                            open_signup=True
+                                            open_signup=True,
+                                            game_name=game_name
                                             )
             except:
                 print("Failed to create tournament")
