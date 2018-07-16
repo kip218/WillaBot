@@ -59,7 +59,7 @@ class Challonge:
         except:
             await ctx.message.author.send("Sorry, something went wrong. Please tell Willa.")
         else:
-            await question.edit(content="'''Game name: " + answer.content + "```")
+            await question.edit(content="```Game name: " + answer.content + "```")
             game_name = answer.content
 
         question = await ctx.message.author.send("What is the name of the tournament?\n\n**Tournament name:** ")
