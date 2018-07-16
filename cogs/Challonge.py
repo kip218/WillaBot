@@ -133,9 +133,10 @@ class Challonge:
                     answered = True
 
         created = False
-        while created is False:
+        counter = 0
+        while created is False and counter < 10:
             try:
-                url = ''.join(random.choice(string.ascii_uppercase + string.digits) for i in range(8))
+                url = ''.join(random.choice(string.ascii_lowercase + string.digits) for i in range(8))
                 created_tournament = challonge.tournaments.create(
                                             name=name,
                                             url=url,
@@ -147,6 +148,7 @@ class Challonge:
                                             )
             except:
                 print("Failed to create tournament")
+                counter += 1
             else:
                 await ctx.message.author.send("Your tournament has been created!\nTournament challonge link: https://challonge.com/" + url)
                 created = True
