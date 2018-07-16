@@ -47,7 +47,7 @@ class Challonge:
         try:
             await ctx.message.author.send("```Please answer the following questions in the appropriate format. Your tournament will be created after this process is done. The bot will time out if each question isn't answered within 30 minutes. Because the challonge function is still in development, please let Willa know if you encounter any errors!```")
         except:
-            await ctx.send("Something went wrong! Please tell Willa.")
+            await ctx.message.author.send("Something went wrong! Please tell Willa.")
             return
 
         def check(m):
@@ -75,7 +75,7 @@ class Challonge:
                     tournament_type = answer.content
                     answered = True
                 else:
-                    await ctx.send("Invalid input. Please choose from the options given, and make sure you don't have a typo.")
+                    await ctx.message.author.send("Invalid input. Please choose from the options given, and make sure you don't have a typo.")
 
         question = await ctx.message.author.send("**Tournament description:** ")
         try:
@@ -106,12 +106,12 @@ class Challonge:
                     minute = int(time_lst[1])
                     tzlocal = tz.tzoffset('UTC', timezone_offset*3600)
                 except:
-                    await ctx.send("Invalid input. Please make sure you're following the format.")
+                    await ctx.message.author.send("Invalid input. Please make sure you're following the format.")
                 else:
                     time_now = datetime.datetime.now(tz=tzlocal)
                     start_time = datetime.datetime(year, month, day, hour, minute, tzinfo=tzlocal)
                     if (start_time - time_now).total_seconds() < 0:
-                        await ctx.send("The starting time of the tournament must be in the future!")
+                        await ctx.message.author.send("The starting time of the tournament must be in the future!")
                     else:
                         await question.edit(content="```Start time: " + answer.content + "```")
                         answered = True
@@ -127,7 +127,7 @@ class Challonge:
                 try:
                     check_in = int(answer.content)
                 except:
-                    await ctx.send("Invalid input. Please input an integer.")
+                    await ctx.message.author.send("Invalid input. Please input an integer.")
                 else:
                     await question.edit(content="```Check-in duration: " + answer.content + "```")
                     answered = True
@@ -136,7 +136,6 @@ class Challonge:
         while created is False:
             try:
                 url = ''.join(random.choice(string.ascii_uppercase + string.digits) for i in range(8))
-                await ctx.send(url)
                 created_tournament = challonge.tournaments.create(
                                             name=name,
                                             url=url,
@@ -149,7 +148,7 @@ class Challonge:
             except:
                 print("Failed to create tournament")
             else:
-                await ctx.send("Your tournament has been created!\nTournament challonge link: https://challonge.com/" + url)
+                await ctx.message.author.send("Your tournament has been created!\nTournament challonge link: https://challonge.com/" + url)
                 created = True
 
     @chal.command()
