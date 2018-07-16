@@ -44,29 +44,27 @@ class Challonge:
 
     @chal.command()
     async def create(self, ctx):
-        try:
-            await ctx.message.author.send("```Please answer the following questions in the appropriate format. Your tournament will be created after this process is done. The bot will time out if each question isn't answered within 30 minutes. Because the challonge function is still in development, please let Willa know if you encounter any errors!```")
-        except:
-            await ctx.message.author.send("Something went wrong! Please tell Willa.")
-            return
+        await ctx.message.author.send("```Please answer the following questions in the appropriate format. Your tournament will be created after this process is done. The bot will time out if each question isn't answered within 10 minutes. Because the challonge function is still in development, please let Willa know if you encounter any errors!```")
 
         def check(m):
             return not m.author.bot and m.channel == ctx.message.author.dm_channel
 
         question = await ctx.message.author.send("What game is the tournament for?\n\n**Game name:** ")
         try:
-            answer = await self.bot.wait_for('message', check=check, timeout=1800)
+            answer = await self.bot.wait_for('message', check=check, timeout=600)
         except:
-            await ctx.message.author.send("Sorry, something went wrong. Please tell Willa.")
+            await question.edit(content="```The bot has timed out!```")
+            return
         else:
             await question.edit(content="```Game name: " + answer.content + "```")
             game_name = answer.content
 
         question = await ctx.message.author.send("What is the name of the tournament?\n\n**Tournament name:** ")
         try:
-            answer = await self.bot.wait_for('message', check=check, timeout=1800)
+            answer = await self.bot.wait_for('message', check=check, timeout=600)
         except:
-                await ctx.message.author.send("Sorry, something went wrong. Please tell Willa.")
+            await question.edit(content="```The bot has timed out!```")
+            return
         else:
             await question.edit(content="```Tournament name: " + answer.content + "```")
             name = answer.content
@@ -75,8 +73,9 @@ class Challonge:
         answered = False
         while answered is False:
             try:
-                answer = await self.bot.wait_for('message', check=check, timeout=1800)
+                answer = await self.bot.wait_for('message', check=check, timeout=600)
             except:
+                await question.edit(content="```The bot has timed out!```")
                 return
             else:
                 if answer.content.lower() == 'single elimination' or answer.content.lower() == 'double elimination':
@@ -88,58 +87,67 @@ class Challonge:
 
         question = await ctx.message.author.send("**Tournament description:** ")
         try:
-            answer = await self.bot.wait_for('message', check=check, timeout=1800)
+            answer = await self.bot.wait_for('message', check=check, timeout=600)
         except:
-            await ctx.message.author.send("Sorry, something went wrong. Please tell Willa.")
+            await question.edit(content="```The bot has timed out!```")
+            return
         else:
             await question.edit(content="```Tournament description: " + answer.content + "```")
             description = answer.content
 
-        question = await ctx.message.author.send("When will the tournament start?\n\n**Format:** \"year-month-day hour:minute UTCtimezone\"\n**Example response:** \"2018-07-15 16:30 +8\"\n\nIf you're not sure which timezone you're in: https://www.timeanddate.com/time/map/")
+        question = await ctx.message.author.send("When will the tournament start? Input \"None\" if there is no planned start time.\n\n**Format:** \"year-month-day hour:minute UTCtimezone\"\n**Example response:** \"2018-07-15 16:30 +8\"\n\nIf you're not sure which timezone you're in: https://www.timeanddate.com/time/map/")
         answered = False
         while answered is False:
             try:
-                answer = await self.bot.wait_for('message', check=check, timeout=1800)
+                answer = await self.bot.wait_for('message', check=check, timeout=600)
             except:
-                await ctx.message.author.send("Sorry, something went wrong. Please tell Willa.")
+                await question.edit(content="```The bot has timed out!```")
             else:
-                try:
-                    answer_lst = answer.content.split(" ")
-                    date_lst = answer_lst[0].split("-")
-                    time_lst = answer_lst[1].split(":")
-                    timezone_offset = int(answer_lst[2])
-                    year = int(date_lst[0])
-                    month = int(date_lst[1])
-                    day = int(date_lst[2])
-                    hour = int(time_lst[0])
-                    minute = int(time_lst[1])
-                    tzlocal = tz.tzoffset('UTC', timezone_offset*3600)
-                except:
-                    await ctx.message.author.send("Invalid input. Please make sure you're following the format.")
-                else:
-                    time_now = datetime.datetime.now(tz=tzlocal)
-                    start_time = datetime.datetime(year, month, day, hour, minute, tzinfo=tzlocal)
-                    if (start_time - time_now).total_seconds() < 0:
-                        await ctx.message.author.send("The starting time of the tournament must be in the future!")
+                if answer.content.lower() != "none":
+                    try:
+                        answer_lst = answer.content.split(" ")
+                        date_lst = answer_lst[0].split("-")
+                        time_lst = answer_lst[1].split(":")
+                        timezone_offset = int(answer_lst[2])
+                        year = int(date_lst[0])
+                        month = int(date_lst[1])
+                        day = int(date_lst[2])
+                        hour = int(time_lst[0])
+                        minute = int(time_lst[1])
+                        tzlocal = tz.tzoffset('UTC', timezone_offset*3600)
+                    except:
+                        await ctx.message.author.send("Invalid input. Please make sure you're following the format.")
                     else:
-                        await question.edit(content="```Start time: " + answer.content + "```")
-                        answered = True
-
-        question = await ctx.message.author.send("Check-in duration? (in minutes)\nExample response: \"60\"\n\n**Check-in duration:** ")
-        answered = False
-        while answered is False:
-            try:
-                answer = await self.bot.wait_for('message', check=check, timeout=1800)
-            except:
-                await ctx.message.author.send("Sorry, something went wrong. Please tell Willa.")
-            else:
-                try:
-                    check_in = int(answer.content)
-                except:
-                    await ctx.message.author.send("Invalid input. Please input an integer.")
+                        time_now = datetime.datetime.now(tz=tzlocal)
+                        start_time = datetime.datetime(year, month, day, hour, minute, tzinfo=tzlocal)
+                        if (start_time - time_now).total_seconds() < 0:
+                            await ctx.message.author.send("The starting time of the tournament must be in the future!")
+                        else:
+                            await question.edit(content="```Start time: " + answer.content + "```")
+                            answered = True
+                            start_time_none = False
                 else:
-                    await question.edit(content="```Check-in duration: " + answer.content + "```")
+                    start_time = None
+                    check_in = None
                     answered = True
+                    start_time_none = True
+
+        if start_time_none is False:
+            question = await ctx.message.author.send("Check-in duration? (in minutes)\nExample response: \"60\"\n\n**Check-in duration:** ")
+            answered = False
+            while answered is False:
+                try:
+                    answer = await self.bot.wait_for('message', check=check, timeout=1800)
+                except:
+                    await question.edit(content="```The bot has timed out!```")
+                else:
+                    try:
+                        check_in = int(answer.content)
+                    except:
+                        await ctx.message.author.send("Invalid input. Please input an integer.")
+                    else:
+                        await question.edit(content="```Check-in duration: " + answer.content + "```")
+                        answered = True
 
         created = False
         counter = 0
