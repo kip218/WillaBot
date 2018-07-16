@@ -174,28 +174,30 @@ class Challonge:
             await ctx.send("Tournament couldn't be found. Either the url is wrong, or the tournament wasn't created under my challonge account.")
             return
         else:
+            game_name = tournament['game_name']
             tournament_name = tournament['name']
-            tournament_id = tournament['id']
             participants_count = tournament['participants_count']
             img_url = tournament['live_image_url']
             start_time = tournament['start_at']
-            lst = []
-            for participant in participants:
-                nickname = participant['name']
-                challonge_username = participant['challonge_username']
-                pair = (nickname, challonge_username)
-                lst.append(str(pair))
             embed = discord.Embed(
                 title="challonge link",
-                description="Tournament ID: " + str(tournament_id),
+                description="Game: " + game_name,
                 url=url,
                 color=0x48d1cc
                 )
             embed.set_author(name=tournament_name)
             embed.set_thumbnail(url=img_url)
             embed.add_field(name="Start time", value=str(start_time), inline=False)
-            embed.add_field(name="Number of participants", value=participants_count, inline=False)
-            embed.add_field(name="List of participants (nickname, username)", value=', '.join(lst), inline=False)
+            embed.add_field(name="Number of participants", value=str(participants_count), inline=False)
+            if participants_count > 0:
+                lst = []
+                for participant in participants:
+                    nickname = participant['name']
+                    challonge_username = participant['challonge_username']
+                    pair = (nickname, challonge_username)
+                    lst.append(str(pair))
+                participants_string = ', '.join(lst)
+                embed.add_field(name="List of participants (nickname, username)", value=participants_string, inline=False)
             await ctx.send(embed=embed)
 
 
