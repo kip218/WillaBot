@@ -54,22 +54,22 @@ class General:
             if found is False:
                 await ctx.send("Could not find user named \"" + user + "\"")
 
-
-    @commands.command(aliases=["math"])
-    async def calc(self, ctx, *, equation: str=None):
-        '''
-        Calculator for simple arithmetic operations (+, -, x, /, ^)
-        w.calc <algebraic expression>
-        A quick simple calculator for when you're feeling lazy.
-        '''
-        equation = equation.replace("^", "**")
-        equation = equation.replace("x", "*")
-        try:
-            res = eval(equation)
-        except SyntaxError:
-            await ctx.send("Invalid input.")
-        else:
-            await ctx.send(res)
+# DON'T USE EVAL IT'S DANGEROUS
+    # @commands.command(aliases=["math"])
+    # async def calc(self, ctx, *, equation: str=None):
+    #     '''
+    #     Calculator for simple arithmetic operations (+, -, x, /, ^)
+    #     w.calc <algebraic expression>
+    #     A quick simple calculator for when you're feeling lazy.
+    #     '''
+    #     equation = equation.replace("^", "**")
+    #     equation = equation.replace("x", "*")
+    #     try:
+    #         res = eval(equation)
+    #     except SyntaxError:
+    #         await ctx.send("Invalid input.")
+    #     else:
+    #         await ctx.send(res)
 
 
 def setup(bot):
