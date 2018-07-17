@@ -42,7 +42,7 @@ class Bot:
         else:
             try:
                 search = int(search)
-            except TypeError:
+            except ValueError:
                 server_lst = self.bot.guilds
                 ind = 0
                 found = False
