@@ -2,30 +2,13 @@ import discord
 from discord.ext import commands
 import challonge
 from settings import challonge_token
-import sqlite3
 import datetime
 from dateutil import tz
 import random
 import string
+import sqlite3
 
 challonge.set_credentials("WillaBot", challonge_token)
-
-conn = sqlite3.connect("database.db")
-c = conn.cursor()
-
-create_tournaments_table = """ CREATE TABLE IF NOT EXISTS tournaments (
-                                    url text PRIMARY KEY,
-                                    name text NOT NULL,
-                                    ID text NOT NULL,
-                                    creator text NOT NULL,
-                                    admins text ,
-                                    ); """
-
-create_users_table = """ CREATE TABLE IF NOT EXISTS users (
-                                    user_id text PRIMARY KEY,
-                                    tournaments text,
-                                    challonge_id text,
-                                    ); """
 
 
 class Challonge:
@@ -44,11 +27,17 @@ class Challonge:
 
     @chal.command()
     async def create(self, ctx):
+        '''
+        Creates a new challonge tournament
+        w.chal create
+        '''
         await ctx.message.author.send("```Please answer the following questions in the appropriate format. Your tournament will be created after this process is done. The bot will time out if each question isn't answered within 10 minutes. Because the challonge function is still in development, please let Willa know if you encounter any errors!```")
 
+        # checking command invoker
         def check(m):
             return not m.author.bot and m.channel == ctx.message.author.dm_channel
 
+        # Game name
         question = await ctx.message.author.send("What game is the tournament for?\n\n**Game name:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
@@ -59,6 +48,7 @@ class Challonge:
             await question.edit(content="```Game name: " + answer.content + "```")
             game_name = answer.content
 
+        # Tournament name
         question = await ctx.message.author.send("What is the name of the tournament?\n\n**Tournament name:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
@@ -69,6 +59,7 @@ class Challonge:
             await question.edit(content="```Tournament name: " + answer.content + "```")
             name = answer.content
 
+        # Tournament type
         question = await ctx.message.author.send("Tournament type?\n\n**Options:** \n- 'single elimination'\n- 'double elimination'")
         answered = False
         while answered is False:
@@ -85,6 +76,7 @@ class Challonge:
                 else:
                     await ctx.message.author.send("Invalid input. Please choose from the options given, and make sure you don't have a typo.")
 
+        # Tournament description
         question = await ctx.message.author.send("**Tournament description:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
@@ -95,7 +87,8 @@ class Challonge:
             await question.edit(content="```Tournament description: " + answer.content + "```")
             description = answer.content
 
-        question = await ctx.message.author.send("When will the tournament start? Input \"None\" if there is no planned start time.\n\n**Format:** \"year-month-day hour:minute UTCtimezone\"\n**Example response:** \"2018-07-15 16:30 +8\"\n\nIf you're not sure which timezone you're in: https://www.timeanddate.com/time/map/")
+        # Start time
+        question = await ctx.message.author.send("When will the tournament start? Input \"None\" if there is no planned start time.\n\n**Format:** \"year-month-day hour:minute UTCtimezone\"\n**Example response:** \"2020-07-15 16:30 +8\"\n\nIf you're not sure which timezone you're in: https://www.timeanddate.com/time/map/")
         answered = False
         while answered is False:
             try:
@@ -132,6 +125,7 @@ class Challonge:
                     answered = True
                     start_time_none = True
 
+        # Check-in duration
         if start_time_none is False:
             question = await ctx.message.author.send("Check-in duration? (in minutes)\nExample response: \"60\"\n\n**Check-in duration:** ")
             answered = False
@@ -149,6 +143,7 @@ class Challonge:
                         await question.edit(content="```Check-in duration: " + answer.content + "```")
                         answered = True
 
+        # Creating tournament through challonge API
         created = False
         counter = 0
         while created is False and counter < 10:
@@ -171,8 +166,22 @@ class Challonge:
                 await ctx.message.author.send("Your tournament has been created!\nTournament challonge link: https://challonge.com/" + url)
                 created = True
 
+        # Updating database
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+        tournament = challonge.tournaments.show(url)
+        tournament_id = tournament['id']
+        c.execute("INSERT INTO tournaments VALUES (?, ?, ?, ?, ?)", (tournament_id, "https://challonge.com/" + url, name, ctx.message.author.id, None))
+        print("Inserted new tournament into database: " + str(tournament_id))
+        conn.commit()
+        conn.close()
+
     @chal.command()
     async def info(self, ctx, url):
+        '''
+        Gives information about the tournament
+        w.chal info <challonge url>
+        '''
         slash_ind = url.rfind("com/")
         url_tail = url[slash_ind+4:]
         try:
@@ -207,6 +216,47 @@ class Challonge:
                 participants_string = ', '.join(lst)
                 embed.add_field(name="List of participants (nickname, username)", value=participants_string, inline=False)
             await ctx.send(embed=embed)
+
+    @chal.command()
+    async def list(self, ctx):
+        '''
+        Your list of tournaments
+        w.chal list
+        '''
+        author_id = ctx.message.author.id
+        conn = sqlite3.connect('database.db')
+        c = conn.cursor()
+        try:
+            c.execute("SELECT * FROM tournaments WHERE creator_id=?", (author_id,))
+        except:
+            await ctx.send("Error")
+        else:
+            lst = []
+            string = ''
+            for tournament in c.fetchall():
+                lst.append(tournament[1])
+            for i in range(len(lst)):
+                string += str(i+1) + ") " + str(lst[i]) + "\n"
+            if string == '':
+                await ctx.send("You haven't created any tournaments!")
+            else:
+                await ctx.send(string)
+
+    # @chal.command()
+    # async def delete(self, ctx, url):
+    #     '''
+    #     Deletes a challonge tournament
+    #     w.chal delete <challonge url>
+    #     '''
+    #     slash_ind = url.rfind("com/")
+    #     url_tail = url[slash_ind+4:]
+    #     try:
+    #         tournament = challonge.tournaments.show(url_tail)
+    #         participants = challonge.participants.index(url_tail)
+    #     except:
+    #         await ctx.send("Tournament couldn't be found. Either the url is wrong, or the tournament wasn't created under my challonge account.")
+    #         return
+    #     else:
 
 
 def setup(bot):

@@ -7,12 +7,13 @@ import sys
 import traceback
 
 
+# Loading cogs (Help must always be last)
 initial_extensions = ['cogs.Chat',
                       'cogs.Bot',
                       'cogs.Owner',
                       'cogs.General',
-                      'cogs.Help',
-                      'cogs.Challonge']
+                      'cogs.Challonge',
+                      'cogs.Help']
 
 bot = commands.Bot(command_prefix='w.')
 bot.remove_command("help")
@@ -61,6 +62,20 @@ async def on_connect():
     print(connect_time)
     print("Connected")
     print("-------------------")
+
+    create_tournaments_table = """ CREATE TABLE IF NOT EXISTS tournaments (
+                                        ID int PRIMAY KEY,
+                                        url text NOT NULL,
+                                        name text NOT NULL,
+                                        creator_id text NOT NULL,
+                                        admins text
+                                        ); """
+
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute(create_tournaments_table)
+    conn.commit()
+    conn.close()
 
 
 @bot.event
