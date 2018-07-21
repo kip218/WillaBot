@@ -246,21 +246,21 @@ class Challonge:
             else:
                 await ctx.send(string)
 
-    @chal.command()
-    async def delete(self, ctx, url):
-        '''
-        Deletes a challonge tournament
-        w.chal delete <challonge url>
-        '''
-        slash_ind = url.rfind("com/")
-        url_tail = url[slash_ind+4:]
-        try:
-            tournament = challonge.tournaments.show(url_tail)
-            participants = challonge.participants.index(url_tail)
-        except:
-            await ctx.send("Tournament couldn't be found. Either the url is wrong, or the tournament wasn't created under my challonge account.")
-            return
-        else:
+    # @chal.command()
+    # async def delete(self, ctx, url):
+    #     '''
+    #     Deletes a challonge tournament
+    #     w.chal delete <challonge url>
+    #     '''
+    #     slash_ind = url.rfind("com/")
+    #     url_tail = url[slash_ind+4:]
+    #     try:
+    #         tournament = challonge.tournaments.show(url_tail)
+    #         participants = challonge.participants.index(url_tail)
+    #     except:
+    #         await ctx.send("Tournament couldn't be found. Either the url is wrong, or the tournament wasn't created under my challonge account.")
+    #         return
+    #     else:
 
 
 def setup(bot):
