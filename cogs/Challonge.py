@@ -28,7 +28,7 @@ class Challonge:
     @chal.command()
     async def create(self, ctx):
         '''
-        Creates a new challonge tournament
+        Create a new challonge tournament
         w.chal create
         '''
         await ctx.message.author.send("```Please answer the following questions in the appropriate format. Your tournament will be created after this process is done. The bot will time out if each question isn't answered within 10 minutes. Because the challonge function is still in development, please let Willa know if you encounter any errors!```")
@@ -111,14 +111,18 @@ class Challonge:
                     except:
                         await ctx.message.author.send("Invalid input. Please make sure you're following the format.")
                     else:
-                        time_now = datetime.datetime.now(tz=tzlocal)
-                        start_time = datetime.datetime(year, month, day, hour, minute, tzinfo=tzlocal)
-                        if (start_time - time_now).total_seconds() < 0:
-                            await ctx.message.author.send("The starting time of the tournament must be in the future!")
+                        try:
+                            time_now = datetime.datetime.now(tz=tzlocal)
+                            start_time = datetime.datetime(year, month, day, hour, minute, tzinfo=tzlocal)
+                        except:
+                            await ctx.message.author.send("Invalid input. Please check that the date is valid.")
                         else:
-                            await question.edit(content="```Start time: " + answer.content + "```")
-                            answered = True
-                            start_time_none = False
+                            if (start_time - time_now).total_seconds() < 0:
+                                await ctx.message.author.send("The starting time of the tournament must be in the future!")
+                            else:
+                                await question.edit(content="```Start time: " + answer.content + "```")
+                                answered = True
+                                start_time_none = False
                 else:
                     start_time = None
                     check_in = None
@@ -242,21 +246,21 @@ class Challonge:
             else:
                 await ctx.send(string)
 
-    # @chal.command()
-    # async def delete(self, ctx, url):
-    #     '''
-    #     Deletes a challonge tournament
-    #     w.chal delete <challonge url>
-    #     '''
-    #     slash_ind = url.rfind("com/")
-    #     url_tail = url[slash_ind+4:]
-    #     try:
-    #         tournament = challonge.tournaments.show(url_tail)
-    #         participants = challonge.participants.index(url_tail)
-    #     except:
-    #         await ctx.send("Tournament couldn't be found. Either the url is wrong, or the tournament wasn't created under my challonge account.")
-    #         return
-    #     else:
+    @chal.command()
+    async def delete(self, ctx, url):
+        '''
+        Deletes a challonge tournament
+        w.chal delete <challonge url>
+        '''
+        slash_ind = url.rfind("com/")
+        url_tail = url[slash_ind+4:]
+        try:
+            tournament = challonge.tournaments.show(url_tail)
+            participants = challonge.participants.index(url_tail)
+        except:
+            await ctx.send("Tournament couldn't be found. Either the url is wrong, or the tournament wasn't created under my challonge account.")
+            return
+        else:
 
 
 def setup(bot):
