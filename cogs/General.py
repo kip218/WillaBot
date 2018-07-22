@@ -60,7 +60,7 @@ class General:
         Get your daily Willacoins!
         w.daily
         '''
-        if self.bot.is_owner(ctx.message.author):
+        if await self.bot.is_owner(ctx.message.author):
             await ctx.send("You got 200 Willacoins!")
         else:
             await ctx.send("SIKE this is still work in progress you didn't get any Willacoins :joy:")
