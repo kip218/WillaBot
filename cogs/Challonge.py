@@ -150,19 +150,19 @@ class Challonge:
         # Creating tournament through challonge API
         created = False
         counter = 0
-        while created is False and counter < 10:
+        while created is False and counter < 20:
             try:
-                url = ''.join(random.choice(string.ascii_lowercase + string.digits) for i in range(8))
-                created_tournament = challonge.tournaments.create(
-                                            name=name,
-                                            url=url,
-                                            tournament_type=tournament_type,
-                                            description=description,
-                                            start_at=start_time,
-                                            check_in_duration=check_in,
-                                            open_signup=True,
-                                            game_name=game_name
-                                            )
+                url = ''.join(random.choice(string.ascii_lowercase + string.digits) for i in range(10))
+                challonge.tournaments.create(
+                                    name=name,
+                                    url=url,
+                                    tournament_type=tournament_type,
+                                    description=description,
+                                    start_at=start_time,
+                                    check_in_duration=check_in,
+                                    open_signup=True,
+                                    game_name=game_name
+                                    )
             except:
                 print("Failed to create tournament")
                 counter += 1
@@ -170,15 +170,15 @@ class Challonge:
                 await ctx.message.author.send("Your tournament has been created!\nTournament challonge link: https://challonge.com/" + url)
                 created = True
 
-        # Updating database
-        conn = sqlite3.connect('database.db')
-        c = conn.cursor()
-        tournament = challonge.tournaments.show(url)
-        tournament_id = tournament['id']
-        c.execute("INSERT INTO tournaments VALUES (?, ?, ?, ?, ?)", (tournament_id, "https://challonge.com/" + url, name, ctx.message.author.id, None))
-        print("Inserted new tournament into database: " + str(tournament_id))
-        conn.commit()
-        conn.close()
+                # Updating database
+                conn = sqlite3.connect('database.db')
+                c = conn.cursor()
+                tournament = challonge.tournaments.show(url)
+                tournament_id = tournament['id']
+                c.execute("INSERT INTO tournaments VALUES (?, ?, ?, ?, ?)", (tournament_id, "https://challonge.com/" + url, name, ctx.message.author.id, None))
+                print("Inserted new tournament into database: " + str(tournament_id))
+                conn.commit()
+                conn.close()
 
     @chal.command()
     async def info(self, ctx, url):
@@ -247,9 +247,9 @@ class Challonge:
                 await ctx.send(string)
 
     # @chal.command()
-    # async def delete(self, ctx, url):
+    # async def removes(self, ctx, url):
     #     '''
-    #     Deletes a challonge tournament
+    #     Removes a challonge tournament
     #     w.chal delete <challonge url>
     #     '''
     #     slash_ind = url.rfind("com/")
