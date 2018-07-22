@@ -54,6 +54,17 @@ class General:
             if found is False:
                 await ctx.send("Could not find user named \"" + user + "\"")
 
+    @commands.command()
+    async def daily(self, ctx):
+        '''
+        Get your daily Willacoins!
+        w.daily
+        '''
+        if self.bot.is_owner(ctx.message.author):
+            await ctx.send("You got 200 Willacoins!")
+        else:
+            await ctx.send("SIKE this is still work in progress you didn't get any Willacoins :joy:")
+
 # DON'T USE EVAL IT'S DANGEROUS
     # @commands.command(aliases=["math"])
     # async def calc(self, ctx, *, equation: str=None):

@@ -31,6 +31,7 @@ class Challonge:
         Create a new challonge tournament
         w.chal create
         '''
+        await ctx.message.author.send("Check your DM!")
         await ctx.message.author.send("```Please answer the following questions in the appropriate format. Your tournament will be created after this process is done. The bot will time out if each question isn't answered within 10 minutes. Because the challonge function is still in development, please let Willa know if you encounter any errors!```")
 
         # checking command invoker
