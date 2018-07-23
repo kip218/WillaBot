@@ -10,6 +10,7 @@ class Chat:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
     @commands.group()
     async def echo(self, ctx):
         '''
@@ -66,6 +67,17 @@ class Chat:
                     text="*Pinging people and running away is a dick move."
                     )
                 await ctx.send(embed=embed)
+
+    @echo.error
+    async def echo_on_cooldown(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            error_msg = str(error)
+            T_ind = error_msg.find("T")
+            error_msg = error_msg[T_ind:]
+            user = ctx.message.author
+            await ctx.send("Slow down " + user.mention + "! The command is on cooldown! " + error_msg + ".")
+        else:
+            await ctx.send("Unknown error. Please tell Willa.")
 
 
 def setup(bot):
