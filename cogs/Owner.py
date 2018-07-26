@@ -91,7 +91,7 @@ class Owner:
                                         ID int PRIMARY KEY,
                                         xp int,
                                         balance int,
-                                        tournament_id_list text[]
+                                        tournament_id_list text[],
                                         todo_list text[]
                                         ); """
 
