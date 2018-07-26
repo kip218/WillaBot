@@ -3,6 +3,7 @@ from discord.ext import commands
 import random
 import os
 import challonge
+from run.py import create_tournaments_table, create_users_table
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -46,10 +47,10 @@ class Owner:
         w.reset db
         '''
         if await self.bot.is_owner(ctx.message.author):
-            await ctx.send("Resetting database...")
             # conn = psycopg2.connect(database='willabot_db')
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
+            await ctx.send("Resetting database...")
             c.execute("DELETE FROM tournaments;")
             c.execute("DELETE FROM users;")
             conn.commit()
@@ -71,30 +72,14 @@ class Owner:
         w.reset drop
         '''
         if await self.bot.is_owner(ctx.message.author):
-            await ctx.send("Dropping tables...")
             # conn = psycopg2.connect(database='willabot_db')
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            await ctx.send("Dropping tables...")
             c = conn.cursor()
             c.execute("DROP TABLE IF EXISTS tournaments, users;")
             await ctx.send("Tables dropped.")
+
             await ctx.send("Recreating tables...")
-
-            # Tables must be exactly same as the ones in run.py
-            create_tournaments_table = """ CREATE TABLE IF NOT EXISTS tournaments (
-                                        ID int PRIMARY KEY,
-                                        url text NOT NULL,
-                                        name text NOT NULL,
-                                        creator_id text NOT NULL,
-                                        admin_list text[]
-                                        ); """
-            create_users_table = """ CREATE TABLE IF NOT EXISTS users (
-                                        ID int PRIMARY KEY,
-                                        xp int,
-                                        balance int,
-                                        tournament_id_list text[],
-                                        todo_list text[]
-                                        ); """
-
             c.execute(create_tournaments_table)
             c.execute(create_users_table)
             conn.commit()

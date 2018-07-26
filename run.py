@@ -78,7 +78,7 @@ async def on_connect():
                                         ID int PRIMARY KEY,
                                         xp int,
                                         balance int,
-                                        tournament_id_list text[],
+                                        tournament_id_list int[],
                                         todo_list text[]
                                         ); """
 
