@@ -83,9 +83,9 @@ class General:
         embed.add_field(name="WillaCoins", value=profile_lst[2])
         embed.set_author(name=profile_lst[0])
         embed.set_thumbnail(url=ctx.message.author.avatar_url)
-        c.commit()
-        c.close()
         await ctx.send(embed=embed)
+        conn.commit()
+        conn.close()
 
 
 # DON'T USE EVAL IT'S DANGEROUS
