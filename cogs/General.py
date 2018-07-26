@@ -55,7 +55,7 @@ class General:
                 else:
                     ind += 1
             if found is False:
-                await ctx.send("Could not find user named \"" + user + "\"")
+                await ctx.send("Could not find user named \"" + user + "\" in the server.")
             else:
                 embed = get_pfp(member)
                 await ctx.send(embed=embed)
@@ -133,6 +133,8 @@ class General:
                 except:
                     await ctx.send("Could not find user.")
                     return
+            else:
+                await ctx.send("Bots don't have profiles!")
         else:
             lst_members = ctx.guild.members
             # loop to search name
@@ -149,13 +151,13 @@ class General:
                 else:
                     ind += 1
             if found is False:
-                await ctx.send("Could not find user named \"" + user + "\".")
+                await ctx.send("Could not find user named \"" + user + "\" in the server.")
             else:
                 try:
                     embed = get_profile(member)
                     await ctx.send(embed=embed)
                 except:
-                    await ctx.send("Could not find user name \"" + user + "\".")
+                    await ctx.send("Could not find user name \"" + user + "\" in the database.")
                     return
 
 # DON'T USE EVAL IT'S DANGEROUS
