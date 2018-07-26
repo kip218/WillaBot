@@ -153,12 +153,15 @@ class General:
             if found is False:
                 await ctx.send("Could not find user named \"" + user + "\" in the server.")
             else:
-                try:
-                    embed = get_profile(member)
-                    await ctx.send(embed=embed)
-                except:
-                    await ctx.send("Could not find user name \"" + user + "\" in the database.")
-                    return
+                if member.bot:
+                    await ctx.send(member.mention + "is a bot. Bots don't have profiles!")
+                else:
+                    try:
+                        embed = get_profile(member)
+                        await ctx.send(embed=embed)
+                    except:
+                        await ctx.send("Could not find user name \"" + user + "\" in the database.")
+                        return
 
 # DON'T USE EVAL IT'S DANGEROUS
     # @commands.command(aliases=["math"])
