@@ -59,7 +59,7 @@ async def on_message(message):
     c.execute(""" INSERT INTO users (ID, xp, balance)
                 VALUES (%s, %s, %s)
                 ON CONFLICT (ID)
-                DO NOTHING;""", (message.author.id, 0, 0))
+                DO NOTHING;""", (message.author.id, str(0), str(0))
 
     await bot.process_commands(message)
 
