@@ -130,7 +130,7 @@ class General:
                 try:
                     embed = get_profile(member)
                     await ctx.send(embed=embed)
-                except commands.CommandInvokeError:
+                except:
                     await ctx.send("Could not find user.")
                     return
         else:
@@ -154,7 +154,7 @@ class General:
                 try:
                     embed = get_profile(member)
                     await ctx.send(embed=embed)
-                except commands.CommandInvokeError:
+                except:
                     await ctx.send("Could not find user name \"" + user + "\".")
                     return
 
