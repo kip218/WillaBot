@@ -46,11 +46,11 @@ class General:
             found = False
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
-                if user.lower() in curr_member.display_name.lower():
+                if user.lower() in curr_member.name.lower():
                     embed = get_pfp(curr_member)
                     await ctx.send(embed=embed)
                     found = True
-                elif user.lower() in curr_member.name.lower():
+                elif user.lower() in curr_member.display_name.lower():
                     embed = get_pfp(curr_member)
                     await ctx.send(embed=embed)
                     found = True
@@ -109,7 +109,7 @@ class General:
                 embed.set_thumbnail(url=member.avatar_url)
                 conn.commit()
                 conn.close()
-            except:
+            except commands.CommandInvokeError:
                 print("get_profile Error")
                 return
             else:
@@ -120,14 +120,14 @@ class General:
             try:
                 embed = get_profile(member)
                 await ctx.send(embed=embed)
-            except:
+            except commands.CommandInvokeError:
                 return
         elif len(ctx.message.mentions) > 0:
             member = ctx.message.mentions[0]
             try:
                 embed = get_profile(member)
                 await ctx.send(embed=embed)
-            except:
+            except commands.CommandInvokeError:
                 return
         else:
             lst_members = ctx.guild.members
@@ -136,18 +136,18 @@ class General:
             found = False
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
-                if user.lower() in curr_member.display_name.lower():
+                if user.lower() in curr_member.name.lower():
                     try:
                         embed = get_profile(member)
                         await ctx.send(embed=embed)
-                    except:
+                    except commands.CommandInvokeError:
                         return
                     found = True
-                elif user.lower() in curr_member.name.lower():
+                elif user.lower() in curr_member.display_name.lower():
                     try:
                         embed = get_profile(member)
                         await ctx.send(embed=embed)
-                    except:
+                    except commands.CommandInvokeError:
                         return
                     found = True
                 else:

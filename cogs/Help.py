@@ -63,7 +63,7 @@ class Help:
                     if delta.total_seconds() > 120:
                         timeout = True
                         return
-                except SyntaxError:
+                except:
                     await ctx.send("Sorry, something went wrong. Please tell Willa.")
                 else:
                     if reaction.emoji == '\U0001F448':
