@@ -68,7 +68,7 @@ class General:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT daily_time, balance FROM users
-                    WHERE ID = %s; """, (str(ctx.message.author.id)))
+                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
         fetch = c.fetchone()
         timestamp = fetch[0]
         balance = fetch[1]
