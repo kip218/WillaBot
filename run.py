@@ -45,6 +45,7 @@ async def on_message(message):
         channel = str(message.channel.recipient)
         server = "DMChannel"
     print("UTC" + time + "| " + server + "| " + channel + "| " + user + ": " + msg)
+
     if not message.author.bot:
         if message.content.lower() in ('what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'):
             await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
@@ -52,10 +53,14 @@ async def on_message(message):
         if "shrug" in message.content.lower():
             await message.channel.send("¯\\_(ツ)_/¯")
 
-        if "sosig" in message.content.lower():
-            embed = discord.Embed(color=0x48d1cc)
-            embed.set_image(url="https://static.tumblr.com/90c42824de11581fb88945e0988e7510/gsvg9km/c9kov82iq/tumblr_static_tumblr_static__640.png")
-            await message.channel.send(embed=embed)
+    # add user to database
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    c = conn.cursor()
+    c.execute(""" INSERT INTO users (ID, xp, balance)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (ID)
+                DO NOTHING;""", (message.author.id, 0, 0))
+
     await bot.process_commands(message)
 
 
@@ -77,8 +82,8 @@ async def on_connect():
 
     create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                         ID int PRIMARY KEY,
-                                        xp int,
-                                        balance int,
+                                        xp int NOT NULL,
+                                        balance int NOT NULL,
                                         tournament_id_list int[],
                                         todo_list text[]
                                         ); """
