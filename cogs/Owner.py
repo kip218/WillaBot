@@ -93,7 +93,8 @@ class Owner:
                                         xp text NOT NULL,
                                         balance text NOT NULL,
                                         tournament_url_list text[],
-                                        todo_list text[]
+                                        todo_list text[],
+                                        daily_time timestamp
                                         ); """
 
             c.execute(create_tournaments_table)

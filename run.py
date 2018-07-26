@@ -7,7 +7,6 @@ from settings import token
 import sys
 import traceback
 
-
 DATABASE_URL = os.environ['DATABASE_URL']
 
 # Loading cogs (Help must always be last)
@@ -88,7 +87,8 @@ async def on_connect():
                                         xp text NOT NULL,
                                         balance text NOT NULL,
                                         tournament_url_list text[],
-                                        todo_list text[]
+                                        todo_list text[],
+                                        daily_time timestamp
                                         ); """
 
     # conn = psycopg2.connect(database='willabot_db')
