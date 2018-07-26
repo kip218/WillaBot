@@ -59,36 +59,36 @@ class General:
             if found is False:
                 await ctx.send("Could not find user named \"" + user + "\"")
 
-    @commands.command()
-    async def daily(self, ctx):
-        '''
-        Get your daily Willacoins!
-        w.daily
-        '''
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        c = conn.cursor()
-        c.execute(""" SELECT daily_time, balance FROM users
-                    WHERE ID = %s; """, (str(ctx.message.author.id)))
-        fetch = c.fetchone()
-        timestamp = fetch[0]
-        balance = fetch[1]
-        if timestamp is None:
-            balance += 200
-            timestamp = datetime.utcnow()
-            c.execute(""" UPDATE users
-                        SET daily_time = %s, balance = %s; """, (timestamp, balance))
-            await ctx.send("You got 200 WillaCoins!")
-        else:
-            delta = datetime.utcnow() - timestamp
-            if delta.total_seconds() > 86400:
-                balance += 200
-                timestamp = datetime.utcnow()
-                c.execute(""" UPDATE users
-                            SET daily_time = %s, balance = %s; """, (timestamp, balance))
-            else:
-                await ctx.send("Daily WillaCoins can only be claimed once every 24 hours!")
-        conn.commit()
-        conn.close()
+    # @commands.command()
+    # async def daily(self, ctx):
+    #     '''
+    #     Get your daily Willacoins!
+    #     w.daily
+    #     '''
+    #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    #     c = conn.cursor()
+    #     c.execute(""" SELECT daily_time, balance FROM users
+    #                 WHERE ID = %s; """, (str(ctx.message.author.id)))
+    #     fetch = c.fetchone()
+    #     timestamp = fetch[0]
+    #     balance = fetch[1]
+    #     if timestamp is None:
+    #         balance += 200
+    #         timestamp = datetime.utcnow()
+    #         c.execute(""" UPDATE users
+    #                     SET daily_time = %s, balance = %s; """, (timestamp, balance))
+    #         await ctx.send("You got 200 WillaCoins!")
+    #     else:
+    #         delta = datetime.utcnow() - timestamp
+    #         if delta.total_seconds() > 86400:
+    #             balance += 200
+    #             timestamp = datetime.utcnow()
+    #             c.execute(""" UPDATE users
+    #                         SET daily_time = %s, balance = %s; """, (timestamp, balance))
+    #         else:
+    #             await ctx.send("Daily WillaCoins can only be claimed once every 24 hours!")
+    #     conn.commit()
+    #     conn.close()
 
     @commands.command()
     async def profile(self, ctx, *, user: str=None):
