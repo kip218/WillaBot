@@ -81,17 +81,17 @@ class Owner:
 
             # Tables must be exactly same as the ones in run.py
             create_tournaments_table = """ CREATE TABLE IF NOT EXISTS tournaments (
-                                        ID int PRIMARY KEY,
+                                        ID text PRIMARY KEY,
                                         url text NOT NULL,
                                         name text NOT NULL,
                                         creator_id text NOT NULL,
                                         admin_list text[]
                                         ); """
             create_users_table = """ CREATE TABLE IF NOT EXISTS users (
-                                        ID int PRIMARY KEY,
-                                        xp int,
-                                        balance int,
-                                        tournament_id_list int[],
+                                        ID text PRIMARY KEY,
+                                        xp text,
+                                        balance text,
+                                        tournament_id_list text[],
                                         todo_list text[]
                                         ); """
 
