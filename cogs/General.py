@@ -119,16 +119,16 @@ class General:
             member = ctx.message.author
             try:
                 embed = get_profile(member)
+                await ctx.send(embed=embed)
             except:
                 return
-            await ctx.send(embed=embed)
         elif len(ctx.message.mentions) > 0:
             member = ctx.message.mentions[0]
             try:
                 embed = get_profile(member)
+                await ctx.send(embed=embed)
             except:
                 return
-            await ctx.send(embed=embed)
         else:
             lst_members = ctx.guild.members
             # loop to search name
@@ -139,16 +139,16 @@ class General:
                 if user.lower() in curr_member.display_name.lower():
                     try:
                         embed = get_profile(member)
+                        await ctx.send(embed=embed)
                     except:
                         return
-                    await ctx.send(embed=embed)
                     found = True
                 elif user.lower() in curr_member.name.lower():
                     try:
                         embed = get_profile(member)
+                        await ctx.send(embed=embed)
                     except:
                         return
-                    await ctx.send(embed=embed)
                     found = True
                 else:
                     ind += 1
