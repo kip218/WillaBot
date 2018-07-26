@@ -75,7 +75,7 @@ class Owner:
             # conn = psycopg2.connect(database='willabot_db')
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
-            c.execute("DROP TABLE IF NOT EXISTS tournaments, users;")
+            c.execute("DROP TABLE IF EXISTS tournaments, users;")
             await ctx.send("Tables dropped.")
             await ctx.send("Recreating tables...")
 
