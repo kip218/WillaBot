@@ -59,7 +59,7 @@ async def on_message(message):
     c.execute(""" INSERT INTO users (ID, xp, balance)
                 VALUES (%s, %s, %s)
                 ON CONFLICT (ID)
-                DO NOTHING;""", (message.author.id, str(0), str(0))
+                DO NOTHING;""", (str(message.author.id), str(0), str(0)))
 
     await bot.process_commands(message)
 
@@ -73,7 +73,7 @@ async def on_connect():
     print("-------------------")
 
     create_tournaments_table = """ CREATE TABLE IF NOT EXISTS tournaments (
-                                        ID int PRIMARY KEY,
+                                        ID text PRIMARY KEY,
                                         url text NOT NULL,
                                         name text NOT NULL,
                                         creator_id text NOT NULL,
@@ -81,10 +81,10 @@ async def on_connect():
                                         ); """
 
     create_users_table = """ CREATE TABLE IF NOT EXISTS users (
-                                        ID int PRIMARY KEY,
-                                        xp int NOT NULL,
-                                        balance int NOT NULL,
-                                        tournament_id_list int[],
+                                        ID text PRIMARY KEY,
+                                        xp text NOT NULL,
+                                        balance text NOT NULL,
+                                        tournament_id_list text[],
                                         todo_list text[]
                                         ); """
 
