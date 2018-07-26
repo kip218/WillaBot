@@ -54,12 +54,12 @@ async def on_message(message):
             await message.channel.send("¯\\_(ツ)_/¯")
 
     # add user to database
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    c = conn.cursor()
-    c.execute(""" INSERT INTO users (ID, xp, balance)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (ID)
-                DO NOTHING;""", (str(message.author.id), str(0), str(0)))
+    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    # c = conn.cursor()
+    # c.execute(""" INSERT INTO users (ID, xp, balance)
+    #             VALUES (%s, %s, %s)
+    #             ON CONFLICT (ID)
+    #             DO NOTHING;""", (message.author.id, 0, 0))
 
     await bot.process_commands(message)
 
