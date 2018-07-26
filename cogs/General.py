@@ -71,7 +71,7 @@ class General:
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
         fetch = c.fetchone()
         timestamp = fetch[0]
-        balance = fetch[1]
+        balance = int(fetch[1])
         if timestamp is None:
             balance += 200
             timestamp = datetime.utcnow()
