@@ -76,8 +76,8 @@ async def on_connect():
 
     create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                         ID int PRIMARY KEY,
-                                        xp int 0,
-                                        balance int 0
+                                        xp int,
+                                        balance int
                                         ); """
 
     # conn = psycopg2.connect(database='willabot_db')
