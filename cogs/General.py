@@ -79,7 +79,7 @@ class General:
         c.execute(""" SELECT username, xp, balance FROM users
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
         profile_lst = c.fetchone()
-        embed = discord.embed(title="XP", description=profile_lst[1], color=ctx.message.author.color)
+        embed = discord.Embed(title="XP", description=profile_lst[1], color=ctx.message.author.color)
         embed.add_field(name="WillaCoins", value=profile_lst[2])
         embed.set_author(name=profile_lst[0])
         embed.set_thumbnail(url=ctx.message.author.avatar_url)
