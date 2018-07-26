@@ -79,6 +79,9 @@ class General:
             c.execute(""" UPDATE users
                         SET daily_time = %s, balance = %s; """, (timestamp, balance))
             await ctx.send("You got 200 WillaCoins!")
+
+            # Logging use of command
+            print(ctx.message.author.name + " has claimed daily for the first time!")
         else:
             delta = datetime.utcnow() - timestamp
             if delta.total_seconds() > 86400:
@@ -154,7 +157,7 @@ class General:
                 await ctx.send("Could not find user named \"" + user + "\" in the server.")
             else:
                 if member.bot:
-                    await ctx.send(member.mention + "is a bot. Bots don't have profiles!")
+                    await ctx.send(member.mention + " is a bot. Bots don't have profiles!")
                 else:
                     try:
                         embed = get_profile(member)
