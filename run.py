@@ -71,13 +71,15 @@ async def on_connect():
                                         url text NOT NULL,
                                         name text NOT NULL,
                                         creator_id text NOT NULL,
-                                        admins text
+                                        admin_list text[]
                                         ); """
 
     create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                         ID int PRIMARY KEY,
                                         xp int,
-                                        balance int
+                                        balance int,
+                                        tournament_id_list text[]
+                                        todo_list text[]
                                         ); """
 
     # conn = psycopg2.connect(database='willabot_db')
