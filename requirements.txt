@@ -4,3 +4,4 @@ discord
 pychal
 python-dateutil
 python-string-utils
+psycopg2
