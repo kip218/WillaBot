@@ -4,4 +4,4 @@ discord
 pychal
 python-dateutil
 python-string-utils
-psycopg2
+psycopg2-binary

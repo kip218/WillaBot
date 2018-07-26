@@ -8,8 +8,7 @@ import sys
 import traceback
 
 
-# DATABASE_URL = os.environ['DATABASE_URL']
-# conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+DATABASE_URL = os.environ['DATABASE_URL']
 
 # Loading cogs (Help must always be last)
 initial_extensions = ['cogs.Chat',
@@ -75,7 +74,8 @@ async def on_connect():
                                         admins text
                                         ); """
 
-    conn = psycopg2.connect(database='willabot_db')
+    # conn = psycopg2.connect(database='willabot_db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     c.execute(create_tournaments_table)
     conn.commit()

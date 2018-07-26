@@ -7,6 +7,9 @@ from dateutil import tz
 import random
 import string
 import psycopg2
+import os
+
+DATABASE_URL = os.environ['DATABASE_URL']
 
 challonge.set_credentials("WillaBot", challonge_token)
 
@@ -175,7 +178,8 @@ class Challonge:
                 created = True
 
                 # Updating database
-                conn = psycopg2.connect(database='willabot_db')
+                # conn = psycopg2.connect(database='willabot_db')
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
                 tournament = challonge.tournaments.show(url)
                 tournament_id = tournament['id']
@@ -233,11 +237,12 @@ class Challonge:
         w.chal list
         '''
         author_id = ctx.message.author.id
-        conn = psycopg2.connect(database='willabot_db')
+        # conn = psycopg2.connect(database='willabot_db')
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         try:
             c.execute("SELECT * FROM tournaments WHERE creator_id=%s", (str(author_id),))
-        except SyntaxError:
+        except:
             await ctx.send("Error")
         else:
             lst = []

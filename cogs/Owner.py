@@ -1,8 +1,10 @@
 import psycopg2
 from discord.ext import commands
 import random
-import sqlite3
+import os
 import challonge
+
+DATABASE_URL = os.environ['DATABASE_URL']
 
 
 class Owner:
@@ -45,7 +47,8 @@ class Owner:
         '''
         if await self.bot.is_owner(ctx.message.author):
             await ctx.send("Resetting database...")
-            conn = psycopg2.connect(database='willabot_db')
+            # conn = psycopg2.connect(database='willabot_db')
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
             c.execute("DELETE FROM tournaments;")
             conn.commit()
