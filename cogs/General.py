@@ -138,14 +138,14 @@ class General:
                 curr_member = lst_members[ind]
                 if user.lower() in curr_member.name.lower():
                     try:
-                        embed = get_profile(member)
+                        embed = get_profile(curr_member)
                         await ctx.send(embed=embed)
                     except commands.CommandInvokeError:
                         return
                     found = True
                 elif user.lower() in curr_member.display_name.lower():
                     try:
-                        embed = get_profile(member)
+                        embed = get_profile(curr_member)
                         await ctx.send(embed=embed)
                     except commands.CommandInvokeError:
                         return
