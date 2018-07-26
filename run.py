@@ -1,4 +1,5 @@
-import sqlite3
+import os
+import psycopg2
 from datetime import datetime
 import discord
 from discord.ext import commands
@@ -6,6 +7,9 @@ from settings import token
 import sys
 import traceback
 
+
+# DATABASE_URL = os.environ['DATABASE_URL']
+# conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 # Loading cogs (Help must always be last)
 initial_extensions = ['cogs.Chat',
@@ -64,14 +68,14 @@ async def on_connect():
     print("-------------------")
 
     create_tournaments_table = """ CREATE TABLE IF NOT EXISTS tournaments (
-                                        ID int PRIMAY KEY,
+                                        ID int PRIMARY KEY,
                                         url text NOT NULL,
                                         name text NOT NULL,
                                         creator_id text NOT NULL,
                                         admins text
                                         ); """
 
-    conn = sqlite3.connect('database.db')
+    conn = psycopg2.connect(database='willabot_db')
     c = conn.cursor()
     c.execute(create_tournaments_table)
     conn.commit()

@@ -6,7 +6,7 @@ import datetime
 from dateutil import tz
 import random
 import string
-import sqlite3
+import psycopg2
 
 challonge.set_credentials("WillaBot", challonge_token)
 
@@ -132,7 +132,7 @@ class Challonge:
 
         # Check-in duration
         if start_time_none is False:
-            question = await ctx.message.author.send("Check-in duration? (in minutes)\nExample response: \"60\"\n\n**Check-in duration:** ")
+            question = await ctx.message.author.send("Check-in duration? (in minutes & in multiples of 5)\nExample response: \"60\"\n\n**Check-in duration:** ")
             answered = False
             while answered is False:
                 try:
@@ -145,8 +145,11 @@ class Challonge:
                     except:
                         await ctx.message.author.send("Invalid input. Please input an integer.")
                     else:
-                        await question.edit(content="```Check-in duration: " + answer.content + "```")
-                        answered = True
+                        if check_in % 5 == 0:
+                            await question.edit(content="```Check-in duration: " + answer.content + "```")
+                            answered = True
+                        else:
+                            await ctx.message.author.send("Invalid input. Input must be in multiples of 5.")
 
         # Creating tournament through challonge API
         created = False
@@ -172,11 +175,12 @@ class Challonge:
                 created = True
 
                 # Updating database
-                conn = sqlite3.connect('database.db')
+                conn = psycopg2.connect(database='willabot_db')
                 c = conn.cursor()
                 tournament = challonge.tournaments.show(url)
                 tournament_id = tournament['id']
-                c.execute("INSERT INTO tournaments VALUES (?, ?, ?, ?, ?)", (tournament_id, "https://challonge.com/" + url, name, ctx.message.author.id, None))
+                c.execute("""INSERT INTO tournaments (ID, url, name, creator_id) 
+                            VALUES (%s, %s, %s, %s);""", (tournament_id, "https://challonge.com/" + url, name, ctx.message.author.id))
                 print("Inserted new tournament into database: " + str(tournament_id))
                 conn.commit()
                 conn.close()
@@ -229,11 +233,11 @@ class Challonge:
         w.chal list
         '''
         author_id = ctx.message.author.id
-        conn = sqlite3.connect('database.db')
+        conn = psycopg2.connect(database='willabot_db')
         c = conn.cursor()
         try:
-            c.execute("SELECT * FROM tournaments WHERE creator_id=?", (author_id,))
-        except:
+            c.execute("SELECT * FROM tournaments WHERE creator_id=%s", (str(author_id),))
+        except SyntaxError:
             await ctx.send("Error")
         else:
             lst = []

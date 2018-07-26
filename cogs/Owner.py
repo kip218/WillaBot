@@ -1,4 +1,4 @@
-import discord
+import psycopg2
 from discord.ext import commands
 import random
 import sqlite3
@@ -45,7 +45,7 @@ class Owner:
         '''
         if await self.bot.is_owner(ctx.message.author):
             await ctx.send("Resetting database...")
-            conn = sqlite3.connect('database.db')
+            conn = psycopg2.connect(database='willabot_db')
             c = conn.cursor()
             c.execute("DELETE FROM tournaments;")
             conn.commit()

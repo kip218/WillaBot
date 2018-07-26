@@ -80,7 +80,7 @@ class General:
         msg = await ctx.send("Choose a door to open (1, 2, 3)\n\n:one: :two: :three:\n:door: :door: :door:")
         answered = False
         while answered is False:
-            answer = await self.bot.wait_for('message', check=check, timeout=600)
+            answer = await self.bot.wait_for('message', check=check, timeout=180)
             try:
                 answer = int(answer.content)
                 options.remove(answer)
@@ -117,7 +117,7 @@ class General:
                 answered = True
                 switch_answered = False
                 while switch_answered is False:
-                    switch = await self.bot.wait_for('message', check=check, timeout=600)
+                    switch = await self.bot.wait_for('message', check=check, timeout=180)
                     if switch.content.lower() == 'y':
                         answer = options[0]
                         switch_answered = True
