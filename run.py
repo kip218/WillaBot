@@ -74,10 +74,17 @@ async def on_connect():
                                         admins text
                                         ); """
 
+    create_users_table = """ CREATE TABLE IF NOT EXISTS users (
+                                        ID int PRIMARY KEY,
+                                        xp int 0,
+                                        balance int 0
+                                        ); """
+
     # conn = psycopg2.connect(database='willabot_db')
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     c.execute(create_tournaments_table)
+    c.execute(create_users_table)
     conn.commit()
     conn.close()
 

@@ -50,7 +50,7 @@ class Owner:
             # conn = psycopg2.connect(database='willabot_db')
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
-            c.execute("DELETE FROM tournaments;")
+            c.execute("DROP TABLE tournaments, users;")
             conn.commit()
             conn.close()
             await ctx.send("Database reset.")
