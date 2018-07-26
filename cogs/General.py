@@ -109,7 +109,7 @@ class General:
                 embed.set_thumbnail(url=member.avatar_url)
                 conn.commit()
                 conn.close()
-            except commands.CommandInvokeError:
+            except TypeError:
                 print("get_profile Error")
                 return
             else:
