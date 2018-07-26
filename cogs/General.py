@@ -47,17 +47,18 @@ class General:
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
                 if user.lower() in curr_member.name.lower():
-                    embed = get_pfp(curr_member)
-                    await ctx.send(embed=embed)
+                    member = curr_member
                     found = True
                 elif user.lower() in curr_member.display_name.lower():
-                    embed = get_pfp(curr_member)
-                    await ctx.send(embed=embed)
+                    member = curr_member
                     found = True
                 else:
                     ind += 1
             if found is False:
                 await ctx.send("Could not find user named \"" + user + "\"")
+            else:
+                embed = get_pfp(member)
+                await ctx.send(embed=embed)
 
     @commands.command()
     async def daily(self, ctx):
@@ -121,14 +122,17 @@ class General:
                 embed = get_profile(member)
                 await ctx.send(embed=embed)
             except commands.CommandInvokeError:
+                await ctx.send("Error")
                 return
         elif len(ctx.message.mentions) > 0:
             member = ctx.message.mentions[0]
-            try:
-                embed = get_profile(member)
-                await ctx.send(embed=embed)
-            except commands.CommandInvokeError:
-                return
+            if not member.bot:
+                try:
+                    embed = get_profile(member)
+                    await ctx.send(embed=embed)
+                except commands.CommandInvokeError:
+                    await ctx.send("Could not find user.")
+                    return
         else:
             lst_members = ctx.guild.members
             # loop to search name
@@ -137,23 +141,22 @@ class General:
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
                 if user.lower() in curr_member.name.lower():
-                    try:
-                        embed = get_profile(curr_member)
-                        await ctx.send(embed=embed)
-                    except commands.CommandInvokeError:
-                        return
+                    member = curr_member
                     found = True
                 elif user.lower() in curr_member.display_name.lower():
-                    try:
-                        embed = get_profile(curr_member)
-                        await ctx.send(embed=embed)
-                    except commands.CommandInvokeError:
-                        return
+                    member = curr_member
                     found = True
                 else:
                     ind += 1
             if found is False:
-                await ctx.send("Could not find user named \"" + user + "\"")
+                await ctx.send("Could not find user named \"" + user + "\".")
+            else:
+                try:
+                    embed = get_profile(member)
+                    await ctx.send(embed=embed)
+                except commands.CommandInvokeError:
+                    await ctx.send("Could not find user name \"" + user + "\".")
+                    return
 
 # DON'T USE EVAL IT'S DANGEROUS
     # @commands.command(aliases=["math"])
