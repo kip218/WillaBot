@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
+import psycopg2
+import os
 
+DATABASE_URL = os.environ['DATABASE_URL']
 
 class General:
     '''
@@ -64,6 +67,25 @@ class General:
             await ctx.send("You got 200 Willacoins!")
         else:
             await ctx.send("SIKE this is still work in progress you didn't get any Willacoins :joy:")
+
+    @commands.command()
+    async def profile(self, ctx):
+        '''
+        Your profile
+        w.profile
+        '''
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT username, xp, balance FROM users
+                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
+        profile_lst = c.fetchone()
+        embed = discord.embed(title="XP", description=profile_lst[1], color=ctx.message.author.color)
+        embed.add_field(name="WillaCoins", value=profile_lst[2])
+        embed.set_author(name=profile_lst[0])
+        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        c.commit()
+        c.close()
+        await ctx.send(embed=embed)
 
 
 # DON'T USE EVAL IT'S DANGEROUS
