@@ -110,18 +110,24 @@ class General:
                 conn.commit()
                 conn.close()
             except:
-                print("Error")
+                print("get_profile Error")
                 return
             else:
                 return embed
 
         if user is None:
             member = ctx.message.author
-            embed = get_profile(member)
+            try:
+                embed = get_profile(member)
+            except:
+                return
             await ctx.send(embed=embed)
         elif len(ctx.message.mentions) > 0:
             member = ctx.message.mentions[0]
-            embed = get_profile(member)
+            try:
+                embed = get_profile(member)
+            except:
+                return
             await ctx.send(embed=embed)
         else:
             lst_members = ctx.guild.members
@@ -131,11 +137,17 @@ class General:
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
                 if user.lower() in curr_member.display_name.lower():
-                    embed = get_profile(curr_member)
+                    try:
+                        embed = get_profile(member)
+                    except:
+                        return
                     await ctx.send(embed=embed)
                     found = True
                 elif user.lower() in curr_member.name.lower():
-                    embed = get_profile(curr_member)
+                    try:
+                        embed = get_profile(member)
+                    except:
+                        return
                     await ctx.send(embed=embed)
                     found = True
                 else:
