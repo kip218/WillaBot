@@ -3,7 +3,7 @@ from discord.ext import commands
 import random
 import os
 import challonge
-from run.py import create_tournaments_table, create_users_table
+# from run.py import create_tournaments_table, create_users_table
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -80,8 +80,8 @@ class Owner:
             await ctx.send("Tables dropped.")
 
             await ctx.send("Recreating tables...")
-            c.execute(create_tournaments_table)
-            c.execute(create_users_table)
+            # c.execute(create_tournaments_table)
+            # c.execute(create_users_table)
             conn.commit()
             conn.close()
             await ctx.send("Tables created.")
