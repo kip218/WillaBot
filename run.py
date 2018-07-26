@@ -53,13 +53,13 @@ async def on_message(message):
         if "shrug" in message.content.lower():
             await message.channel.send("¯\\_(ツ)_/¯")
 
-    # add user to database
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    c = conn.cursor()
-    c.execute(""" INSERT INTO users (ID, xp, balance)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (ID)
-                DO NOTHING;""", (message.author.id, 0, 0))
+        # add user to database
+        # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # c = conn.cursor()
+        # c.execute(""" INSERT INTO users (ID, xp, balance)
+        #             VALUES (%s, %s, %s)
+        #             ON CONFLICT (ID)
+        #             DO NOTHING;""", (message.author.id, 0, 0))
 
     await bot.process_commands(message)
 
