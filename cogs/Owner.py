@@ -89,9 +89,10 @@ class Owner:
                                         ); """
             create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                         ID text PRIMARY KEY,
-                                        xp text,
-                                        balance text,
-                                        tournament_id_list text[],
+                                        username text NOT NULL,
+                                        xp text NOT NULL,
+                                        balance text NOT NULL,
+                                        tournament_url_list text[],
                                         todo_list text[]
                                         ); """
 

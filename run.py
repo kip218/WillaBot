@@ -56,10 +56,10 @@ async def on_message(message):
         # add user to database
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        c.execute(""" INSERT INTO users (ID, xp, balance)
-                    VALUES (%s, %s, %s)
+        c.execute(""" INSERT INTO users (ID, username, xp, balance)
+                    VALUES (%s, %s, %s, %s)
                     ON CONFLICT (ID)
-                    DO NOTHING;""", (message.author.id, 0, 0))
+                    DO NOTHING;""", (message.author.id, message.author.name, 0, 0))
         conn.commit()
         conn.close()
 
@@ -84,9 +84,10 @@ async def on_connect():
 
     create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                         ID text PRIMARY KEY,
+                                        username text NOT NULL,
                                         xp text NOT NULL,
                                         balance text NOT NULL,
-                                        tournament_id_list text[],
+                                        tournament_url_list text[],
                                         todo_list text[]
                                         ); """
 
