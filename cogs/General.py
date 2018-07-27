@@ -172,7 +172,7 @@ class General:
         w.todo <subcommand>
         '''
         if ctx.invoked_subcommand is None:
-            await ctx.send("Subcommands: list, add, remove, check")
+            await ctx.send("Subcommands: list, add, remove, check, clean")
 
     @todo.command()
     async def list(self, ctx):
@@ -186,7 +186,7 @@ class General:
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
         todo_list = c.fetchone()[0]
         if todo_list is None:
-            await ctx.send("Your to-do list is empty!")
+            await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
         else:
             description = ""
             for i in range(len(todo_list)):
@@ -204,10 +204,16 @@ class General:
         '''
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        c.execute(""" UPDATE users
-                    SET todo_list = array_append(todo_list, %s) 
-                    WHERE ID = %s; """, (str(task), str(ctx.message.author.id)))
-        await ctx.send("Added task: \"" + str(task) + "\"")
+        c.execute(""" SELECT todo_list FROM users
+                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
+        todo_list = c.fetchone()[0]
+        if task in todo_list:
+            await ctx.send(str(task) + " is already in your to-do list!")
+        else:
+            c.execute(""" UPDATE users
+                        SET todo_list = array_append(todo_list, %s) 
+                        WHERE ID = %s; """, (str(task), str(ctx.message.author.id)))
+            await ctx.send("Added task: \"" + str(task) + "\"")
         conn.commit()
         conn.close()
 
@@ -266,6 +272,21 @@ class General:
                             SET todo_list = array_replace(todo_list, %s, %s)
                             WHERE ID = %s; """, (task_to_check, "~~"+task_to_check+"~~", str(ctx.message.author.id)))
                 await ctx.send("Checked task: \"" + task_to_check + "\"")
+        conn.commit()
+        conn.close()
+
+    @todo.command()
+    async def clean(self, ctx):
+        '''
+        Completely cleans your to-do list
+        w.todo clean
+        '''
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" UPDATE users
+                    SET todo_list = Null
+                    WHERE ID = %s; """, (str(ctx.message.author.id)))
+        await ctx.send("Your to-do list has been cleaned.")
         conn.commit()
         conn.close()
 
