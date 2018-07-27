@@ -190,7 +190,7 @@ class General:
         else:
             description = ""
             for i in range(len(todo_list)):
-                description += "**" + str(i+1) + ")** " + todo_list[i] + "\n\n"
+                description += "**" + str(i+1) + ")** " + todo_list[i] + "\n"
             embed = discord.Embed(title=str(ctx.message.author.name) + "'s to-do list", description=description, color=0x48d1cc)
             await ctx.send(embed=embed)
         conn.commit()
@@ -207,6 +207,7 @@ class General:
         c.execute(""" UPDATE users
                     SET todo_list = array_append(todo_list, %s) 
                     WHERE ID = %s; """, (str(task), str(ctx.message.author.id)))
+        await ctx.send("Added task: \"" + str(task) + "\"")
         conn.commit()
         conn.close()
 
@@ -220,6 +221,7 @@ class General:
             num = int(num)
         except:
             await ctx.send("You must input an integer.")
+            return
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
@@ -230,11 +232,40 @@ class General:
             c.execute(""" UPDATE users
                         SET todo_list = array_remove(todo_list, %s)
                         WHERE ID = %s; """, (task_to_remove, str(ctx.message.author.id)))
+            await ctx.send("Removed task: \"" + task_to_remove + "\"")
         else:
             await ctx.send("You must input an integer between 1 and " + str(len(todo_list)))
         conn.commit()
         conn.close()
 
+    @todo.command()
+    async def check(self, ctx, num):
+        '''
+        Checks or unchecks a task from your to-do list
+        w.todo check <task number>
+        '''
+        try:
+            num = int(num)
+        except:
+            await ctx.send("You must input an integer.")
+            return
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT todo_list FROM users
+                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
+        todo_list = c.fetchone()[0]
+        if 1 <= num <= len(todo_list):
+            task_to_check = todo_list[num-1]
+            if task_to_check[:2] == "~~" and task_to_check[-2:] == "~~":
+                c.execute(""" UPDATE users
+                            SET todo_list = array_replace(todo_list, %s, %s)
+                            WHERE ID = %s; """, (task_to_check, task_to_check[2:-2], str(ctx.message.author.id)))
+                await ctx.send("Unchecked task: \"" + task_to_check[2:-2] + "\"")
+            else:
+                c.execute(""" UPDATE users
+                            SET todo_list = array_replace(todo_list, %s, %s)
+                            WHERE ID = %s; """, (task_to_check, "~~"+task_to_check+"~~", str(ctx.message.author.id)))
+                await ctx.send("Checked task: \"" + task_to_check + "\"")
 
 # DON'T USE EVAL IT'S DANGEROUS
     # @commands.command(aliases=["math"])
