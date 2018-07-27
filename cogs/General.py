@@ -208,7 +208,7 @@ class General:
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
         todo_list = c.fetchone()[0]
         if task in todo_list:
-            await ctx.send(str(task) + " is already in your to-do list!")
+            await ctx.send("\"" + str(task) + "\" is already in your to-do list!")
         else:
             c.execute(""" UPDATE users
                         SET todo_list = array_append(todo_list, %s) 
@@ -285,7 +285,7 @@ class General:
         c = conn.cursor()
         c.execute(""" UPDATE users
                     SET todo_list = Null
-                    WHERE ID = %s; """, (str(ctx.message.author.id)))
+                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
         await ctx.send("Your to-do list has been cleaned.")
         conn.commit()
         conn.close()
