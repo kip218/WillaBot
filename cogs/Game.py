@@ -1,5 +1,9 @@
 from discord.ext import commands
 import random
+import psycopg2
+import os
+
+DATABASE_URL = os.environ['DATABASE_URL']
 
 
 class Game:
@@ -86,6 +90,18 @@ class Game:
                             else:
                                 emotes += ":goat: "
                         if answer == car:
+                            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                            c = conn.cursor()
+                            c.execute(""" SELECT xp, balance FROM users
+                                        WHERE ID = %s; """, (str(ctx.message.author.id), ))
+                            fetch = c.fetchone()
+                            xp = int(fetch[0])
+                            balance = int(fetch[1])
+                            xp += random.randint(10, 20)
+                            balance += random.randint(20, 40)
+                            c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.message.author.id)))
+                            conn.commit()
+                            conn.close()
                             await msg.edit(content="You found the car!\n\n" + emotes)
                         else:
                             await msg.edit(content="You did not find the car. Try again!\n\n" + emotes)
