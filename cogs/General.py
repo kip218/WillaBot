@@ -190,7 +190,7 @@ class General:
         else:
             embed = discord.Embed(title=str(ctx.message.author.name) + "'s to-do list", color=0x48d1cc)
             for i in range(len(todo_list)):
-                embed.add_field(name=str(i+1) + ". " + todo_list[i], inline=False)
+                embed.add_field(name="Task " + str(i+1), value=todo_list[i], inline=False)
             await ctx.send(embed=embed)
         conn.commit()
         conn.close()
@@ -230,6 +230,7 @@ class General:
         if 1 <= num <= len(todo_list):
             print("4")
             task_to_remove = todo_list[num-1]
+            await ctx.send(task_to_remove)
             print("5")
             c.execute(""" UPDATE users
                         SET todo_list = array_remove(todo_list, %s)
