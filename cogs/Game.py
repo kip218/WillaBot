@@ -97,12 +97,14 @@ class Game:
                             fetch = c.fetchone()
                             xp = int(fetch[0])
                             balance = int(fetch[1])
-                            xp += random.randint(10, 20)
-                            balance += random.randint(20, 40)
+                            xp_increase = random.randint(10, 20)
+                            balance_increase = random.randint(20, 40)
+                            xp += xp_increase
+                            balance += balance_increase
                             c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.message.author.id)))
                             conn.commit()
                             conn.close()
-                            await msg.edit(content="You found the car!\n\n" + emotes)
+                            await msg.edit(content="You found the car!\n\nYou got " + str(xp_increase) + " XP and " + str(balance_increase) + " WillaCoins.\n\n" + emotes)
                         else:
                             await msg.edit(content="You did not find the car. Try again!\n\n" + emotes)
 
