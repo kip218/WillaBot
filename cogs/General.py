@@ -190,7 +190,7 @@ class General:
         else:
             embed = discord.Embed(title=str(ctx.message.author.name) + "'s to-do list", color=0x48d1cc)
             for i in range(len(todo_list)):
-                embed.add_field(name="", value=str(i+1) + ". " + todo_list[i], inline=False)
+                embed.add_field(name=" ", value=str(i+1) + ". " + todo_list[i], inline=False)
             await ctx.send(embed=embed)
         conn.commit()
         conn.close()
