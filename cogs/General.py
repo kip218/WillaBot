@@ -266,6 +266,8 @@ class General:
                             SET todo_list = array_replace(todo_list, %s, %s)
                             WHERE ID = %s; """, (task_to_check, "~~"+task_to_check+"~~", str(ctx.message.author.id)))
                 await ctx.send("Checked task: \"" + task_to_check + "\"")
+        conn.commit()
+        conn.close()
 
 # DON'T USE EVAL IT'S DANGEROUS
     # @commands.command(aliases=["math"])
