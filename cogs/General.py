@@ -77,18 +77,17 @@ class General:
             balance += 200
             timestamp = datetime.utcnow()
             c.execute(""" UPDATE users
-                        SET daily_time = %s, balance = %s; """, (timestamp, balance))
+                        SET daily_time = %s, balance = %s
+                        WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
             await ctx.send("You got 200 WillaCoins!")
-
-            # Logging use of command
-            print(ctx.message.author.name + " has claimed daily for the first time!")
         else:
             delta = datetime.utcnow() - timestamp
             if delta.total_seconds() > 86400:
                 balance += 200
                 timestamp = datetime.utcnow()
                 c.execute(""" UPDATE users
-                            SET daily_time = %s, balance = %s; """, (timestamp, balance))
+                            SET daily_time = %s, balance = %s
+                            WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
             else:
                 await ctx.send("Daily WillaCoins can only be claimed once every 24 hours!")
         conn.commit()
