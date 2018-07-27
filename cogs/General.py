@@ -190,7 +190,7 @@ class General:
         else:
             embed = discord.Embed(title=str(ctx.message.author.name) + "'s to-do list", color=0x48d1cc)
             for i in range(len(todo_list)):
-                embed.add_field(name="/u200b", value=str(i+1) + ". " + todo_list[i], inline=False)
+                embed.add_field(name=str(i+1) + ". " + todo_list[i], inline=False)
             await ctx.send(embed=embed)
         conn.commit()
         conn.close()
@@ -221,14 +221,20 @@ class General:
             await ctx.send("You must input an integer.")
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
+        print("1")
         c.execute(""" SELECT todo_list FROM users
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
+        print("2")
         todo_list = c.fetchone()[0]
+        print("3")
         if 1 <= num <= len(todo_list):
+            print("4")
             task_to_remove = todo_list[num-1]
+            print("5")
             c.execute(""" UPDATE users
                         SET todo_list = array_remove(todo_list, %s)
                         WHERE ID = %s; """, (task_to_remove, str(ctx.message.author.id)))
+            print("6")
         else:
             await ctx.send("You must input an integer between 1 and " + str(len(todo_list)))
 
