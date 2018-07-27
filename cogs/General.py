@@ -187,6 +187,7 @@ class General:
         todo_list = c.fetchone()[0]
         if todo_list is None:
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
+            return
         else:
             description = ""
             for i in range(len(todo_list)):
@@ -207,13 +208,14 @@ class General:
         c.execute(""" SELECT todo_list FROM users
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
         todo_list = c.fetchone()[0]
-        if task in todo_list:
-            await ctx.send("\"" + str(task) + "\" is already in your to-do list!")
-        else:
-            c.execute(""" UPDATE users
-                        SET todo_list = array_append(todo_list, %s) 
-                        WHERE ID = %s; """, (str(task), str(ctx.message.author.id)))
-            await ctx.send("Added task: \"" + str(task) + "\"")
+        if todo_list is not None:
+            if task in todo_list:
+                await ctx.send("\"" + str(task) + "\" is already in your to-do list!")
+                return
+        c.execute(""" UPDATE users
+                    SET todo_list = array_append(todo_list, %s) 
+                    WHERE ID = %s; """, (str(task), str(ctx.message.author.id)))
+        await ctx.send("Added task: \"" + str(task) + "\"")
         conn.commit()
         conn.close()
 
@@ -233,6 +235,9 @@ class General:
         c.execute(""" SELECT todo_list FROM users
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
         todo_list = c.fetchone()[0]
+        if todo_list is None:
+            await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
+            return
         if 1 <= num <= len(todo_list):
             task_to_remove = todo_list[num-1]
             c.execute(""" UPDATE users
@@ -260,6 +265,9 @@ class General:
         c.execute(""" SELECT todo_list FROM users
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
         todo_list = c.fetchone()[0]
+        if todo_list is None:
+            await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
+            return
         if 1 <= num <= len(todo_list):
             task_to_check = todo_list[num-1]
             if task_to_check[:2] == "~~" and task_to_check[-2:] == "~~":
