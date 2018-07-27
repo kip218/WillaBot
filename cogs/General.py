@@ -183,7 +183,7 @@ class General:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
-                    WHERE ID = %s; """, (str(ctx.message.author.id, )))
+                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
         todo_list = c.fetchone()[0]
         if todo_list is None:
             await ctx.send("Your to-do list is empty!")
@@ -222,7 +222,7 @@ class General:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
-                    WHERE ID = %s; """, (str(ctx.message.author.id, )))
+                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
         todo_list = c.fetchone()[0]
         if 1 <= num <= len(todo_list):
             task_to_remove = todo_list[num-1]
