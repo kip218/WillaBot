@@ -221,23 +221,18 @@ class General:
             await ctx.send("You must input an integer.")
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        print("1")
         c.execute(""" SELECT todo_list FROM users
                     WHERE ID = %s; """, (str(ctx.message.author.id), ))
-        print("2")
         todo_list = c.fetchone()[0]
-        print("3")
         if 1 <= num <= len(todo_list):
-            print("4")
             task_to_remove = todo_list[num-1]
-            await ctx.send(task_to_remove)
-            print("5")
             c.execute(""" UPDATE users
                         SET todo_list = array_remove(todo_list, %s)
                         WHERE ID = %s; """, (task_to_remove, str(ctx.message.author.id)))
-            print("6")
         else:
             await ctx.send("You must input an integer between 1 and " + str(len(todo_list)))
+        conn.commit()
+        conn.close()
 
 
 # DON'T USE EVAL IT'S DANGEROUS
