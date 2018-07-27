@@ -89,7 +89,10 @@ class General:
                             SET daily_time = %s, balance = %s
                             WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
             else:
-                await ctx.send("Daily WillaCoins can only be claimed once every 24 hours!")
+                time_remaining = 86400 - int(delta.total_seconds())
+                hours, remainder = divmod(int(time_remaining), 3600)
+                minutes, seconds = divmod(remainder, 60)
+                await ctx.send("Daily WillaCoins can only be claimed once every 24 hours! Time remaining: " + f"{hours}h {minutes}m {seconds}s")
         conn.commit()
         conn.close()
 
