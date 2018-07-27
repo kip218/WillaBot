@@ -188,9 +188,10 @@ class General:
         if todo_list is None:
             await ctx.send("Your to-do list is empty!")
         else:
-            embed = discord.Embed(title=str(ctx.message.author.name) + "'s to-do list", color=0x48d1cc)
+            description = ""
             for i in range(len(todo_list)):
-                embed.add_field(name="Task " + str(i+1), value=todo_list[i], inline=False)
+                description += "**" + str(i+1) + ")** " + todo_list[i] + "\n\n"
+            embed = discord.Embed(title=str(ctx.message.author.name) + "'s to-do list", description=description, color=0x48d1cc)
             await ctx.send(embed=embed)
         conn.commit()
         conn.close()
