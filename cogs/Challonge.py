@@ -183,11 +183,11 @@ class Challonge:
                 c = conn.cursor()
                 tournament = challonge.tournaments.show(url)
                 tournament_id = tournament['id']
-                c.execute("""INSERT INTO tournaments (ID, url, name, creator_id) 
-                            VALUES (%s, %s, %s, %s);""", (tournament_id, "https://challonge.com/" + url, name, ctx.message.author.id))
-                c.execute("""UPDATE users
+                c.execute(""" INSERT INTO tournaments (ID, url, name, creator_id) 
+                            VALUES (%s, %s, %s, %s); """, (tournament_id, "https://challonge.com/" + url, name, ctx.message.author.id))
+                c.execute(""" UPDATE users
                             SET tournament_url_list = array_append(tournament_url_list, %s) 
-                            WHERE ID = %s;""", ("https://challonge.com/" + url, str(ctx.message.author.id)))
+                            WHERE ID = %s; """, ("https://challonge.com/" + url, str(ctx.message.author.id)))
                 print("Inserted new tournament into database: " + str(tournament_id))
                 conn.commit()
                 conn.close()

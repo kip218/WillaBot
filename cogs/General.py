@@ -165,6 +165,74 @@ class General:
                         await ctx.send("Could not find user name \"" + user + "\" in the database.")
                         return
 
+    @commands.group()
+    async def todo(self, ctx):
+        '''
+        To-do list commands
+        w.todo <subcommand>
+        '''
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Subcommands: list, add, remove, check")
+
+    @todo.command()
+    async def list(self, ctx):
+        '''
+        Your to-do list
+        w.todo list
+        '''
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT todo_list FROM users
+                    WHERE ID = %s; """, (str(ctx.message.author.id, )))
+        todo_list = c.fetchone()[0]
+        if todo_list is None:
+            await ctx.send("Your to-do list is empty!")
+        else:
+            embed = discord.Embed(title=str(ctx.message.author.name) + "'s to-do list", color=0x48d1cc)
+            for i in range(len(todo_list)):
+                embed.add_field(value=str(i+1) + ". " + todo_list[i], inline=False)
+            await ctx.send(embed=embed)
+        conn.commit()
+        conn.close()
+
+    @todo.command()
+    async def add(self, ctx, *, task):
+        '''
+        Adds to your to-do list
+        w.todo add <task>
+        '''
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" UPDATE users
+                    SET todo_list = array_append(todo_list, %s) 
+                    WHERE ID = %s; """, (str(task), str(ctx.message.author.id)))
+        conn.commit()
+        conn.close()
+
+    @todo.command()
+    async def remove(self, ctx, num):
+        '''
+        Removes a task from your to-do list
+        w.todo remove <task number>
+        '''
+        try:
+            num = int(num)
+        except:
+            await ctx.send("You must input an integer.")
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT todo_list FROM users
+                    WHERE ID = %s; """, (str(ctx.message.author.id, )))
+        todo_list = c.fetchone()[0]
+        if 1 <= num <= len(todo_list):
+            task_to_remove = todo_list[num-1]
+            c.execute(""" UPDATE users
+                        SET todo_list = array_remove(todo_list, %s)
+                        WHERE ID = %s; """, (task_to_remove, str(ctx.message.author.id)))
+        else:
+            await ctx.send("You must input an integer between 1 and " + str(len(todo_list))
+
+
 # DON'T USE EVAL IT'S DANGEROUS
     # @commands.command(aliases=["math"])
     # async def calc(self, ctx, *, equation: str=None):

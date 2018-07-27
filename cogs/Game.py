@@ -108,6 +108,13 @@ class Game:
                         else:
                             await msg.edit(content="You did not find the car. Try again!\n\n" + emotes)
 
+    @commands.command()
+    async def pd(self, ctx, user):
+        '''
+        Prisoner's Dilemma
+        w.pd <user>
+        '''
+        
 
 def setup(bot):
     bot.add_cog(Game(bot))
