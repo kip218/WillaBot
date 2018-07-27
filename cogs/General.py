@@ -230,7 +230,7 @@ class General:
                         SET todo_list = array_remove(todo_list, %s)
                         WHERE ID = %s; """, (task_to_remove, str(ctx.message.author.id)))
         else:
-            await ctx.send("You must input an integer between 1 and " + str(len(todo_list))
+            await ctx.send("You must input an integer between 1 and " + str(len(todo_list)))
 
 
 # DON'T USE EVAL IT'S DANGEROUS
