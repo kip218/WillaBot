@@ -75,6 +75,7 @@ class Chat:
                 await ctx.send(embed=embed)
 
     @echo.error
+    @echo.delete.error
     async def echo_on_cooldown(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             error_msg = str(error)
