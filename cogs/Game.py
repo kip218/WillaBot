@@ -190,7 +190,7 @@ class Game:
                     await opponent_prompt.edit(content="The game has timed out!")
                     timeout = True
                     return
-            except:
+            except SyntaxError:
                 await ctx.send("Sorry, something went wrong. Please tell Willa.")
             else:
                 if msg.author == player:
