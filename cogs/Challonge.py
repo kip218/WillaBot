@@ -243,24 +243,24 @@ class Challonge:
         # conn = psycopg2.connect(database='willabot_db')
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        try:
-            c.execute("SELECT * FROM tournaments WHERE creator_id=%s", (str(author_id),))
-        except:
-            await ctx.send("Error")
+        c.execute("SELECT * FROM tournaments WHERE creator_id=%s", (str(author_id),))
+        embed = discord.Embed(title=str(ctx.message.author.name) + "'s tournaments")
+        tournament_lst = c.fetchall()
+        tuple_lst = []
+        if len(tournament_lst) == 0:
+            await ctx.send("You haven't created any tournaments!")
         else:
-            lst = []
-            string = ''
-            for tournament in c.fetchall():
-                lst.append(tournament[1])
-            for i in range(len(lst)):
-                string += str(i+1) + ") " + str(lst[i]) + "\n"
-            if string == '':
-                await ctx.send("You haven't created any tournaments!")
-            else:
-                await ctx.send(string)
+            for tournament in tournament_lst:
+                tuple_lst.append((tournament[2], tournament[1]))
+            for i in range(len(tuple_lst)):
+                tournament_name = str(i+1) + ") " + str(tuple_lst[i][0]) + "\n"
+                tournament_url = tuple_lst[i][1]
+                embed.add_field(name=tournament_name, value=tournament_url, inline=False)
+            await ctx.send(embed=embed)
+        conn.close()
 
     # @chal.command()
-    # async def removes(self, ctx, url):
+    # async def remove(self, ctx, url):
     #     '''
     #     Removes a challonge tournament
     #     w.chal delete <challonge url>
