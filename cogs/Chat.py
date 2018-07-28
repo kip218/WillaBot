@@ -17,6 +17,9 @@ class Chat:
         Repeats message.
         w.echo <message>
         '''
+        if message is None:
+            ctx.command.reset_cooldown(ctx)
+            return
         if ctx.invoked_subcommand is None:
             content = ctx.message.content
             space_ind = content.find(' ')
@@ -24,13 +27,17 @@ class Chat:
                 content = content[space_ind+1:]
                 await ctx.send(content)
 
+    @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
     @echo.command(aliases=["del"])
     async def delete(self, ctx, *, message: str=None):
         '''
         Repeats message and deletes original message.
         w.echo delete <message>
         '''
-        if len(ctx.message.mentions) == 0 and message is not None:
+        if message is None:
+            ctx.command.reset_cooldown(ctx)
+            return
+        if len(ctx.message.mentions) == 0:
             try:
                 await ctx.message.delete()
             except EnvironmentError:
@@ -67,16 +74,16 @@ class Chat:
                     )
                 await ctx.send(embed=embed)
 
-    # @echo.error
-    # async def echo_on_cooldown(self, ctx, error):
-    #     if isinstance(error, commands.CommandOnCooldown):
-    #         error_msg = str(error)
-    #         T_ind = error_msg.find("T")
-    #         error_msg = error_msg[T_ind:]
-    #         user = ctx.message.author
-    #         await ctx.send("Slow down " + user.mention + "! The command is on cooldown! " + error_msg + ".")
-    #     else:
-    #         await ctx.send("Unknown error. Please tell Willa.")
+    @echo.error
+    async def echo_on_cooldown(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            error_msg = str(error)
+            T_ind = error_msg.find("T")
+            error_msg = error_msg[T_ind:]
+            user = ctx.message.author
+            await ctx.send("Slow down " + user.mention + "! The command is on cooldown! " + error_msg + ".")
+        else:
+            await ctx.send("Unknown error. Please tell Willa.")
 
 
 def setup(bot):
