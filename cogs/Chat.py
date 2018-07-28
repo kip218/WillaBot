@@ -12,7 +12,7 @@ class Chat:
 
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
     @commands.group()
-    async def echo(self, ctx, *, message: str=None, invoke_without_command=True):
+    async def echo(self, ctx, message: str=None, invoke_without_command=True):
         '''
         Repeats message.
         w.echo <message>
