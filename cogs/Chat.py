@@ -12,7 +12,7 @@ class Chat:
 
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
     @commands.group()
-    async def echo(self, ctx):
+    async def echo(self, ctx, message):
         '''
         Repeats message.
         w.echo <message>
@@ -25,20 +25,20 @@ class Chat:
                 await ctx.send(content)
 
     @echo.command(aliases=["erase", "del"])
-    async def delete(self, ctx, *, content: str=None):
+    async def delete(self, ctx, *, message):
         '''
         Repeats message and deletes original message.
         w.echo delete <message>
         '''
-        if len(ctx.message.mentions) == 0 and content is not None:
+        if len(ctx.message.mentions) == 0 and message is not None:
             try:
                 await ctx.message.delete()
             except EnvironmentError:
                 await ctx.send("I don't have permission to delete messages!")
             else:
-                await ctx.send(content)
+                await ctx.send(message)
         else:
-            if content is None:
+            if message is None:
                 return
             else:
                 mentioned_msg = ctx.message.content

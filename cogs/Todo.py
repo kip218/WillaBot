@@ -68,13 +68,13 @@ class Todo:
         conn.close()
 
     @todo.command()
-    async def remove(self, ctx, num):
+    async def remove(self, ctx, task_number):
         '''
         Removes a task from your to-do list.
         w.todo remove <task number>
         '''
         try:
-            num = int(num)
+            num = int(task_number)
         except:
             await ctx.send("You must input an integer.")
             return
@@ -97,13 +97,13 @@ class Todo:
         conn.close()
 
     @todo.command()
-    async def check(self, ctx, num):
+    async def check(self, ctx, task_number):
         '''
         Checks or unchecks a task from your to-do list.
         w.todo check <task number>
         '''
         try:
-            num = int(num)
+            num = int(task_number)
         except:
             await ctx.send("You must input an integer.")
             return

@@ -19,8 +19,8 @@ class Game:
     @commands.command()
     async def montyhall(self, ctx):
         '''
+        The famous Monty Hall problem.
         w.montyhall
-        The famous Monty Hall problem
         '''
 
         def check(m):
@@ -113,8 +113,8 @@ class Game:
     @commands.command()
     async def pw(self, ctx, user):
         '''
+        The Peace War game.
         w.pw <user>
-        The Peace War game
         '''
         if len(ctx.message.mentions) == 0:
             await ctx.send("You must mention a user to play against!")

@@ -262,13 +262,13 @@ class Challonge:
         conn.close()
 
     @chal.command()
-    async def remove(self, ctx, num):
+    async def remove(self, ctx, tournament_number):
         '''
         Removes a challonge tournament.
         w.chal delete <tournament number>
         '''
         try:
-            num = int(num)
+            num = int(tournament_number)
         except:
             await ctx.send("You must input an integer.")
             return
