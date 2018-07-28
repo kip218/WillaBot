@@ -88,11 +88,12 @@ class General:
                 c.execute(""" UPDATE users
                             SET daily_time = %s, balance = %s
                             WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
+                await ctx.send("You got 200 WillaCoins!")
             else:
                 time_remaining = 86400 - int(delta.total_seconds())
                 hours, remainder = divmod(int(time_remaining), 3600)
                 minutes, seconds = divmod(remainder, 60)
-                await ctx.send("Daily WillaCoins can only be claimed once every 24 hours! Time remaining: " + f"{hours}h {minutes}m {seconds}s")
+                await ctx.send("Daily WillaCoins can only be claimed once every 24 hours!\nTime remaining: " + f"{hours}h {minutes}m {seconds}s")
         conn.commit()
         conn.close()
 
