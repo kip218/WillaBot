@@ -183,6 +183,7 @@ class Game:
         while timeout is False and (player_answered is False or opponent_answered is False):
             try:
                 done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player), self.bot.wait_for('message', check=check_opponent)], return_when=asyncio.FIRST_COMPLETED)
+                msg = done[0]
                 delta = datetime.utcnow() - start_time
                 if delta.total_seconds() > 120:
                     await player_prompt.edit(content="The game has timed out!")
@@ -192,12 +193,12 @@ class Game:
             except:
                 await ctx.send("Sorry, something went wrong. Please tell Willa.")
             else:
-                if done.author == player:
+                if msg.author == player:
                     if done.content.lower() == "peace":
                         player_war = False
                     elif done.content.lower() == "war":
                         player_war = True
-                elif done.author == opponent:
+                elif msg.author == opponent:
                     if done.content.lower() == "peace":
                         opponent_war = False
                     elif done.content.lower() == "war":
