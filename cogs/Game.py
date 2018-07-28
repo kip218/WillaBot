@@ -127,7 +127,6 @@ class Game:
             return
 
         # checking if both players have sufficient balance
-
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT balance FROM users
@@ -190,19 +189,24 @@ class Game:
                     await opponent_prompt.edit(content="The game has timed out!")
                     timeout = True
                     return
-            except SyntaxError:
+            except:
                 await ctx.send("Sorry, something went wrong. Please tell Willa.")
+                return
             else:
                 if msg.author == player:
                     if msg.content.lower() == "peace":
                         player_war = False
+                        player_answered = True
                     elif msg.content.lower() == "war":
                         player_war = True
+                        player_answered = True
                 elif msg.author == opponent:
                     if msg.content.lower() == "peace":
                         opponent_war = False
+                        opponent_answered = True
                     elif msg.content.lower() == "war":
                         opponent_war = True
+                        opponent_answered = True
 
         both_peace = "Both players declared **PEACE** and got 100 WillaCoins!"
         both_war = "Both players declared **WAR** and lost 100 WillaCoins!"
