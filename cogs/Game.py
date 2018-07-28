@@ -111,7 +111,7 @@ class Game:
                             await msg.edit(content="You did not find the car. Try again!\n\n" + emotes)
 
     @commands.command()
-    async def pw(self, ctx, user, bet_amount):
+    async def pw(self, ctx, user):
         '''
         The Peace War game
         w.pw <user> <bet amount>
