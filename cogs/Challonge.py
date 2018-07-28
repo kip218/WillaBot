@@ -281,11 +281,13 @@ class Challonge:
         elif 1 <= num <= len(tournament_lst):
             tournament_id_to_delete = tournament_lst[num-1][0]
             tournament_url_to_delete = tournament_lst[num-1][1]
+            tournament_name = tournament_lst[num-1][2]
             challonge.tournaments.destroy(tournament_id_to_delete)
             c.execute("DELETE FROM tournaments WHERE id=%s;", (tournament_id_to_delete, ))
             c.execute("""UPDATE users 
                         SET tournament_url_list = array_remove(tournament_url_list, %s)
                         WHERE ID = %s; """, (tournament_url_to_delete, str(ctx.message.author.id)))
+            await ctx.send("Removed tournament: " + tournament_name)
         else:
             await ctx.send("You must input an integer between 1 and " + str(len(tournament_lst)))
         conn.commit()
