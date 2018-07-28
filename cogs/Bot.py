@@ -46,7 +46,7 @@ class Bot:
                     curr_server = server_lst[ind]
                     if server_name.lower().replace(" ", "") in curr_server.name.lower().replace(" ", ""):
                         title = curr_server.name
-                        member_count = str(len(ctx.guild.members))
+                        member_count = str(len(curr_server.members))
                         icon_url = curr_server.icon_url
                         found = True
                     else:
