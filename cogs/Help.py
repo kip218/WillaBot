@@ -60,7 +60,7 @@ class Help:
                     done, pending = await asyncio.wait([self.bot.wait_for('reaction_add', check=check), self.bot.wait_for('reaction_remove', check=check)], return_when=asyncio.FIRST_COMPLETED)
                     reaction = done.pop().result()[0]
                     delta = datetime.utcnow() - start_time
-                    if delta.total_seconds() > 120:
+                    if delta.total_seconds() > 300:
                         timeout = True
                         return
                 except:

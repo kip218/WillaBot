@@ -194,14 +194,14 @@ class Game:
                 await ctx.send("Sorry, something went wrong. Please tell Willa.")
             else:
                 if msg.author == player:
-                    if done.content.lower() == "peace":
+                    if msg.content.lower() == "peace":
                         player_war = False
-                    elif done.content.lower() == "war":
+                    elif msg.content.lower() == "war":
                         player_war = True
                 elif msg.author == opponent:
-                    if done.content.lower() == "peace":
+                    if msg.content.lower() == "peace":
                         opponent_war = False
-                    elif done.content.lower() == "war":
+                    elif msg.content.lower() == "war":
                         opponent_war = True
 
         both_peace = "Both players declared **PEACE** and got 100 WillaCoins!"
