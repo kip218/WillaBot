@@ -114,7 +114,7 @@ class Game:
     async def pw(self, ctx, user):
         '''
         The Peace War game
-        w.pw <user> <bet amount>
+        w.pw <user>
         '''
         if len(ctx.message.mentions) == 0:
             await ctx.send("You must mention a user to play against!")
@@ -183,7 +183,7 @@ class Game:
         while timeout is False and (player_answered is False or opponent_answered is False):
             try:
                 done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player), self.bot.wait_for('message', check=check_opponent)], return_when=asyncio.FIRST_COMPLETED)
-                msg = done.pop().result()[0]
+                msg = done.pop().result()
                 delta = datetime.utcnow() - start_time
                 if delta.total_seconds() > 120:
                     await player_prompt.edit(content="The game has timed out!")

@@ -14,10 +14,10 @@ def format_help_page(bot, cog_name, curr_page, max_page):
     embed.set_author(name="WillaBot", icon_url="https://cdn.discordapp.com/avatars/463398601553346581/16918503e6313c71fc023ac37233d992.webp?size=1024")
     embed.set_footer(text="Prefix is 'w.'")
     for command in lst_commands:
-        embed.add_field(name=command.name, value=command.short_doc, inline=False)
+        embed.add_field(name=command.name, value=command.signature, inline=False)
         if isinstance(command, commands.core.Group):
             for subcommand in command.commands:
-                embed.add_field(name=subcommand.qualified_name, value=subcommand.short_doc, inline=False)
+                embed.add_field(name=subcommand.qualified_name, value=subcommand.signature, inline=False)
     return embed
 
 
