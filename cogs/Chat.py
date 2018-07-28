@@ -24,7 +24,7 @@ class Chat:
                 content = content[space_ind+1:]
                 await ctx.send(content)
 
-    @echo.command(aliases=["erase", "del"])
+    @echo.command(aliases=["del"])
     async def delete(self, ctx, *, message):
         '''
         Repeats message and deletes original message.

@@ -37,14 +37,14 @@ class Bot:
             icon_url = ctx.guild.icon_url
         else:
             try:
-                search = int(server_name)
+                server_num = int(server_name)
             except ValueError:
                 server_lst = self.bot.guilds
                 ind = 0
                 found = False
                 while found == False and ind < len(server_lst):
                     curr_server = server_lst[ind]
-                    if search.lower().replace(" ", "") in curr_server.name.lower().replace(" ", ""):
+                    if server_name.lower().replace(" ", "") in curr_server.name.lower().replace(" ", ""):
                         title = curr_server.name
                         member_count = str(len(ctx.guild.members))
                         icon_url = curr_server.icon_url
@@ -52,11 +52,11 @@ class Bot:
                     else:
                         ind += 1
                 if found == False:
-                    await ctx.send("Could not find server named \"" + search + "\"")
+                    await ctx.send("Could not find server named \"" + server_num + "\"")
                     return
             else:
-                if 1 <= search <= len(self.bot.guilds):
-                    server = self.bot.guilds[search-1]
+                if 1 <= server_num <= len(self.bot.guilds):
+                    server = self.bot.guilds[server_num-1]
                     title = server.name
                     member_count = str(len(server.members))
                     icon_url = server.icon_url
