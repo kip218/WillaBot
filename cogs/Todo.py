@@ -17,7 +17,7 @@ class Todo:
     @commands.group()
     async def todo(self, ctx):
         '''
-        To-do list commands
+        To-do list commands.
         w.todo <subcommand>
         '''
         if ctx.invoked_subcommand is None:
@@ -48,7 +48,7 @@ class Todo:
     @todo.command()
     async def add(self, ctx, *, task):
         '''
-        Adds to your to-do list
+        Adds a task to your to-do list.
         w.todo add <task>
         '''
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -70,7 +70,7 @@ class Todo:
     @todo.command()
     async def remove(self, ctx, num):
         '''
-        Removes a task from your to-do list
+        Removes a task from your to-do list.
         w.todo remove <task number>
         '''
         try:
@@ -99,7 +99,7 @@ class Todo:
     @todo.command()
     async def check(self, ctx, num):
         '''
-        Checks or unchecks a task from your to-do list
+        Checks or unchecks a task from your to-do list.
         w.todo check <task number>
         '''
         try:
@@ -134,7 +134,7 @@ class Todo:
     @todo.command()
     async def clean(self, ctx):
         '''
-        Completely cleans your to-do list
+        Completely cleans your to-do list.
         w.todo clean
         '''
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')

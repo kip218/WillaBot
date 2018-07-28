@@ -18,9 +18,8 @@ class General:
     @commands.command()
     async def pfp(self, ctx, *, user: str=None):
         '''
-        Sends profile picture
+        [user]'s profile picture. Sends your profile picture if [user] not specified.
         w.pfp [user]
-        Sends your profile picture if [user] not specified.
         '''
         # gets embed msg of member's avatar
         def get_pfp(member):
@@ -100,8 +99,8 @@ class General:
     @commands.command()
     async def profile(self, ctx, *, user: str=None):
         '''
-        Your profile
-        w.profile
+        [user]'s profile. Sends your profile picture if [user] not specified.
+        w.profile [user]
         '''
         def get_profile(member):
             try:

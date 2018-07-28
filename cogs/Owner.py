@@ -18,7 +18,7 @@ class Owner:
     @commands.command()
     async def shutdown(self, ctx):
         '''
-        Shut down WillaBot
+        Shut down WillaBot.
         w.shutdown
         '''
         if await self.bot.is_owner(ctx.message.author):
@@ -42,7 +42,7 @@ class Owner:
     @reset.command()
     async def db(self, ctx):
         '''
-        Reset all tables from database
+        Reset all tables from database.
         w.reset db
         '''
         if await self.bot.is_owner(ctx.message.author):
@@ -67,7 +67,7 @@ class Owner:
     @reset.command()
     async def drop(self, ctx):
         '''
-        Drop all tables from database and recreate them
+        Drop all tables from database and recreate them.
         w.reset drop
         '''
         if await self.bot.is_owner(ctx.message.author):
@@ -114,7 +114,7 @@ class Owner:
     @reset.command()
     async def chal(self, ctx):
         '''
-        Reset challonge
+        Reset challonge.
         w.reset chal
         '''
         if await self.bot.is_owner(ctx.message.author):

@@ -19,8 +19,8 @@ class Game:
     @commands.command()
     async def montyhall(self, ctx):
         '''
-        The famous Monty Hall problem
         w.montyhall
+        The famous Monty Hall problem
         '''
 
         def check(m):
@@ -113,8 +113,8 @@ class Game:
     @commands.command()
     async def pw(self, ctx, user):
         '''
-        The Peace War game
         w.pw <user>
+        The Peace War game
         '''
         if len(ctx.message.mentions) == 0:
             await ctx.send("You must mention a user to play against!")
@@ -162,7 +162,7 @@ class Game:
             else:
                 if accept.content == "w.accept":
                     accepted = True
-                    await ctx.send("Challenge accepted! Check your DMs!")
+                    challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
 
         player_prompt = await player.send("The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 500 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.")
         opponent_prompt = await opponent.send("The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 500 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.")
@@ -187,6 +187,7 @@ class Game:
                 if delta.total_seconds() > 120:
                     await player_prompt.edit(content="The game has timed out!")
                     await opponent_prompt.edit(content="The game has timed out!")
+                    await challenge_accepted.edit(content="Challenge accepted! Check your DMs!\nThe game has timed out!")
                     timeout = True
                     return
             except:

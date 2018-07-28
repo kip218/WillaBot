@@ -33,7 +33,7 @@ class Challonge:
     @chal.command()
     async def create(self, ctx):
         '''
-        Create a new challonge tournament
+        Create a new challonge tournament.
         w.chal create
         '''
         await ctx.send("Check your DM!")
@@ -197,7 +197,7 @@ class Challonge:
     @chal.command()
     async def info(self, ctx, url):
         '''
-        Gives information about the tournament
+        Gives information about the tournament.
         w.chal info <challonge url>
         '''
         slash_ind = url.rfind("com/")
@@ -238,7 +238,7 @@ class Challonge:
     @chal.command()
     async def list(self, ctx):
         '''
-        Your list of tournaments
+        Your list of tournaments.
         w.chal list
         '''
         # conn = psycopg2.connect(database='willabot_db')
@@ -264,7 +264,7 @@ class Challonge:
     @chal.command()
     async def remove(self, ctx, num):
         '''
-        Removes a challonge tournament
+        Removes a challonge tournament.
         w.chal delete <tournament number>
         '''
         try:
