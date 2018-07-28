@@ -27,6 +27,8 @@ class Challonge:
         '''
         Group of challonge commands
         '''
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Subcommands: list, create, remove, info")
 
     @chal.command()
     async def create(self, ctx):
@@ -239,14 +241,13 @@ class Challonge:
         Your list of tournaments
         w.chal list
         '''
-        author_id = ctx.message.author.id
         # conn = psycopg2.connect(database='willabot_db')
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        c.execute("SELECT * FROM tournaments WHERE creator_id=%s", (str(author_id),))
+        c.execute("SELECT * FROM tournaments WHERE creator_id=%s ORDER BY id ASC;", (str(ctx.message.author.id),))
         tournament_lst = c.fetchall()
         if len(tournament_lst) == 0:
-            await ctx.send("You haven't created any tournaments!")
+            await ctx.send("You haven't created any tournaments! You can create a tournament with \"w.chal create\".")
         else:
             tuple_lst = []
             description = ''
@@ -260,21 +261,35 @@ class Challonge:
             await ctx.send(embed=embed)
         conn.close()
 
-    # @chal.command()
-    # async def remove(self, ctx, url):
-    #     '''
-    #     Removes a challonge tournament
-    #     w.chal delete <challonge url>
-    #     '''
-    #     slash_ind = url.rfind("com/")
-    #     url_tail = url[slash_ind+4:]
-    #     try:
-    #         tournament = challonge.tournaments.show(url_tail)
-    #         participants = challonge.participants.index(url_tail)
-    #     except:
-    #         await ctx.send("Tournament couldn't be found. Either the url is wrong, or the tournament wasn't created under my challonge account.")
-    #         return
-    #     else:
+    @chal.command()
+    async def remove(self, ctx, num):
+        '''
+        Removes a challonge tournament
+        w.chal delete <tournament number>
+        '''
+        try:
+            num = int(num)
+        except:
+            await ctx.send("You must input an integer.")
+            return
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("SELECT * FROM tournaments WHERE creator_id=%s ORDER BY id ASC;", (str(ctx.message.author.id), ))
+        tournament_lst = c.fetchall()
+        if len(tournament_lst) == 0:
+            await ctx.send("You haven't created any tournaments! You can create a tournament with \"w.chal create\".")
+        elif 1 <= num <= len(tournament_lst):
+            tournament_id_to_delete = tournament_lst[num-1][0]
+            tournament_url_to_delete = tournament_lst[num-1][1]
+            challonge.tournaments.destroy(tournament_id_to_delete)
+            c.execute("DELETE FROM tournaments WHERE id=%s;", (tournament_id_to_delete, ))
+            c.execute("""UPDATE users 
+                        SET tournament_url_list = array_remove(tournament_url_list, %s)
+                        WHERE ID = %s; """, (tournament_url_to_delete, str(ctx.message.author.id)))
+        else:
+            await ctx.send("You must input an integer between 1 and " + str(len(tournament_lst)))
+        conn.commit()
+        conn.close()
 
 
 def setup(bot):
