@@ -12,19 +12,12 @@ class Chat:
 
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
     @commands.group()
-    async def echo(self, ctx, message: str=None):
+    async def echo(self, ctx, message: str):
         '''
         Repeats message.
         w.echo <message>
         '''
-        if ctx.invoked_subcommand is None:
-            content = ctx.message.content
-            space_ind = content.find(' ')
-            if space_ind > 4:
-                content = content[space_ind+1:]
-                if content == "delete" or content == "del":
-                    return
-                await ctx.send(content)
+        await ctx.send(message)
 
     @echo.command(aliases=["del"])
     async def delete(self, ctx, *, message: str=None):
