@@ -12,7 +12,7 @@ class Chat:
 
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
     @commands.group()
-    async def echo(self, ctx, message):
+    async def echo(self, ctx, message: str=None):
         '''
         Repeats message.
         w.echo <message>
@@ -25,7 +25,7 @@ class Chat:
                 await ctx.send(content)
 
     @echo.command(aliases=["del"])
-    async def delete(self, ctx, *, message):
+    async def delete(self, ctx, *, message: str=None):
         '''
         Repeats message and deletes original message.
         w.echo delete <message>
