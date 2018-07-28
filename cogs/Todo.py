@@ -11,6 +11,9 @@ class Todo:
     Commands for the to-do list.
     '''
 
+    def __init__(self, bot):
+        self.bot = bot
+
     @commands.group()
     async def todo(self, ctx):
         '''
