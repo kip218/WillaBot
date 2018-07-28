@@ -22,6 +22,8 @@ class Chat:
             space_ind = content.find(' ')
             if space_ind > 4:
                 content = content[space_ind+1:]
+                if content == "delete" or content == "del":
+                    return
                 await ctx.send(content)
 
     @echo.command(aliases=["del"])
