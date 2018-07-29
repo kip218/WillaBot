@@ -164,7 +164,7 @@ class General:
                     try:
                         embed = get_profile(member)
                         await ctx.send(embed=embed)
-                    except:
+                    except SyntaxError:
                         await ctx.send("Could not find user name \"" + user + "\" in the database.")
                         return
 

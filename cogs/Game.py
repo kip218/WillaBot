@@ -116,7 +116,7 @@ class Game:
         The Peace War game.
         w.pw <user>
         '''
-        if len(ctx.message.mentions) == 0 or user is None:
+        if len(ctx.message.mentions) == 0:
             await ctx.send("You must mention a user to play against!")
             return
 
