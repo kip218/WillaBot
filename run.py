@@ -35,7 +35,7 @@ if __name__ == '__main__':
 @bot.event
 async def on_message(message):
     # logging
-    time = str(message.created_at.replace(microsecond=0))
+    # time = str(message.created_at.replace(microsecond=0))
     user = str(message.author)
     msg = message.clean_content
     if isinstance(message.channel, discord.TextChannel):
@@ -44,7 +44,7 @@ async def on_message(message):
     elif isinstance(message.channel, discord.DMChannel):
         channel = str(message.channel.recipient)
         server = "DMChannel"
-    print("UTC" + time + "| " + server + "| " + channel + "| " + user + ": " + msg)
+    print(server + "| " + channel + "| " + user + ": " + msg)
 
     if not message.author.bot:
         if message.content.lower() in ('what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'):

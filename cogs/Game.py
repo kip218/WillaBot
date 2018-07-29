@@ -164,8 +164,9 @@ class Game:
                     accepted = True
                     challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
 
-        player_prompt = await player.send("The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 500 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.")
-        opponent_prompt = await opponent.send("The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 500 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.")
+        prompt = "The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 500 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war."
+        player_prompt = await player.send(prompt)
+        opponent_prompt = await opponent.send(prompt)
         start_time = datetime.utcnow()
 
         # checking player's response
