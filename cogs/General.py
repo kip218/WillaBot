@@ -45,7 +45,7 @@ class General:
             found = False
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
-                if user.lower() in (curr_member.name.lower() + curr_member.discriminator.lower()):
+                if user.lower() in (curr_member.name.lower() + "#" + curr_member.discriminator.lower()):
                     member = curr_member
                     found = True
                 elif user.lower() in curr_member.display_name.lower():
@@ -147,7 +147,7 @@ class General:
             found = False
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
-                if user.lower() in (curr_member.name.lower() + curr_member.discriminator.lower()):
+                if user.lower() in (curr_member.name.lower() + "#" + curr_member.discriminator.lower()):
                     member = curr_member
                     found = True
                 elif user.lower() in curr_member.display_name.lower():
