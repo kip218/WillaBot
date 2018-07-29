@@ -45,7 +45,7 @@ class General:
             found = False
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
-                if user.lower() in curr_member.name.lower():
+                if user.lower() in (curr_member.name.lower() + curr_member.discriminator.lower()):
                     member = curr_member
                     found = True
                 elif user.lower() in curr_member.display_name.lower():
@@ -109,17 +109,13 @@ class General:
                 c.execute(""" SELECT username, xp, balance FROM users
                             WHERE ID = %s; """, (str(member.id), ))
                 profile_lst = c.fetchone()
-                print("----------------------------------------\n" + str(member.id))
-                print("----------------------------------------\n" + str(profile_lst[0]))
-                print("----------------------------------------\n" + str(profile_lst[1]))
-                print("----------------------------------------\n" + str(profile_lst[2]))
-                embed = discord.Embed(title="XP", description=str(profile_lst[1]), color=member.color)
-                embed.add_field(name="WillaCoins", value=str(profile_lst[2]))
+                embed = discord.Embed(title="XP", description=profile_lst[1], color=member.color)
+                embed.add_field(name="WillaCoins", value=profile_lst[2])
                 embed.set_author(name=profile_lst[0])
                 embed.set_thumbnail(url=member.avatar_url)
                 conn.commit()
                 conn.close()
-            except SyntaxError:
+            except TypeError:
                 print("get_profile Error")
                 return
             else:
@@ -151,7 +147,7 @@ class General:
             found = False
             while found is False and ind < len(lst_members):
                 curr_member = lst_members[ind]
-                if user.lower() in curr_member.name.lower():
+                if user.lower() in (curr_member.name.lower() + curr_member.discriminator.lower()):
                     member = curr_member
                     found = True
                 elif user.lower() in curr_member.display_name.lower():
@@ -168,7 +164,7 @@ class General:
                     try:
                         embed = get_profile(member)
                         await ctx.send(embed=embed)
-                    except SyntaxError:
+                    except:
                         await ctx.send("Could not find user name \"" + user + "\" in the database.")
                         return
 
