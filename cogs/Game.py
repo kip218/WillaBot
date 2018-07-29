@@ -259,7 +259,7 @@ class Game:
                         WHERE ID = %s; """, (str(opponent_balance), str(opponent.id)))
             await player.send(peace_war)
             await opponent.send(war_peace)
-            await ctx.send(player.mention + " declared **WAR** while " + opponent.mention + " declared **PEACE**. " + player.mention + " won 300 WillaCoins while " + opponent.mention + " lost 300 WillaCoins!")
+            await ctx.send(player.mention + " declared **PEACE** while " + opponent.mention + " declared **WAR**. " + player.mention + " won 300 WillaCoins while " + opponent.mention + " lost 300 WillaCoins!")
         else:
             player_balance -= 100
             opponent_balance -= 100
