@@ -4,7 +4,6 @@ import random
 import os
 import challonge
 import discord
-import images
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -137,8 +136,11 @@ class Owner:
 
     @commands.command()
     async def test(self, ctx):
+        '''
+        test
+        '''
         try:
-            await ctx.send(file=discord.File('test.png'))
+            await ctx.send(file=discord.File('images/test.png'))
         except:
             await ctx.send("First method failed")
         await ctx.send("Closing function...")
