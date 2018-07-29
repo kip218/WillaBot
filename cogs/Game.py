@@ -164,7 +164,7 @@ class Game:
                     accepted = True
                     challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
 
-        prompt = "The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 500 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war."
+        prompt = "The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 300 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war."
         player_prompt = await player.send(prompt)
         opponent_prompt = await opponent.send(prompt)
         start_time = datetime.utcnow()
@@ -212,8 +212,8 @@ class Game:
 
         both_peace = "Both players declared **PEACE** and got 100 WillaCoins!"
         both_war = "Both players declared **WAR** and lost 100 WillaCoins!"
-        war_peace = "You declared **WAR** while your opponent declared **PEACE**! You won 500 WillaCoins while your opponent lost 300 WillaCoins!"
-        peace_war = "You declared **PEACE** while your opponent declared **WAR**! You lost 300 WillaCoins while your opponent won 500 WillaCoins!"
+        war_peace = "You declared **WAR** while your opponent declared **PEACE**! You won 300 WillaCoins while your opponent lost 300 WillaCoins!"
+        peace_war = "You declared **PEACE** while your opponent declared **WAR**! You lost 300 WillaCoins while your opponent won 300 WillaCoins!"
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
@@ -237,7 +237,7 @@ class Game:
             await opponent.send(both_peace)
             await ctx.send(player.mention + " and " + opponent.mention + " both declared **PEACE** and got 100 Willacoins!")
         elif player_war is True and opponent_war is False:
-            player_balance += 500
+            player_balance += 300
             opponent_balance -= 300
             c.execute(""" UPDATE users
                         SET balance = %s
@@ -247,10 +247,10 @@ class Game:
                         WHERE ID = %s; """, (str(opponent_balance), str(opponent.id)))
             await player.send(war_peace)
             await opponent.send(peace_war)
-            await ctx.send(player.mention + " declared **WAR** while " + opponent.mention + " declared **PEACE**. " + player.mention + " won 500 WillaCoins while " + opponent.mention + " lost 300 WillaCoins!")
+            await ctx.send(player.mention + " declared **WAR** while " + opponent.mention + " declared **PEACE**. " + player.mention + " won 300 WillaCoins while " + opponent.mention + " lost 300 WillaCoins!")
         elif player_war is False and opponent_war is True:
             player_balance -= 300
-            opponent_balance += 500
+            opponent_balance += 300
             c.execute(""" UPDATE users
                         SET balance = %s
                         WHERE ID = %s; """, (str(player_balance), str(player.id)))
@@ -259,7 +259,7 @@ class Game:
                         WHERE ID = %s; """, (str(opponent_balance), str(opponent.id)))
             await player.send(peace_war)
             await opponent.send(war_peace)
-            await ctx.send(player.mention + " declared **WAR** while " + opponent.mention + " declared **PEACE**. " + player.mention + " won 500 WillaCoins while " + opponent.mention + " lost 300 WillaCoins!")
+            await ctx.send(player.mention + " declared **WAR** while " + opponent.mention + " declared **PEACE**. " + player.mention + " won 300 WillaCoins while " + opponent.mention + " lost 300 WillaCoins!")
         else:
             player_balance -= 100
             opponent_balance -= 100
