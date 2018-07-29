@@ -140,8 +140,6 @@ class Owner:
             await ctx.send(file=discord.File('test.png'))
         except:
             await ctx.send("First method failed")
-            await ctx.send(file=discord.File('test'))
-            await ctx.send("Second method worked")
         await ctx.send("Closing function...")
 
 
