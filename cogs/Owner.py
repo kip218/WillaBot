@@ -3,6 +3,7 @@ from discord.ext import commands
 import random
 import os
 import challonge
+import discord
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -132,6 +133,16 @@ class Owner:
                 await ctx.send("no u")
             elif num == 2:
                 await ctx.send("아니")
+
+    @commands.command()
+    async def test(self, ctx):
+        try:
+            await ctx.send(file=discord.File('test.png'))
+        except:
+            await ctx.send("First method failed")
+            await ctx.send(file=discord.File('test'))
+            await ctx.send("Second method worked")
+        await ctx.send("Closing function...")
 
 
 def setup(bot):
