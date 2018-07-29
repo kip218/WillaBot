@@ -4,6 +4,7 @@ import random
 import os
 import challonge
 import discord
+import images
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
