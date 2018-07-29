@@ -115,7 +115,7 @@ class General:
                 embed.set_thumbnail(url=member.avatar_url)
                 conn.commit()
                 conn.close()
-            except TypeError:
+            except SyntaxError:
                 print("get_profile Error")
                 return
             else:
