@@ -140,7 +140,7 @@ class Owner:
         test
         '''
         try:
-            await ctx.send(file=discord.File('images/test.png'))
+            await ctx.send(file=discord.File('images/test_test.png'))
         except:
             await ctx.send("First method failed")
         await ctx.send("Closing function...")
