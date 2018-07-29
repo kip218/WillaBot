@@ -165,7 +165,7 @@ class Challonge:
                 challonge.tournaments.create(
                                     name=name,
                                     url=url,
-                                    tournament_type=tournament_type,
+                                    tournament_type=tournament_type.lower(),
                                     description=description,
                                     start_at=start_time,
                                     check_in_duration=check_in,

@@ -134,17 +134,6 @@ class Owner:
             elif num == 2:
                 await ctx.send("아니")
 
-    @commands.command()
-    async def test(self, ctx):
-        '''
-        test
-        '''
-        try:
-            await ctx.send(file=discord.File('images/test_test.png'))
-        except:
-            await ctx.send("First method failed")
-        await ctx.send("Closing function...")
-
 
 def setup(bot):
     bot.add_cog(Owner(bot))
