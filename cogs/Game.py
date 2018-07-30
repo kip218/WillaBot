@@ -53,6 +53,7 @@ class Game:
                 options.remove(answer)
                 options.append(answer)
             except commands.errors.CommandInvokeError:
+                await msg.edit(content=msg.content + "\n\nThe bot has timed out!")
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
                 c.execute(""" UPDATE users
@@ -89,13 +90,14 @@ class Game:
                         emotes += ":goat: "
                     else:
                         emotes += ":door: "
-                await msg.edit(content="You've chosen door number " + str(answer) + ".\n\nDoor number " + str(reveal_goat) + " has been opened, revealing a goat.\n\nWould you like to switch? (y/n)\n\n" + emotes)
+                msg = await msg.edit(content="You've chosen door number " + str(answer) + ".\n\nDoor number " + str(reveal_goat) + " has been opened, revealing a goat.\n\nWould you like to switch? (y/n)\n\n" + emotes)
                 answered = True
         switch_answered = False
         while switch_answered is False:
             try:
                 switch = await self.bot.wait_for('message', check=check, timeout=180)
             except commands.errors.CommandInvokeError:
+                await msg.edit(content=msg.content + "\n\nThe bot has timed out!")
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
                 c.execute(""" UPDATE users

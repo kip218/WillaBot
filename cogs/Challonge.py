@@ -36,6 +36,23 @@ class Challonge:
         Create a new challonge tournament.
         w.chal create
         '''
+        # Check that the user isn't already creating a tournament
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(ctx.author.id), ))
+        status_lst = c.fetchone()[0]
+        if status_lst is not None:
+            if "chal create" in status_lst:
+                await ctx.send("You're already creating a tournament!")
+                conn.commit()
+                conn.close()
+                return
+        c.execute(""" UPDATE users
+                    SET status = array_append(status, %s)
+                    WHERE ID = %s; """, ('chal create', str(ctx.author.id)))
+        conn.commit()
+        conn.close()
+
         await ctx.send("Check your DM!")
         await ctx.message.author.send("```Please answer the following questions in the appropriate format. Your tournament will be created after this process is done. The bot will time out if each question isn't answered within 10 minutes. Because the challonge function is still in development, please let Willa know if you encounter any errors!```")
 
@@ -47,8 +64,15 @@ class Challonge:
         question = await ctx.message.author.send("What game is the tournament for?\n\n**Game name:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
-        except:
+        except commands.errors.CommandInvokeError:
             await question.edit(content="```The bot has timed out!```")
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE users
+                        SET status = array_remove(status, %s)
+                        WHERE ID = %s; """, ('chal create', str(ctx.author.id)))
+            conn.commit()
+            conn.close()
             return
         else:
             await question.edit(content="```Game name: " + answer.content + "```")
@@ -58,8 +82,15 @@ class Challonge:
         question = await ctx.message.author.send("What is the name of the tournament?\n\n**Tournament name:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
-        except:
+        except commands.errors.CommandInvokeError:
             await question.edit(content="```The bot has timed out!```")
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE users
+                        SET status = array_remove(status, %s)
+                        WHERE ID = %s; """, ('chal create', str(ctx.author.id)))
+            conn.commit()
+            conn.close()
             return
         else:
             await question.edit(content="```Tournament name: " + answer.content + "```")
@@ -71,8 +102,15 @@ class Challonge:
         while answered is False:
             try:
                 answer = await self.bot.wait_for('message', check=check, timeout=600)
-            except:
+            except commands.errors.CommandInvokeError:
                 await question.edit(content="```The bot has timed out!```")
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+                c.execute(""" UPDATE users
+                            SET status = array_remove(status, %s)
+                            WHERE ID = %s; """, ('chal create', str(ctx.author.id)))
+                conn.commit()
+                conn.close()
                 return
             else:
                 if answer.content.lower() == 'single elimination' or answer.content.lower() == 'double elimination':
@@ -86,8 +124,15 @@ class Challonge:
         question = await ctx.message.author.send("**Tournament description:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
-        except:
+        except commands.errors.CommandInvokeError:
             await question.edit(content="```The bot has timed out!```")
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE users
+                        SET status = array_remove(status, %s)
+                        WHERE ID = %s; """, ('chal create', str(ctx.author.id)))
+            conn.commit()
+            conn.close()
             return
         else:
             await question.edit(content="```Tournament description: " + answer.content + "```")
@@ -99,8 +144,16 @@ class Challonge:
         while answered is False:
             try:
                 answer = await self.bot.wait_for('message', check=check, timeout=600)
-            except:
+            except commands.errors.CommandInvokeError:
                 await question.edit(content="```The bot has timed out!```")
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+                c.execute(""" UPDATE users
+                            SET status = array_remove(status, %s)
+                            WHERE ID = %s; """, ('chal create', str(ctx.author.id)))
+                conn.commit()
+                conn.close()
+                return
             else:
                 if answer.content.lower() != "none":
                     try:
@@ -142,8 +195,16 @@ class Challonge:
             while answered is False:
                 try:
                     answer = await self.bot.wait_for('message', check=check, timeout=1800)
-                except:
+                except commands.errors.CommandInvokeError:
                     await question.edit(content="```The bot has timed out!```")
+                    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                    c = conn.cursor()
+                    c.execute(""" UPDATE users
+                                SET status = array_remove(status, %s)
+                                WHERE ID = %s; """, ('chal create', str(ctx.author.id)))
+                    conn.commit()
+                    conn.close()
+                    return
                 else:
                     try:
                         check_in = int(answer.content)
@@ -193,6 +254,14 @@ class Challonge:
                 print("Inserted new tournament into database: " + str(tournament_id))
                 conn.commit()
                 conn.close()
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" UPDATE users
+                    SET status = array_remove(status, %s)
+                    WHERE ID = %s; """, ('chal create', str(ctx.author.id)))
+        conn.commit()
+        conn.close()
 
     @chal.command()
     async def info(self, ctx, url):
