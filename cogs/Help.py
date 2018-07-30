@@ -42,7 +42,7 @@ class Help:
         w.help [command]
         Command can be specified to get more information about the command.
         '''
-        if ctx.invoked_subcommand is None:
+        if command is None:
             curr_page = 1
             curr_ind = curr_page - 1
             embed = self.lst_cogs_embed[curr_ind]
@@ -80,6 +80,9 @@ class Help:
                     new_ind = new_page_num - 1
                     new_embed = self.lst_cogs_embed[new_ind]
                     await help_page.edit(embed=new_embed)
+        else:
+            if command in self.bot.commands:
+                await ctx.send(command.help)
 
     @help.error
     async def help_on_cooldown(self, ctx, error):

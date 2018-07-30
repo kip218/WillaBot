@@ -21,7 +21,7 @@ class Brawlhalla:
         '''
 
     @b.command()
-    async def info(self, ctx, legend, skin: str='base', color: str='Classic_Colors'):
+    async def info(self, ctx, legend, skin: str=None, color: str=None):
         '''
         Gives info of a Brawlhalla legend, skin, color.
         '''
@@ -35,10 +35,14 @@ class Brawlhalla:
             return res
 
         legend = legend.upper().replace('-', '_')
-        if skin != "base":
+        if skin is not None:
             skin = format(skin)
-        if color != "Classic_Colors":
+        else:
+            skin = 'base'
+        if color is not None:
             color = format(color)
+        else:
+            color = 'Classic_Colors'
         img_url_lst = [legend, skin, color]
         img_url = '_'.join(img_url_lst)
         print(img_url)
