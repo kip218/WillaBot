@@ -89,8 +89,9 @@ class Help:
             error_msg = error_msg[T_ind:]
             user = ctx.message.author
             await ctx.send("Slow down " + user.mention + "! The command is on cooldown! " + error_msg + ".")
-        # else:
-        #     await ctx.send("Unknown error. Please tell Willa.")
+        else:
+            await ctx.send("Unknown error. Please tell Willa.")
+            print(error)
 
     @help.command()
     async def owner(self, ctx):
