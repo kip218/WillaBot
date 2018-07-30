@@ -52,7 +52,7 @@ class Game:
                 answer = int(answer.content)
                 options.remove(answer)
                 options.append(answer)
-            except TimeoutError:
+            except commands.CommandInvokeError:
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
                 c.execute(""" UPDATE users
@@ -95,7 +95,7 @@ class Game:
         while switch_answered is False:
             try:
                 switch = await self.bot.wait_for('message', check=check, timeout=180)
-            except TimeoutError:
+            except commands.CommandInvokeError:
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
                 c.execute(""" UPDATE users
@@ -199,7 +199,7 @@ class Game:
         while accepted is False:
             try:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=120)
-            except TimeoutError:
+            except commands.CommandInvokeError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
                 return
             else:
