@@ -217,7 +217,7 @@ class Game:
                 conn.commit()
                 conn.close()
                 return
-        c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(opponent.id, )))
+        c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(opponent.id), ))
         opponent_status_lst = c.fetchone()[0]
         if opponent_status_lst is not None:
             if "pw" in opponent_status_lst:
