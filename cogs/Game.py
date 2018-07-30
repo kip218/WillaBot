@@ -48,11 +48,11 @@ class Game:
         answered = False
         while answered is False:
             try:
-                answer = await self.bot.wait_for('message', check=check, timeout=180)
+                answer = await self.bot.wait_for('message', check=check, timeout=60)
                 answer = int(answer.content)
                 options.remove(answer)
                 options.append(answer)
-            except commands.errors.CommandInvokeError:
+            except asyncio.TimeoutError:
                 await msg.edit(content=msg.content + "\n\nThe bot has timed out!")
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
@@ -95,8 +95,8 @@ class Game:
         switch_answered = False
         while switch_answered is False:
             try:
-                switch = await self.bot.wait_for('message', check=check, timeout=180)
-            except commands.errors.CommandInvokeError:
+                switch = await self.bot.wait_for('message', check=check, timeout=60)
+            except asyncio.TimeoutError:
                 await msg.edit(content=msg.content + "\n\nThe bot has timed out!")
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
@@ -201,7 +201,7 @@ class Game:
         while accepted is False:
             try:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=120)
-            except commands.errors.CommandInvokeError:
+            except asyncio.TimeoutError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
                 return
             else:
