@@ -37,14 +37,14 @@ class Brawlhalla:
             return res
 
         legend = legend.upper().replace('-', '_')
-        if skin is not None:
-            skin = format(skin)
-        else:
+        if skin is None or skin == "base":
             skin = 'base'
-        if color is not None:
-            color = format(color)
         else:
+            skin = format(skin)
+        if color is None or color == "Classic_Colors":
             color = 'Classic_Colors'
+        else:
+            color = format(color)
         img_url_lst = [legend, skin, color]
         img_url = '_'.join(img_url_lst)
         print(img_url)

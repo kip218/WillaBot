@@ -12,7 +12,7 @@ def format_help_page(bot, cog_name, curr_page, max_page):
         color=0x48d1cc
         )
     embed.set_author(name="WillaBot", icon_url="https://cdn.discordapp.com/avatars/463398601553346581/16918503e6313c71fc023ac37233d992.webp?size=1024")
-    embed.set_footer(text="Prefix is 'w.'. 'w.help [command]' for more info on command.")
+    embed.set_footer(text="Prefix is \"w.\"\n\"w.help [command]\" for info on a specific command")
     for command in lst_commands:
         embed.add_field(name=command.signature, value=command.short_doc, inline=False)
         if isinstance(command, commands.core.Group):
@@ -34,7 +34,7 @@ class Help:
             self.lst_cogs_embed.append(embed)
 
     @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def help(self, ctx, *, command: str=None):
         '''
         Sends the help menu.
