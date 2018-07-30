@@ -52,7 +52,7 @@ class Game:
                 answer = int(answer.content)
                 options.remove(answer)
                 options.append(answer)
-            except commands.CommandInvokeError:
+            except commands.errors.CommandInvokeError:
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
                 c.execute(""" UPDATE users
@@ -95,7 +95,7 @@ class Game:
         while switch_answered is False:
             try:
                 switch = await self.bot.wait_for('message', check=check, timeout=180)
-            except commands.CommandInvokeError:
+            except commands.errors.CommandInvokeError:
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
                 c.execute(""" UPDATE users
@@ -199,7 +199,7 @@ class Game:
         while accepted is False:
             try:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=120)
-            except commands.CommandInvokeError:
+            except commands.errors.CommandInvokeError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
                 return
             else:
@@ -227,7 +227,7 @@ class Game:
                 return
         c.execute(""" UPDATE users
                     SET status = array_append(status, %s)
-                    WHERE ID = %s; """, ('pw', str(ctx.author.id)))
+                    WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
         conn.commit()
         conn.close()
 
