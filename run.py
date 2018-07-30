@@ -17,6 +17,7 @@ initial_extensions = ['cogs.Chat',
                       'cogs.Challonge',
                       'cogs.Game',
                       'cogs.Todo',
+                      'cogs.Brawlhalla',
                       'cogs.Help']
 
 bot = commands.Bot(command_prefix='w.')

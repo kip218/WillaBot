@@ -28,7 +28,7 @@ class Help:
 
     def __init__(self, bot):
         self.bot = bot
-        self.lst_cogs = ['General', 'Game', 'Todo', 'Chat', 'Challonge', 'Bot']
+        self.lst_cogs = ['General', 'Game', 'Todo', 'Chat', 'Brawlhalla', 'Challonge', 'Bot']
         self.lst_cogs_embed = []
         for i in range(len(self.lst_cogs)):
             embed = format_help_page(bot, self.lst_cogs[i], i+1, len(self.lst_cogs))
