@@ -18,12 +18,14 @@ class Brawlhalla:
     async def b(self, ctx):
         '''
         Brawlhalla commands
+        w.b
         '''
 
     @b.command()
     async def info(self, ctx, legend, skin: str=None, color: str=None):
         '''
         Gives info of a Brawlhalla legend, skin, color.
+        w.b info
         '''
         def format(string):
             string_lst = string.split("-")
