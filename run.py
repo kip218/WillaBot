@@ -99,7 +99,7 @@ async def on_connect():
     c.execute(create_tournaments_table)
     c.execute(create_users_table)
     c.execute("ALTER TABLE users DROP COLUMN status;")
-    c.execute("ALTER TABLE users ADD COLUMN status test[]")
+    c.execute("ALTER TABLE users ADD COLUMN status test[];")
     conn.commit()
     conn.close()
 
