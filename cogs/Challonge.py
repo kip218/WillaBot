@@ -8,6 +8,7 @@ import random
 import string
 import psycopg2
 import os
+import asyncio
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -64,7 +65,7 @@ class Challonge:
         question = await ctx.message.author.send("What game is the tournament for?\n\n**Game name:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
-        except commands.errors.CommandInvokeError:
+        except asyncio.TimeoutError:
             await question.edit(content="```The bot has timed out!```")
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
@@ -82,7 +83,7 @@ class Challonge:
         question = await ctx.message.author.send("What is the name of the tournament?\n\n**Tournament name:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
-        except commands.errors.CommandInvokeError:
+        except asyncio.TimeoutError:
             await question.edit(content="```The bot has timed out!```")
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
@@ -102,7 +103,7 @@ class Challonge:
         while answered is False:
             try:
                 answer = await self.bot.wait_for('message', check=check, timeout=600)
-            except commands.errors.CommandInvokeError:
+            except asyncio.TimeoutError:
                 await question.edit(content="```The bot has timed out!```")
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
@@ -124,7 +125,7 @@ class Challonge:
         question = await ctx.message.author.send("**Tournament description:** ")
         try:
             answer = await self.bot.wait_for('message', check=check, timeout=600)
-        except commands.errors.CommandInvokeError:
+        except asyncio.TimeoutError:
             await question.edit(content="```The bot has timed out!```")
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
@@ -144,7 +145,7 @@ class Challonge:
         while answered is False:
             try:
                 answer = await self.bot.wait_for('message', check=check, timeout=600)
-            except commands.errors.CommandInvokeError:
+            except asyncio.TimeoutError:
                 await question.edit(content="```The bot has timed out!```")
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
@@ -195,7 +196,7 @@ class Challonge:
             while answered is False:
                 try:
                     answer = await self.bot.wait_for('message', check=check, timeout=1800)
-                except commands.errors.CommandInvokeError:
+                except asyncio.TimeoutError:
                     await question.edit(content="```The bot has timed out!```")
                     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                     c = conn.cursor()
