@@ -89,7 +89,8 @@ async def on_connect():
                                         balance text NOT NULL,
                                         tournament_url_list text[],
                                         todo_list text[],
-                                        daily_time timestamp
+                                        daily_time timestamp,
+                                        status text[]
                                         ); """
 
     # conn = psycopg2.connect(database='willabot_db')
@@ -97,6 +98,8 @@ async def on_connect():
     c = conn.cursor()
     c.execute(create_tournaments_table)
     c.execute(create_users_table)
+    c.execute("ALTER TABLE users DROP COLUMN status;")
+    c.execute("ALTER TABLE users ADD COLUMN status test[]")
     conn.commit()
     conn.close()
 

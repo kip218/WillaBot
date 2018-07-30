@@ -32,7 +32,7 @@ class Todo:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
-                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
+                    WHERE ID = %s; """, (str(ctx.author.id), ))
         todo_list = c.fetchone()[0]
         if todo_list is None:
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
@@ -40,7 +40,7 @@ class Todo:
             description = ""
             for i in range(len(todo_list)):
                 description += "**" + str(i+1) + ")** " + todo_list[i] + "\n"
-            embed = discord.Embed(title=str(ctx.message.author.name) + "'s to-do list", description=description, color=0x48d1cc)
+            embed = discord.Embed(title=str(ctx.author.name) + "'s to-do list", description=description, color=0x48d1cc)
             await ctx.send(embed=embed)
         conn.commit()
         conn.close()
@@ -54,7 +54,7 @@ class Todo:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
-                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
+                    WHERE ID = %s; """, (str(ctx.author.id), ))
         todo_list = c.fetchone()[0]
         if todo_list is not None:
             if task in todo_list:
@@ -62,7 +62,7 @@ class Todo:
                 return
         c.execute(""" UPDATE users
                     SET todo_list = array_append(todo_list, %s) 
-                    WHERE ID = %s; """, (str(task), str(ctx.message.author.id)))
+                    WHERE ID = %s; """, (str(task), str(ctx.author.id)))
         await ctx.send("Added task: \"" + str(task) + "\"")
         conn.commit()
         conn.close()
@@ -81,7 +81,7 @@ class Todo:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
-                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
+                    WHERE ID = %s; """, (str(ctx.author.id), ))
         todo_list = c.fetchone()[0]
         if todo_list is None:
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
@@ -89,7 +89,7 @@ class Todo:
             task_to_remove = todo_list[num-1]
             c.execute(""" UPDATE users
                         SET todo_list = array_remove(todo_list, %s)
-                        WHERE ID = %s; """, (task_to_remove, str(ctx.message.author.id)))
+                        WHERE ID = %s; """, (task_to_remove, str(ctx.author.id)))
             await ctx.send("Removed task: \"" + task_to_remove + "\"")
         else:
             await ctx.send("You must input an integer between 1 and " + str(len(todo_list)))
@@ -110,7 +110,7 @@ class Todo:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
-                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
+                    WHERE ID = %s; """, (str(ctx.author.id), ))
         todo_list = c.fetchone()[0]
         if todo_list is None:
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
@@ -119,12 +119,12 @@ class Todo:
             if task_to_check[:2] == "~~" and task_to_check[-2:] == "~~":
                 c.execute(""" UPDATE users
                             SET todo_list = array_replace(todo_list, %s, %s)
-                            WHERE ID = %s; """, (task_to_check, task_to_check[2:-2], str(ctx.message.author.id)))
+                            WHERE ID = %s; """, (task_to_check, task_to_check[2:-2], str(ctx.author.id)))
                 await ctx.send("Unchecked task: \"" + task_to_check[2:-2] + "\"")
             else:
                 c.execute(""" UPDATE users
                             SET todo_list = array_replace(todo_list, %s, %s)
-                            WHERE ID = %s; """, (task_to_check, "~~"+task_to_check+"~~", str(ctx.message.author.id)))
+                            WHERE ID = %s; """, (task_to_check, "~~"+task_to_check+"~~", str(ctx.author.id)))
                 await ctx.send("Checked task: \"" + task_to_check + "\"")
         else:
             await ctx.send("You must input an integer between 1 and " + str(len(todo_list)))
@@ -141,7 +141,7 @@ class Todo:
         c = conn.cursor()
         c.execute(""" UPDATE users
                     SET todo_list = Null
-                    WHERE ID = %s; """, (str(ctx.message.author.id), ))
+                    WHERE ID = %s; """, (str(ctx.author.id), ))
         await ctx.send("Your to-do list has been cleaned.")
         conn.commit()
         conn.close()

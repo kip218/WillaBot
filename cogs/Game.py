@@ -22,21 +22,46 @@ class Game:
         The famous Monty Hall problem.
         w.montyhall
         '''
+        # Check that the user isn't already playing the game
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(ctx.author.id), ))
+        status_lst = c.fetchone()[0]
+        if status_lst is not None:
+            if "montyhall" in status_lst:
+                await ctx.send("You're already in a game of montyhall!")
+                conn.commit()
+                conn.close()
+                return
+        c.execute(""" UPDATE users
+                    SET status = array_append(status, %s)
+                    WHERE ID = %s; """, ('montyhall', str(ctx.author.id)))
+        conn.commit()
+        conn.close()
 
         def check(m):
-            return not m.author.bot and m.author == ctx.message.author
+            return not m.author.bot and m.author == ctx.author
 
         options = [1, 2, 3]
         car = random.randint(1, 3)
         msg = await ctx.send("Choose a door to open (1, 2, 3)\n\n:one: :two: :three:\n:door: :door: :door:")
         answered = False
         while answered is False:
-            answer = await self.bot.wait_for('message', check=check, timeout=180)
             try:
+                answer = await self.bot.wait_for('message', check=check, timeout=180)
                 answer = int(answer.content)
                 options.remove(answer)
                 options.append(answer)
-            except:
+            except TimeoutError:
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+                c.execute(""" UPDATE users
+                            SET status = array_remove(status, %s)
+                            WHERE ID = %s; """, ('montyhall', str(ctx.author.id)))
+                conn.commit()
+                conn.close()
+                return
+            except ValueError:
                 pass
             else:
                 options.remove(car)
@@ -66,49 +91,67 @@ class Game:
                         emotes += ":door: "
                 await msg.edit(content="You've chosen door number " + str(answer) + ".\n\nDoor number " + str(reveal_goat) + " has been opened, revealing a goat.\n\nWould you like to switch? (y/n)\n\n" + emotes)
                 answered = True
-                switch_answered = False
-                while switch_answered is False:
-                    switch = await self.bot.wait_for('message', check=check, timeout=180)
-                    if switch.content.lower() == 'y':
-                        answer = options[0]
-                        switch_answered = True
-                    elif switch.content.lower() == 'n':
-                        switch_answered = True
-                    if switch_answered is True:
-                        emotes = ""
-                        for i in range(1, 4):
-                            if i == answer:
-                                emotes += ":arrow_down: "
-                            elif i == 1:
-                                emotes += ":one: "
-                            elif i == 2:
-                                emotes += ":two: "
-                            elif i == 3:
-                                emotes += ":three: "
-                        emotes += "\n"
-                        for i in range(1, 4):
-                            if i == car:
-                                emotes += ":red_car: "
-                            else:
-                                emotes += ":goat: "
-                        if answer == car:
-                            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-                            c = conn.cursor()
-                            c.execute(""" SELECT xp, balance FROM users
-                                        WHERE ID = %s; """, (str(ctx.message.author.id), ))
-                            fetch = c.fetchone()
-                            xp = int(fetch[0])
-                            balance = int(fetch[1])
-                            xp_increase = random.randint(10, 20)
-                            balance_increase = random.randint(20, 40)
-                            xp += xp_increase
-                            balance += balance_increase
-                            c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.message.author.id)))
-                            conn.commit()
-                            conn.close()
-                            await msg.edit(content="You found the car!\n\nYou got " + str(xp_increase) + " XP and " + str(balance_increase) + " WillaCoins.\n\n" + emotes)
+        switch_answered = False
+        while switch_answered is False:
+            try:
+                switch = await self.bot.wait_for('message', check=check, timeout=180)
+            except TimeoutError:
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+                c.execute(""" UPDATE users
+                            SET status = array_remove(status, %s)
+                            WHERE ID = %s; """, ('montyhall', str(ctx.author.id)))
+                conn.commit()
+                conn.close()
+                return
+            else:
+                if switch.content.lower() == 'y':
+                    answer = options[0]
+                    switch_answered = True
+                elif switch.content.lower() == 'n':
+                    switch_answered = True
+                if switch_answered is True:
+                    emotes = ""
+                    for i in range(1, 4):
+                        if i == answer:
+                            emotes += ":arrow_down: "
+                        elif i == 1:
+                            emotes += ":one: "
+                        elif i == 2:
+                            emotes += ":two: "
+                        elif i == 3:
+                            emotes += ":three: "
+                    emotes += "\n"
+                    for i in range(1, 4):
+                        if i == car:
+                            emotes += ":red_car: "
                         else:
-                            await msg.edit(content="You did not find the car. Try again!\n\n" + emotes)
+                            emotes += ":goat: "
+                    if answer == car:
+                        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                        c = conn.cursor()
+                        c.execute(""" SELECT xp, balance FROM users
+                                    WHERE ID = %s; """, (str(ctx.author.id), ))
+                        fetch = c.fetchone()
+                        xp = int(fetch[0])
+                        balance = int(fetch[1])
+                        xp_increase = random.randint(10, 20)
+                        balance_increase = random.randint(20, 40)
+                        xp += xp_increase
+                        balance += balance_increase
+                        c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.author.id)))
+                        conn.commit()
+                        conn.close()
+                        await msg.edit(content="You found the car!\n\nYou got " + str(xp_increase) + " XP and " + str(balance_increase) + " WillaCoins.\n\n" + emotes)
+                    else:
+                        await msg.edit(content="You did not find the car. Try again!\n\n" + emotes)
+                    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" UPDATE users
+                    SET status = array_remove(status, %s)
+                    WHERE ID = %s; """, ('montyhall', str(ctx.author.id)))
+        conn.commit()
+        conn.close()
 
     @commands.command()
     async def pw(self, ctx, user):
@@ -120,7 +163,7 @@ class Game:
             await ctx.send("You must mention a user to play against!")
             return
 
-        player = ctx.message.author
+        player = ctx.author
         opponent = ctx.message.mentions[0]
         if opponent.bot:
             await ctx.send("You can't challenge a bot!")
@@ -156,13 +199,39 @@ class Game:
         while accepted is False:
             try:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=120)
-            except:
-                await challenge_msg.edit(content=opponent.mention + "! " + player.mention + " challenged you to a game of Peace/War! Type \"w.accept\" to accept!\n\nThe challenge has timed out!")
+            except TimeoutError:
+                await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
                 return
             else:
                 if accept.content == "w.accept":
                     accepted = True
-                    challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
+
+        # Check that the user isn't already playing the game
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(player.id), ))
+        player_status_lst = c.fetchone()[0]
+        if player_status_lst is not None:
+            if "pw" in player_status_lst:
+                await ctx.send(player.name + " is already in a game of Peace/War!")
+                conn.commit()
+                conn.close()
+                return
+        c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(opponent.id, )))
+        opponent_status_lst = c.fetchone()[0]
+        if opponent_status_lst is not None:
+            if "pw" in opponent_status_lst:
+                await ctx.send(opponent.name + " is already in a game of Peace/War!")
+                conn.commit()
+                conn.close()
+                return
+        c.execute(""" UPDATE users
+                    SET status = array_append(status, %s)
+                    WHERE ID = %s; """, ('pw', str(ctx.author.id)))
+        conn.commit()
+        conn.close()
+
+        challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
 
         prompt = "The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 300 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war."
         player_prompt = await player.send(prompt)
@@ -189,6 +258,13 @@ class Game:
                     await player_prompt.edit(content="The game has timed out!")
                     await opponent_prompt.edit(content="The game has timed out!")
                     await challenge_accepted.edit(content="Challenge accepted! Check your DMs!\nThe game has timed out!")
+                    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                    c = conn.cursor()
+                    c.execute(""" UPDATE users
+                                SET status = array_remove(status, %s)
+                                WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
+                    conn.commit()
+                    conn.close()
                     timeout = True
                     return
             except:
@@ -273,6 +349,11 @@ class Game:
             await opponent.send(both_war)
             await ctx.send(player.mention + " and " + opponent.mention + " both declared **WAR** and lost 100 WillaCoins!")
 
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" UPDATE users
+                    SET status = array_remove(status, %s)
+                    WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
         conn.commit()
         conn.close()
 
