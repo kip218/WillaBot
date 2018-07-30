@@ -22,6 +22,9 @@ class Brawlhalla:
 
     @b.command()
     async def test(self, ctx):
+        '''
+        test
+        '''
         await ctx.send(file=discord.File("http://s3.amazonaws.com/willabot-assets/images/legends/ADA_Atlantean_Ada_Black.png"))
 
 def setup(bot):
