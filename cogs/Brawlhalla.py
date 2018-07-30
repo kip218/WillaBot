@@ -34,7 +34,7 @@ class Brawlhalla:
             res = "_".join(string_lst)
             return res
 
-        legend = legend.upper()
+        legend = legend.upper().replace('-', '_')
         if skin != "base":
             skin = format(skin)
         if color != "Classic_Colors":

@@ -36,7 +36,7 @@ class Help:
 
     @commands.cooldown(rate=1, per=10, type=commands.BucketType.user)
     @commands.group()
-    async def help(self, ctx):
+    async def help(self, ctx, command: str=None):
         '''
         Sends the help menu.
         w.help [command]
