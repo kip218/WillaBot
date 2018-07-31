@@ -65,8 +65,8 @@ class Brawlhalla:
                 # remove this after s3 update
                 legend = legend.upper()
                 obj_dict = s3.list_objects_v2(Bucket='willabot-assets', Prefix=f'images/legends/{legend}')
-                for obj in obj_dict['Contents']:
-                    print(obj['Key'])
+                # for obj in obj_dict['Contents']:
+                #     print(obj['Key'])
                 list_length = str(len(obj_dict['Contents']))
                 await ctx.send(f"Finished iterating through {list_length} files for {legend}")
             await ctx.send("DONE")
