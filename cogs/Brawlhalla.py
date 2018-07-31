@@ -53,7 +53,7 @@ class Brawlhalla:
         embed.set_image(url="https://s3.amazonaws.com/willabot-assets/images/legends/" + img_url + ".png")
         await ctx.send(embed=embed)
 
-    @b.command()
+    @b.command(hidden=False)
     async def test(self, ctx):
         '''
         test
