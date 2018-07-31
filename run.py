@@ -95,7 +95,7 @@ async def on_connect():
                                         ); """
 
     # create_legends_table = """ CREATE TABLE IF NOT EXISTS legends (
-    #                                     filename text PRIMARY KEY,
+    #                                     key text PRIMARY KEY,
     #                                     name text NOT NULL,
     #                                     skin text NOT NULL,
     #                                     color text NOT NULL,
