@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import psycopg2
 import os
-import boto3
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
