@@ -25,8 +25,8 @@ class Bot:
             total_users += len(guild.members)
         await ctx.send("WillaBot is currently exploring " + str(num) + " different servers with " + str(total_users) + " users!")
 
-    @commands.command(aliases=["server"])
-    async def serverinfo(self, ctx, *, server_name: str=None):
+    @commands.command()
+    async def server(self, ctx, *, server_name: str=None):
         '''
         Gives current server info if [server name] not specified. Name of the server can be specified to show info of that server. WillaBot needs to be a member of the server.
         w.serverinfo [server name]

@@ -28,7 +28,7 @@ class Chat:
                 await ctx.send(content)
 
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
-    @echo.command(aliases=["del"])
+    @echo.command(aliases=["del"], usage="/ del [message]")
     async def delete(self, ctx, *, message: str=None):
         '''
         Repeats message and deletes original message.
