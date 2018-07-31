@@ -94,6 +94,14 @@ async def on_connect():
                                         status text[]
                                         ); """
 
+    # create_legends_table = """ CREATE TABLE IF NOT EXISTS legends (
+    #                                     filename text PRIMARY KEY,
+    #                                     name text NOT NULL,
+    #                                     skin text NOT NULL,
+    #                                     color text NOT NULL,
+    #                                     stance_stats text[]
+    #                                     ); """
+
     # conn = psycopg2.connect(database='willabot_db')
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()

@@ -8,11 +8,11 @@ def format_help_page(bot, cog_name, curr_page, max_page):
     lst_commands = bot.get_cog_commands(cog_name)
     embed = discord.Embed(
         title=cog_name + " commands",
-        description="Page " + str(curr_page) + " of " + str(max_page) + ". React with :point_left: or :point_right: below to view other pages.",
+        description="Page " + str(curr_page) + " of " + str(max_page) + ". React with :point_left: or :point_right: below to view other pages.\n\"w.help [command]\" for info on a specific command.",
         color=0x48d1cc
         )
     embed.set_author(name="WillaBot", icon_url="https://cdn.discordapp.com/avatars/463398601553346581/16918503e6313c71fc023ac37233d992.webp?size=1024")
-    embed.set_footer(text="Prefix is \"w.\"\n\"w.help [command]\" for info on a specific command")
+    embed.set_footer(text="Prefix is \"w.\"")
     for command in lst_commands:
         embed.add_field(name=command.signature, value=command.short_doc, inline=False)
         if isinstance(command, commands.core.Group):
@@ -87,7 +87,7 @@ class Help:
                 await ctx.send(cmd.help)
 
     @help.error
-    async def help_on_cooldown(self, ctx, error):
+    async def help_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             error_msg = str(error)
             T_ind = error_msg.find("T")
