@@ -26,6 +26,7 @@ class Brawlhalla:
         '''
         Gives info of a Brawlhalla legend, skin, color.
         w.b info
+
         Leave [skin]/[color] empty to get the default skin/color.
         For example:
         - "w.b info ada" gives default skin default color ada
@@ -71,7 +72,7 @@ class Brawlhalla:
             name = row[1][0].upper() + row[1][1:]
             skin = row[2][0].upper() + row[2][1:]
             color = row[3][0].upper() + row[3][1:]
-            embed = discord.Embed(title=f"{skin} {name} *({color})*")
+            embed = discord.Embed(title=f"{skin} {name} *({color})*", color=0x36393E)
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
             # temporary if statement. remove when finished updating all legends.
             if row[4] is not None and row[5] is not None:
