@@ -61,7 +61,7 @@ class Brawlhalla:
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        c.execute("""SELECT key, name, skin, color FROM legends
+        c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
                         WHERE name LIKE '%%'||%s||'%%'
                             AND skin LIKE '%%'||%s||'%%'
                             AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
@@ -71,8 +71,14 @@ class Brawlhalla:
             name = row[1][0].upper() + row[1][1:]
             skin = row[2][0].upper() + row[2][1:]
             color = row[3][0].upper() + row[3][1:]
-            embed = discord.Embed(title=f"{skin} {name} *{color}*")
+            embed = discord.Embed(title=f"{skin} {name} *({color})*")
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
+            # temporary if statement. remove when finished updating all legends.
+            if row[4] is not None and row[5] is not None:
+                default_stats = row[4][0]
+                weapons = row[5]
+                embed.add_field(name="Stats", value=f"**Str:** {default_stats[0]}\n**Dex:** {default_stats[1]}\n**Def:** {default_stats[2]}\n**Spd:** {default_stats[3]}", inline=True)
+                embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
             await ctx.send(embed=embed)
         else:
             await ctx.send("Legend/skin/color not found!")

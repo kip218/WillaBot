@@ -99,7 +99,8 @@ async def on_connect():
                                         name text NOT NULL,
                                         skin text NOT NULL,
                                         color text NOT NULL,
-                                        stance_stats text[]
+                                        stance_stats text[][] NOT NULL,
+                                        weapons text[] NOT NULL
                                         ); """
 
     # conn = psycopg2.connect(database='willabot_db')
@@ -110,6 +111,62 @@ async def on_connect():
     c.execute(create_legends_table)
     c.execute("ALTER TABLE users DROP COLUMN status;")
     c.execute("ALTER TABLE users ADD COLUMN status text[];")
+    # c.execute("""UPDATE legends
+    #                 SET stance_stats = '{{6,7,3,6}, {7,7,2,6}, {6,8,3,5}, {6,6,4,6}, {5,7,3,7}}'
+    #                 WHERE name = 'ada' ;""")
+    # c.execute("""UPDATE legends
+    #                 SET weapons = '{Blasters, Spear}'
+    #                 WHERE name = 'ada' ;""")
+
+    # c.execute("""UPDATE legends
+    #                 SET stance_stats = '{{5,5,4,8}, {6,5,3,8}, {4,6,4,8}, {5,5,5,7}, {5,4,5,9}}'
+    #                 WHERE name = 'artemis' ;""")
+    # c.execute("""UPDATE legends
+    #                 SET weapons = '{Rocket Lance, Scythe}'
+    #                 WHERE name = 'artemis' ;""")
+
+    # c.execute("""UPDATE legends
+    #                 SET stance_stats = '{{4,7,5,6}, {5,6,5,6}, {4,8,5,5}, {3,7,6,6}, {4,7,4,7}}'
+    #                 WHERE name = 'asuri' ;""")
+    # c.execute("""UPDATE legends
+    #                 SET weapons = '{Katars, Sword}'
+    #                 WHERE name = 'asuri' ;""")
+
+    # c.execute("""UPDATE legends
+    #                 SET stance_stats = '{{7,5,6,4}, {8,5,5,4}, {7,6,6,3}, {7,4,7,4}, {6,5,6,5}}'
+    #                 WHERE name = 'azoth' ;""")
+    # c.execute("""UPDATE legends
+    #                 SET weapons = '{Bow, Axe}'
+    #                 WHERE name = 'azoth' ;""")
+
+    # c.execute("""UPDATE legends
+    #                 SET stance_stats = '{{6,4,8,4}, {7,3,8,4}, {6,5,8,3}, {5,4,9,4}, {6,4,7,5}}'
+    #                 WHERE name = 'barraza' ;""")
+    # c.execute("""UPDATE legends
+    #                 SET weapons = '{Axe, Blasters}'
+    #                 WHERE name = 'barraza' ;""")
+
+    # c.execute("""UPDATE legends
+    #                 SET stance_stats = '{{6,6,5,5}, {7,5,5,5}, {6,7,4,5}, {6,6,6,4}, {5,6,5,6}}'
+    #                 WHERE name = 'bodvar' ;""")
+    # c.execute("""UPDATE legends
+    #                 SET weapons = '{Hammer, Sword}'
+    #                 WHERE name = 'bodvar' ;""")
+
+    # c.execute("""UPDATE legends
+    #                 SET stance_stats = '{{5,5,5,7}, {6,4,5,7}, {5,6,5,6}, {4,5,6,7}, {5,5,4,8}}'
+    #                 WHERE name = 'brynn' ;""")
+    # c.execute("""UPDATE legends
+    #                 SET weapons = '{Axe, Spear}'
+    #                 WHERE name = 'brynn' ;""")
+
+    # c.execute("""UPDATE legends
+    #                 SET stance_stats = '{{7,5,4,6}, {8,5,4,5}, {7,6,3,6}, {6,5,6,5}, {7,4,4,7}}'
+    #                 WHERE name = 'caspian' ;""")
+    # c.execute("""UPDATE legends
+    #                 SET weapons = '{Gauntlets, Katars}'
+    #                 WHERE name = 'caspian' ;""")
+
     conn.commit()
     conn.close()
 
