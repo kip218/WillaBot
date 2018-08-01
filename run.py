@@ -94,19 +94,20 @@ async def on_connect():
                                         status text[]
                                         ); """
 
-    # create_legends_table = """ CREATE TABLE IF NOT EXISTS legends (
-    #                                     key text PRIMARY KEY,
-    #                                     name text NOT NULL,
-    #                                     skin text NOT NULL,
-    #                                     color text NOT NULL,
-    #                                     stance_stats text[]
-    #                                     ); """
+    create_legends_table = """ CREATE TABLE IF NOT EXISTS legends (
+                                        key text PRIMARY KEY,
+                                        name text NOT NULL,
+                                        skin text NOT NULL,
+                                        color text NOT NULL,
+                                        stance_stats text[]
+                                        ); """
 
     # conn = psycopg2.connect(database='willabot_db')
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     c.execute(create_tournaments_table)
     c.execute(create_users_table)
+    c.execute(create_legends_table)
     c.execute("ALTER TABLE users DROP COLUMN status;")
     c.execute("ALTER TABLE users ADD COLUMN status text[];")
     conn.commit()
