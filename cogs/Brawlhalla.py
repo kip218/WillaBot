@@ -8,7 +8,7 @@ DATABASE_URL = os.environ['DATABASE_URL']
 
 class Brawlhalla:
     '''
-    Commands for the to-do list.
+    Commands for Brawlhalla.
     '''
 
     def __init__(self, bot):
@@ -61,14 +61,17 @@ class Brawlhalla:
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        c.execute("""SELECT key FROM legends
+        c.execute("""SELECT key, name, skin, color FROM legends
                         WHERE name LIKE '%%'||%s||'%%'
                             AND skin LIKE '%%'||%s||'%%'
                             AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
         row = c.fetchone()
         if row is not None:
             full_key = row[0]
-            embed = discord.Embed()
+            name = row[1][0].upper() + row[1][1:]
+            skin = row[2][0].upper() + row[2][1:]
+            color = row[3][0].upper() + row[3][1:]
+            embed = discord.Embed(title=f"{skin} {name} *{color}*")
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
             await ctx.send(embed=embed)
         else:
