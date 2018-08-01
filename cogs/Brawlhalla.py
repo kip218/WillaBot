@@ -21,20 +21,27 @@ class Brawlhalla:
         w.b
         '''
 
-    @b.command(usage="<legend>, [skin], [color]")
-    async def info(self, ctx, *, msg):
+    @b.command(usage="<legend> / [skin] / [color]")
+    async def info(self, ctx, *, msg: str=None):
         '''
         Gives info of a Brawlhalla legend, skin, color.
         w.b info
+        Leave [skin]/[color] empty to get the default skin/color.
+        For example:
+        - "w.b info ada" gives default skin default color ada
+        - "w.b info ada//black" gives default skin black ada
+        - "w.b info ada/atlantean" gives default color atlantean ada
         '''
         # clean user input
-        msg_lst = msg.split(',')
+        msg_lst = msg.split('/')
         msg_lst_clean = []
         for value in msg_lst:
             value = value.replace(' ', '')
             value = value.replace('\'', '')
             value = value.replace('-', '')
             value = value.replace('_', '')
+            value = value.replace('.', '')
+            value = value.replace(',', '')
             value = value.lower()
             msg_lst_clean.append(value)
 
@@ -66,6 +73,7 @@ class Brawlhalla:
             await ctx.send(embed=embed)
         else:
             await ctx.send("Legend/skin/color not found!")
+        conn.close()
 
     # @b.command()
     # async def test(self, ctx):
