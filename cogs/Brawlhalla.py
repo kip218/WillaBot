@@ -158,7 +158,7 @@ class Brawlhalla:
             legend_name = row[0]
             c.execute(""" SELECT DISTINCT skin FROM legends
                             WHERE name = %s
-                            WHERE skin LIKE '%%'||%s||'%%'; """, (legend_input, skin_input))
+                            AND skin LIKE '%%'||%s||'%%'; """, (legend_input, skin_input))
             row = c.fetchone()
             if row is None:
                 if row is None:
@@ -167,7 +167,7 @@ class Brawlhalla:
             skin_name = row[0]
             c.execute(""" SELECT color FROM legends
                             WHERE name = %s
-                            WHERE skin LIKE '%%'||%s||'%%'; """, (legend_input, skin_input))
+                            AND skin LIKE '%%'||%s||'%%'; """, (legend_input, skin_input))
             rows = c.fetchall()
             colors_lst = []
             for row in rows:
@@ -177,7 +177,6 @@ class Brawlhalla:
             embed.set_footer(text="Some colors may be unavailable.")
             await ctx.send(embed=embed)
         conn.close()
-
 
     # @b.command()
     # async def test(self, ctx):
