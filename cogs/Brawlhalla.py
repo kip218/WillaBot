@@ -21,10 +21,10 @@ class Brawlhalla:
         w.b
         '''
 
-    @b.command(usage="<legend> / [skin] / [color]")
+    @b.command(usage="[legend] / [skin] / [color]")
     async def info(self, ctx, *, msg: str=None):
         '''
-        Gives info of a Brawlhalla legend, skin, color.
+        Your selected legend. Gives info of a Brawlhalla legend/skin/color if specified.
         w.b info
 
         Leave [skin]/[color] empty to get the default skin/color.
@@ -33,6 +33,48 @@ class Brawlhalla:
         - "w.b info ada//black" gives default skin black ada
         - "w.b info ada/atlantean" gives default color atlantean ada
         '''
+        if msg is None:
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute("""SELECT selected_legend FROM users
+                            WHERE ID = %s """, (str(ctx.author.id),))
+            selected_legend = c.fetchone()[0]
+            # return if user hasn't selected a legend
+            if selected_legend is None:
+                await ctx.send("You have not selected a legend yet! Use \"w.b legends\" to see your legends.")
+                conn.close()
+                return
+            key = selected_legend[0]
+            legend_name = selected_legend[1][0].upper() + selected_legend[1][1:]
+            skin = selected_legend[2][0].upper() + selected_legend[2][1:]
+            color = selected_legend[3][0].upper() + selected_legend[3][1:]
+            stance_num = int(selected_legend[4])
+            level = selected_legend[5]
+            stance_lst = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
+            c.execute("""SELECT stance_stats, weapons FROM legends
+                            WHERE key = %s; """, (key,))
+            row = c.fetchone()
+            stats_lst = row[0][stance_num]
+            weapons = row[1]
+            embed = discord.Embed(color=0x36393E)
+            embed.add_field(name=f"{stance_lst[stance_num]} Stance", value=f"**Str:** {stats_lst[0]}\n**Dex:** {stats_lst[1]}\n**Def:** {stats_lst[2]}\n**Spd:** {stats_lst[3]}", inline=True)
+            embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
+            embed.set_thumbnail(url=ctx.author.avatar_url)
+            embed.set_author(name=f"{ctx.author.name}'s Level {level} {skin} {legend_name}", icon_url=ctx.author.avatar_url)
+            # embed.set_image(url=f"https://s3.amazonaws.com/willabot-assets/{key}")
+            # c.execute("""SELECT legends_lst FROM users
+            #                 WHERE ID = %s; """, (str(ctx.author.id),))
+            # legends_lst = c.fetchone()[0]
+            # for ind in range(len(legends_lst)):
+            #     if legends_lst[ind][0] == key:
+            #         legend_number = ind+1
+            # embed.set_footer(text=f"Selected Legend: {legend_number}/{len(legends_lst)}")
+            await ctx.send(embed=embed)
+            conn.close()
+            return
+
+        row = c.fetchone()
+
         # clean user input
         def clean_input(msg):
             if msg is not None:
