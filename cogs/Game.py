@@ -156,7 +156,7 @@ class Game:
         conn.close()
 
     @commands.command()
-    async def pw(self, ctx, user, bet_amount: int):
+    async def pw(self, ctx, user, bet_amount: int=None):
         '''
         The Peace War game.
         w.pw <user> <bet amount>
@@ -169,6 +169,10 @@ class Game:
         opponent = ctx.message.mentions[0]
         if opponent.bot:
             await ctx.send("You can't challenge a bot!")
+            return
+
+        if bet_amount is None:
+            await ctx.send("You must specify a bet amount!")
             return
 
         # checking if both players have sufficient balance
@@ -235,7 +239,7 @@ class Game:
 
         challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
 
-        prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of WillaCoins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\n**Bet amount:** {bet_amount}"
+        prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of WillaCoins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\nBet amount: {bet_amount}"
         player_prompt = await player.send(prompt)
         opponent_prompt = await opponent.send(prompt)
         start_time = datetime.utcnow()
