@@ -235,7 +235,7 @@ class Game:
 
         challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
 
-        prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of WillaCoins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount.\n- If both players declare war, both lose the bet amount of WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\n**Bet amount:** {bet_amount}"
+        prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of WillaCoins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\n**Bet amount:** {bet_amount}"
         player_prompt = await player.send(prompt)
         opponent_prompt = await opponent.send(prompt)
         start_time = datetime.utcnow()
