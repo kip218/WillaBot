@@ -111,36 +111,6 @@ async def on_connect():
     c.execute(create_legends_table)
     c.execute("ALTER TABLE users DROP COLUMN status;")
     c.execute("ALTER TABLE users ADD COLUMN status text[];")
-
-    # c.execute("""UPDATE legends
-    #                 SET
-    #                 stance_stats = '{{4,6,6,6}, {5,6,5,6}, {4,7,6,5}, {4,5,7,6}, {3,6,6,7}}',
-    #                 weapons = '{Bow, Sword}'
-    #                 WHERE name = 'ulgrim' ;""")
-
-    # c.execute("""UPDATE legends
-    #                 SET
-    #                 stance_stats = '{{4,6,6,6}, {5,6,5,6}, {4,7,6,5}, {4,5,7,6}, {3,6,6,7}}',
-    #                 weapons = '{Bow, Sword}'
-    #                 WHERE name = 'val' ;""")
-
-    # c.execute("""UPDATE legends
-    #                 SET
-    #                 stance_stats = '{{4,6,6,6}, {5,6,5,6}, {4,7,6,5}, {4,5,7,6}, {3,6,6,7}}',
-    #                 weapons = '{Bow, Sword}'
-    #                 WHERE name = 'wushang' ;""")
-
-    # c.execute("""UPDATE legends
-    #                 SET
-    #                 stance_stats = '{{4,6,6,6}, {5,6,5,6}, {4,7,6,5}, {4,5,7,6}, {3,6,6,7}}',
-    #                 weapons = '{Bow, Sword}'
-    #                 WHERE name = 'xull' ;""")
-
-    # c.execute("""UPDATE legends
-    #                 SET
-    #                 stance_stats = '{{4,6,6,6}, {5,6,5,6}, {4,7,6,5}, {4,5,7,6}, {3,6,6,7}}',
-    #                 weapons = '{Bow, Sword}'
-    #                 WHERE name = 'yumiko' ;""")
     conn.commit()
     conn.close()
 
