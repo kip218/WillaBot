@@ -61,7 +61,7 @@ class Brawlhalla:
             embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
             embed.set_thumbnail(url=ctx.author.avatar_url)
             embed.set_author(name=f"{ctx.author.name}'s Level {level} {skin} {legend_name}", icon_url=ctx.author.avatar_url)
-            # embed.set_image(url=f"https://s3.amazonaws.com/willabot-assets/{key}")
+            embed.set_image(url=f"https://s3.amazonaws.com/willabot-assets/{key}")
             # c.execute("""SELECT legends_lst FROM users
             #                 WHERE ID = %s; """, (str(ctx.author.id),))
             # legends_lst = c.fetchone()[0]
