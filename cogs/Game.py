@@ -156,10 +156,10 @@ class Game:
         conn.close()
 
     @commands.command()
-    async def pw(self, ctx, user):
+    async def pw(self, ctx, user, bet_amount: int):
         '''
         The Peace War game.
-        w.pw <user>
+        w.pw <user> <bet amount>
         '''
         if len(ctx.message.mentions) == 0:
             await ctx.send("You must mention a user to play against!")
@@ -187,12 +187,12 @@ class Game:
             conn.close()
             return
         else:
-            if player_balance < 300 or opponent_balance < 300:
-                await ctx.send("One player does not have enough WillaCoins to play. You must have more than 300 WillaCoins to play the Peace War game.")
+            if player_balance < bet_amount or opponent_balance < bet_amount:
+                await ctx.send("One player does not have enough WillaCoins to play. You must have more than triple the bet amount to play the Peace War game.")
                 conn.close()
                 return
 
-        challenge_msg = await ctx.send(opponent.mention + "! " + player.mention + " challenged you to a game of Peace/War! Type \"w.accept\" to accept!")
+        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept\" to accept!\n\n**Bet amount: {bet_amount}")
 
         # checking if opponent accepts challenge
         def check_accept(m):
@@ -235,7 +235,7 @@ class Game:
 
         challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
 
-        prompt = "The rules of the Peace War game are as follows:\n\n- If both players declare peace, they both get 100 WillaCoins.\n- If one player declares war while the other declares peace, the player declaring war gets 300 WillaCoins, while the player declaring peace loses 300 WillaCoins\n- If both players declare war, they both lose 100 WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war."
+        prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of WillaCoins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount.\n- If both players declare war, both lose the bet amount of WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\n**Bet amount:** {bet_amount}"
         player_prompt = await player.send(prompt)
         opponent_prompt = await opponent.send(prompt)
         start_time = datetime.utcnow()
@@ -288,68 +288,51 @@ class Game:
                         opponent_war = True
                         opponent_answered = True
 
-        both_peace = "Both players declared **PEACE** and got 100 WillaCoins!"
-        both_war = "Both players declared **WAR** and lost 100 WillaCoins!"
-        war_peace = "You declared **WAR** while your opponent declared **PEACE**! You won 300 WillaCoins while your opponent lost 300 WillaCoins!"
-        peace_war = "You declared **PEACE** while your opponent declared **WAR**! You lost 300 WillaCoins while your opponent won 300 WillaCoins!"
+        both_peace = f"Both players declared **PEACE** and got {bet_amount} WillaCoins!"
+        both_war = f"Both players declared **WAR** and lost {bet_amount} WillaCoins!"
+        war_peace = f"You declared **WAR** while your opponent declared **PEACE**! You won {3*bet_amount} WillaCoins while your opponent lost {3*bet_amount} WillaCoins!"
+        peace_war = f"You declared **PEACE** while your opponent declared **WAR**! You lost {3*bet_amount} WillaCoins while your opponent won {3*bet_amount} WillaCoins!"
 
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        c = conn.cursor()
-        c.execute(""" SELECT balance FROM users
-                    WHERE ID = %s; """, (str(player.id), ))
-        player_balance = int(c.fetchone()[0])
-        c.execute(""" SELECT balance FROM users
-                    WHERE ID = %s; """, (str(opponent.id), ))
-        opponent_balance = int(c.fetchone()[0])
+        def update_database_coins(player, opponent, player_add, opponent_add):
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" SELECT balance FROM users
+                        WHERE ID = %s; """, (str(player.id), ))
+            player_balance = int(c.fetchone()[0])
+            c.execute(""" SELECT balance FROM users
+                        WHERE ID = %s; """, (str(opponent.id), ))
+            opponent_balance = int(c.fetchone()[0])
+            player_balance += player_add
+            opponent_balance += opponent_add
+            c.execute(""" UPDATE users
+                        SET balance = %s
+                        WHERE ID = %s; """, (str(player_balance), str(player.id)))
+            c.execute(""" UPDATE users
+                        SET balance = %s
+                        WHERE ID = %s; """, (str(opponent_balance), str(opponent.id)))
+            conn.commit()
+            conn.close()
 
         if player_war is False and opponent_war is False:
-            player_balance += 100
-            opponent_balance += 100
-            c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(player_balance), str(player.id)))
-            c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(opponent_balance), str(opponent.id)))
+            update_database_coins(player, opponent, bet_amount, bet_amount)
             await player.send(both_peace)
             await opponent.send(both_peace)
-            await ctx.send(player.mention + " and " + opponent.mention + " both declared **PEACE** and got 100 Willacoins!")
+            await ctx.send(f"{player.mention} and {opponent.mention} both declared **PEACE** and got {bet_amount} Willacoins!")
         elif player_war is True and opponent_war is False:
-            player_balance += 300
-            opponent_balance -= 300
-            c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(player_balance), str(player.id)))
-            c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(opponent_balance), str(opponent.id)))
+            update_database_coins(player, opponent, 3*bet_amount, -3*bet_amount)
             await player.send(war_peace)
             await opponent.send(peace_war)
-            await ctx.send(player.mention + " declared **WAR** while " + opponent.mention + " declared **PEACE**. " + player.mention + " won 300 WillaCoins while " + opponent.mention + " lost 300 WillaCoins!")
+            await ctx.send(f"{player.mention} declared **WAR** while {opponent.mention} declared **PEACE**. {player.mention} won {3*bet_amount} WillaCoins while {opponent.mention} lost {3*bet_amount} WillaCoins!")
         elif player_war is False and opponent_war is True:
-            player_balance -= 300
-            opponent_balance += 300
-            c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(player_balance), str(player.id)))
-            c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(opponent_balance), str(opponent.id)))
+            update_database_coins(player, opponent, -3*bet_amount, 3*bet_amount)
             await player.send(peace_war)
             await opponent.send(war_peace)
-            await ctx.send(player.mention + " declared **PEACE** while " + opponent.mention + " declared **WAR**. " + player.mention + " won 300 WillaCoins while " + opponent.mention + " lost 300 WillaCoins!")
+            await ctx.send(f"{player.mention} declared **PEACE** while {opponent.mention} declared **WAR**. {player.mention} won {3*bet_amount} WillaCoins while {opponent.mention} lost {3*bet_amount} WillaCoins!")
         else:
-            player_balance -= 100
-            opponent_balance -= 100
-            c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(player_balance), str(player.id)))
-            c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(opponent_balance), str(opponent.id)))
+            update_database_coins(player, opponent, -bet_amount, -bet_amount)
             await player.send(both_war)
             await opponent.send(both_war)
-            await ctx.send(player.mention + " and " + opponent.mention + " both declared **WAR** and lost 100 WillaCoins!")
+            await ctx.send(f"{player.mention} and {opponent.mention} both declared **WAR** and lost {bet_amount} WillaCoins!")
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
