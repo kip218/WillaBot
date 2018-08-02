@@ -35,32 +35,35 @@ class Brawlhalla:
         '''
         # clean user input
         def clean_input(msg):
-            msg_lst = msg.split('/')
-            msg_lst_clean = []
-            for value in msg_lst:
-                value = value.replace(' ', '')
-                value = value.replace('\'', '')
-                value = value.replace('-', '')
-                value = value.replace('_', '')
-                value = value.replace('.', '')
-                value = value.replace(',', '')
-                value = value.lower()
-                msg_lst_clean.append(value)
+            if msg is not None:
+                msg_lst = msg.split('/')
+                msg_lst_clean = []
+                for value in msg_lst:
+                    value = value.replace(' ', '')
+                    value = value.replace('\'', '')
+                    value = value.replace('-', '')
+                    value = value.replace('_', '')
+                    value = value.replace('.', '')
+                    value = value.replace(',', '')
+                    value = value.lower()
+                    msg_lst_clean.append(value)
 
-            legend_name = msg_lst_clean[0]
-            try:
-                skin = msg_lst_clean[1]
-                if skin == '':
+                legend_name = msg_lst_clean[0]
+                try:
+                    skin = msg_lst_clean[1]
+                    if skin == '':
+                        skin = 'base'
+                except IndexError:
                     skin = 'base'
-            except IndexError:
-                skin = 'base'
-            try:
-                color = msg_lst_clean[2]
-                if color == '':
+                try:
+                    color = msg_lst_clean[2]
+                    if color == '':
+                        color = 'classic'
+                except IndexError:
                     color = 'classic'
-            except IndexError:
-                color = 'classic'
-            return (legend_name, skin, color)
+                return (legend_name, skin, color)
+            else:
+                return None
 
         # get embed of legend/skin/color
         def get_embed(row):
@@ -77,7 +80,11 @@ class Brawlhalla:
             embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
             return embed
 
-        legend_name, skin, color = clean_input(msg)
+        clean_input = clean_input(msg)
+        if clean_input is not None:
+            legend_name, skin, color = clean_input(msg)
+        else:
+            return
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
@@ -198,7 +205,7 @@ class Brawlhalla:
             # get list of colors
             c.execute(""" SELECT color FROM legends
                             WHERE name = %s
-                            AND skin = %s; """, (legend_name, skin_input))
+                            AND skin = %s; """, (legend_name, skin_name))
             rows = c.fetchall()
             colors_lst = []
             for row in rows:

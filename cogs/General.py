@@ -106,6 +106,9 @@ class General:
             try:
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
+                c.execute(""" UPDATE users SET username = %s
+                                WHERE ID = %s
+                                AND username != %s; """, (member.name, str(member.id), member.name))
                 c.execute(""" SELECT username, xp, balance FROM users
                             WHERE ID = %s; """, (str(member.id), ))
                 profile_lst = c.fetchone()
