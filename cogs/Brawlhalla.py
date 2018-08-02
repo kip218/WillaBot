@@ -97,9 +97,11 @@ class Brawlhalla:
                 WHERE name LIKE '%%'||%s||'%%'
                     AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin))
             row = c.fetchone()
-            embed = get_embed(row)
-            await ctx.send(embed=embed)
-            found = True
+            # only search for color and send embed if skin can be found
+            if row is not None:
+                embed = get_embed(row)
+                await ctx.send(embed=embed)
+                found = True
         # if not found, send help message
         if found is False:
             await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] [skin]\" to see a list of available legends/skins/colors!")
