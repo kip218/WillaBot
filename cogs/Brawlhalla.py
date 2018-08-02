@@ -88,39 +88,42 @@ class Brawlhalla:
     async def list(self, ctx, *, msg: str=None):
         '''
         Lists all available legends in the database. Specify [legend] to view all available skins for that legend. Specify [skin] to view all available colors for that skin.
-        w.b list [legend]
+        w.b list [legend] / [skin]
 
         Isaiah, Jiro, Lin fei, and Zariel are currently unavailable.
         Not all skins and colors may be available.
         '''
         # clean user input
         def clean_input(msg):
-            msg_lst = msg.split('/')
-            msg_lst_clean = []
-            for value in msg_lst:
-                value = value.replace(' ', '')
-                value = value.replace('\'', '')
-                value = value.replace('-', '')
-                value = value.replace('_', '')
-                value = value.replace('.', '')
-                value = value.replace(',', '')
-                value = value.lower()
-                msg_lst_clean.append(value)
+            if msg is not None:
+                msg_lst = msg.split('/')
+                msg_lst_clean = []
+                for value in msg_lst:
+                    value = value.replace(' ', '')
+                    value = value.replace('\'', '')
+                    value = value.replace('-', '')
+                    value = value.replace('_', '')
+                    value = value.replace('.', '')
+                    value = value.replace(',', '')
+                    value = value.lower()
+                    msg_lst_clean.append(value)
 
-            legend_name = msg_lst_clean[0]
-            try:
-                skin = msg_lst_clean[1]
-                if skin == '':
+                legend_name = msg_lst_clean[0]
+                try:
+                    skin = msg_lst_clean[1]
+                    if skin == '':
+                        skin = None
+                except IndexError:
                     skin = None
-            except IndexError:
-                skin = None
-            return (legend_name, skin)
+                return (legend_name, skin)
+            else:
+                return (None, None)
 
         (legend_input, skin_input) = clean_input(msg)
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        if legend_input is None:
+        if msg is None:
             c.execute("""SELECT DISTINCT name FROM legends; """)
             rows = c.fetchall()
             legends_lst = []
