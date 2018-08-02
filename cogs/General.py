@@ -111,7 +111,7 @@ class General:
                 profile_lst = c.fetchone()
                 embed = discord.Embed(title="XP", description=profile_lst[1], color=member.color)
                 embed.add_field(name="WillaCoins", value=profile_lst[2])
-                embed.set_author(name=profile_lst[0])
+                embed.set_author(name=member.name)
                 embed.set_thumbnail(url=member.avatar_url)
                 conn.commit()
                 conn.close()

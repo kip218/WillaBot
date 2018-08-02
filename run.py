@@ -61,6 +61,9 @@ async def on_message(message):
                     VALUES (%s, %s, %s, %s)
                     ON CONFLICT (ID)
                     DO NOTHING;""", (message.author.id, message.author.name, 0, 0))
+        c.execute(""" UPDATE users SET username = %s
+                        WHERE ID = %s
+                        AND username != %s    ; """, (message.author.name, message.author.id, message.author.name))
         conn.commit()
         conn.close()
 
