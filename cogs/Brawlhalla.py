@@ -34,40 +34,36 @@ class Brawlhalla:
         - "w.b info ada/atlantean" gives default color atlantean ada
         '''
         # clean user input
-        msg_lst = msg.split('/')
-        msg_lst_clean = []
-        for value in msg_lst:
-            value = value.replace(' ', '')
-            value = value.replace('\'', '')
-            value = value.replace('-', '')
-            value = value.replace('_', '')
-            value = value.replace('.', '')
-            value = value.replace(',', '')
-            value = value.lower()
-            msg_lst_clean.append(value)
+        def clean_input(msg):
+            msg_lst = msg.split('/')
+            msg_lst_clean = []
+            for value in msg_lst:
+                value = value.replace(' ', '')
+                value = value.replace('\'', '')
+                value = value.replace('-', '')
+                value = value.replace('_', '')
+                value = value.replace('.', '')
+                value = value.replace(',', '')
+                value = value.lower()
+                msg_lst_clean.append(value)
 
-        legend_name = msg_lst_clean[0]
-        try:
-            skin = msg_lst_clean[1]
-            if skin == '':
+            legend_name = msg_lst_clean[0]
+            try:
+                skin = msg_lst_clean[1]
+                if skin == '':
+                    skin = 'base'
+            except IndexError:
                 skin = 'base'
-        except IndexError:
-            skin = 'base'
-        try:
-            color = msg_lst_clean[2]
-            if color == '':
+            try:
+                color = msg_lst_clean[2]
+                if color == '':
+                    color = 'classic'
+            except IndexError:
                 color = 'classic'
-        except IndexError:
-            color = 'classic'
+            return (legend_name, skin, color)
 
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        c = conn.cursor()
-        c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
-                        WHERE name LIKE '%%'||%s||'%%'
-                            AND skin LIKE '%%'||%s||'%%'
-                            AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
-        row = c.fetchone()
-        if row is not None:
+        # get embed of legend/skin/color
+        def get_embed(row):
             full_key = row[0]
             name = row[1][0].upper() + row[1][1:]
             skin = row[2][0].upper() + row[2][1:]
@@ -79,9 +75,34 @@ class Brawlhalla:
             weapons = row[5]
             embed.add_field(name="Stats", value=f"**Str:** {default_stats[0]}\n**Dex:** {default_stats[1]}\n**Def:** {default_stats[2]}\n**Spd:** {default_stats[3]}", inline=True)
             embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
+            return embed
+
+        legend_name, skin, color = clean_input(msg)
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+                        WHERE name LIKE '%%'||%s||'%%'
+                            AND skin LIKE '%%'||%s||'%%'
+                            AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
+        row = c.fetchone()
+        found = False
+        if row is not None:
+            embed = get_embed(row)
             await ctx.send(embed=embed)
-        else:
-            await ctx.send("Legend/skin/color not found!")
+            found = True
+        # search again if classic color does not exist for skin
+        elif color == 'classic':
+            c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+                WHERE name LIKE '%%'||%s||'%%'
+                    AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin))
+            row = c.fetchone()
+            embed = get_embed(row)
+            await ctx.send(embed=embed)
+            found = True
+        # if not found, send help message
+        if found is False:
+            await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] [skin]\" to see a list of available legends/skins/colors!")
         conn.close()
 
     @b.command(usage="[legend] / [skin]")
@@ -119,7 +140,7 @@ class Brawlhalla:
             else:
                 return (None, None)
 
-        (legend_input, skin_input) = clean_input(msg)
+        legend_input, skin_input = clean_input(msg)
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
@@ -134,15 +155,17 @@ class Brawlhalla:
             embed.set_footer(text="Isaiah, Jiro, Lin fei, and Zariel are currently unavailable.")
             await ctx.send(embed=embed)
         elif skin_input is None:
+            # find legend matching input
             c.execute(""" SELECT DISTINCT name FROM legends
-                            WHERE name = %s; """, (legend_input,))
+                            WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
             row = c.fetchone()
             if row is None:
-                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available. Make sure you're typing the legend name exactly as shown on the list.")
+                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available.")
                 return
             legend_name = row[0]
+            # get list of skins
             c.execute(""" SELECT DISTINCT skin FROM legends
-                            WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
+                            WHERE name = %s; """, (legend_name,))
             rows = c.fetchall()
             skins_lst = []
             for row in rows:
@@ -152,25 +175,28 @@ class Brawlhalla:
             embed.set_footer(text="Some skins may be unavailable.")
             await ctx.send(embed=embed)
         else:
+            # find legend matching input
             c.execute(""" SELECT DISTINCT name FROM legends
-                            WHERE name = %s; """, (legend_input,))
+                            WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
             row = c.fetchone()
             if row is None:
-                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available. Make sure you're typing the legend name exactly as shown on the list.")
+                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available.")
                 return
             legend_name = row[0]
+            # find skin matching input
             c.execute(""" SELECT DISTINCT skin FROM legends
                             WHERE name = %s
-                            AND skin LIKE '%%'||%s||'%%'; """, (legend_input, skin_input))
+                            AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin_input))
             row = c.fetchone()
             if row is None:
                 if row is None:
-                    await ctx.send("Could not find skin. Try \"w.b list [legend]\" to see the list of skins available for that legend. Make sure you're typing the legend name exactly as shown on the list.")
+                    await ctx.send("Could not find skin. Try \"w.b list [legend]\" to see the list of skins available for that legend.")
                 return
             skin_name = row[0]
+            # get list of colors
             c.execute(""" SELECT color FROM legends
                             WHERE name = %s
-                            AND skin LIKE '%%'||%s||'%%'; """, (legend_input, skin_input))
+                            AND skin = %s; """, (legend_name, skin_input))
             rows = c.fetchall()
             colors_lst = []
             for row in rows:
