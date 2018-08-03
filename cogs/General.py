@@ -217,23 +217,26 @@ class General:
         def check_confirm(m):
             return m.author == ctx.author
 
-        try:
-            confirm = await self.bot.wait_for('message', check=check_confirm, timeout=20)
-        except asyncio.TimeoutError:
-            await confirm_msg.edit(content=confirm_msg.content + "\n*The payment has timed out!*")
-            return
-        else:
-            if confirm.content == 'w.confirm':
-                payer_balance -= amount
-                c.execute(""" SELECT balance FROM users
-                            WHERE ID = %s; """, (str(receiver.id),))
-                receiver_balance = int(c.fetchone()[0])
-                receiver_balance += amount
-                c.execute(""" UPDATE users SET balance = %s
-                            WHERE ID = %s; """, (str(payer_balance), str(ctx.author.id)))
-                c.execute(""" UPDATE users SET balance = %s
-                            WHERE ID = %s; """, (str(receiver_balance), str(receiver.id)))
-                await ctx.send(f"Payment confirmed. {ctx.author.mention} has paid {receiver.mention} {amount} coins.")
+        confirmed = False
+        while confirmed is False:
+            try:
+                confirm = await self.bot.wait_for('message', check=check_confirm, timeout=20)
+            except asyncio.TimeoutError:
+                await confirm_msg.edit(content=confirm_msg.content + "\n*The payment has timed out!*")
+                return
+            else:
+                if confirm.content == 'w.confirm':
+                    payer_balance -= amount
+                    c.execute(""" SELECT balance FROM users
+                                WHERE ID = %s; """, (str(receiver.id),))
+                    receiver_balance = int(c.fetchone()[0])
+                    receiver_balance += amount
+                    c.execute(""" UPDATE users SET balance = %s
+                                WHERE ID = %s; """, (str(payer_balance), str(ctx.author.id)))
+                    c.execute(""" UPDATE users SET balance = %s
+                                WHERE ID = %s; """, (str(receiver_balance), str(receiver.id)))
+                    await ctx.send(f"Payment confirmed. {ctx.author.mention} has paid {receiver.mention} {amount} coins.")
+                    confirmed = True
         conn.commit()
         conn.close()
 
