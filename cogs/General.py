@@ -214,11 +214,11 @@ class General:
 
         confirm_msg = await ctx.send(f"{ctx.author.mention} Are you sure you want to pay {receiver.mention} {amount} coins?\nType \"w.confirm\" to confirm payment.")
 
-        def check_accept(m):
+        def check_confirm(m):
             return m.author == ctx.author
 
         try:
-            confirm = await self.bot.wait_for('message', check=check_accept, timeout=20)
+            confirm = await self.bot.wait_for('message', check=check_confirm, timeout=20)
         except asyncio.TimeoutError:
             await confirm_msg.edit(content=confirm_msg.content + "\n*The payment has timed out!*")
             return
@@ -226,7 +226,7 @@ class General:
             if confirm.content == 'w.confirm':
                 payer_balance -= amount
                 c.execute(""" SELECT balance FROM users
-                            WHERE ID = %s; """, (str(user.id),))
+                            WHERE ID = %s; """, (str(receiver.id),))
                 receiver_balance = int(c.fetchone()[0])
                 receiver_balance += amount
                 c.execute(""" UPDATE users SET balance = %s
@@ -234,6 +234,8 @@ class General:
                 c.execute(""" UPDATE users SET balance = %s
                             WHERE ID = %s; """, (str(receiver_balance), str(receiver.id)))
                 await ctx.send(f"Payment confirmed. {ctx.author.mention} has paid {receiver.mention} {amount} coins.")
+        conn.commit()
+        conn.close()
 
 # DON'T USE EVAL IT'S DANGEROUS
     # @commands.command(aliases=["math"])
