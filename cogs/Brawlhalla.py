@@ -33,6 +33,7 @@ class Brawlhalla:
         - "w.b info ada//black" gives default skin black ada
         - "w.b info ada/atlantean" gives default color atlantean ada
         '''
+        # if no arguments given, fetch the user's selected legend
         if msg is None:
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
@@ -56,11 +57,11 @@ class Brawlhalla:
             row = c.fetchone()
             stats_lst = row[0][stance_num]
             weapons = row[1]
-            embed = discord.Embed(color=0x36393E)
+            embed = discord.Embed(title=ctx.author.name, color=0x36393E)
             embed.add_field(name=f"{stance_lst[stance_num]} Stance", value=f"**Str:** {stats_lst[0]}\n**Dex:** {stats_lst[1]}\n**Def:** {stats_lst[2]}\n**Spd:** {stats_lst[3]}", inline=True)
             embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
             embed.set_thumbnail(url=ctx.author.avatar_url)
-            embed.set_author(name=f"{ctx.author.name}'s Level {level} {skin} {legend_name}", icon_url=ctx.author.avatar_url)
+            embed.set_author(name=f"Level {level} {skin} {legend_name}", icon_url=ctx.author.avatar_url)
             embed.set_image(url=f"https://s3.amazonaws.com/willabot-assets/{key}")
             # c.execute("""SELECT legends_lst FROM users
             #                 WHERE ID = %s; """, (str(ctx.author.id),))
@@ -72,8 +73,6 @@ class Brawlhalla:
             await ctx.send(embed=embed)
             conn.close()
             return
-
-        row = c.fetchone()
 
         # clean user input
         def clean_input(msg):
@@ -122,12 +121,7 @@ class Brawlhalla:
             embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
             return embed
 
-        clean_input = clean_input(msg)
-        if clean_input is not None:
-            legend_name, skin, color = clean_input(msg)
-        else:
-            return
-
+        legend_name, skin, color = clean_input(msg)
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
