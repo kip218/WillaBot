@@ -65,7 +65,7 @@ class Brawlhalla:
             skin = selected_legend[2][0].upper() + selected_legend[2][1:]
             color = selected_legend[3][0].upper() + selected_legend[3][1:]
             stance_num = int(selected_legend[4])
-            xp = selected_legend[5]
+            xp = int(selected_legend[5])
             level, curr_xp, next_xp = level_currxp_nextxp(xp)
             stance_lst = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
             c.execute("""SELECT stance_stats, weapons FROM legends
