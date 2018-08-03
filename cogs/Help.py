@@ -48,7 +48,6 @@ class Help:
             help_page = await ctx.send(embed=embed)
             await help_page.add_reaction(emoji='\U0001F448')
             await help_page.add_reaction(emoji='\U0001F449')
-            start_time = datetime.utcnow()
 
             def check(reaction, user):
                 return ctx.message.author == user and user.bot is False and (reaction.emoji == '\U0001F448' or reaction.emoji == '\U0001F449') and help_page.id == reaction.message.id
@@ -56,14 +55,11 @@ class Help:
             timeout = False
             while timeout is False:
                 try:
-                    done, pending = await asyncio.wait([self.bot.wait_for('reaction_add', check=check), self.bot.wait_for('reaction_remove', check=check)], return_when=asyncio.FIRST_COMPLETED)
+                    done, pending = await asyncio.wait([self.bot.wait_for('reaction_add', check=check, timeout=300), self.bot.wait_for('reaction_remove', check=check, timeout=300)], return_when=asyncio.FIRST_COMPLETED)
                     reaction = done.pop().result()[0]
-                    delta = datetime.utcnow() - start_time
-                    if delta.total_seconds() > 300:
-                        timeout = True
-                        return
-                except:
-                    await ctx.send("Sorry, something went wrong. Please tell Willa.")
+                except asyncio.TimeoutError:
+                    timeout = True
+                    return
                 else:
                     if reaction.emoji == '\U0001F448':
                         if curr_page == 1:

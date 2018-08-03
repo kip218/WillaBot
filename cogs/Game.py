@@ -191,8 +191,16 @@ class Game:
             conn.close()
             return
         else:
-            if player_balance < 3*bet_amount or opponent_balance < 3*bet_amount:
-                await ctx.send("One player does not have enough Coins to play. You must have more than triple the bet amount to play the Peace War game.")
+            if player_balance < 3*bet_amount and opponent_balance < 3*bet_amount:
+                await ctx.send("Both players do not have enough Coins to play. You must have more than **triple** the bet amount to play the Peace War game.")
+                conn.close()
+                return
+            elif player_balance < 3*bet_amount:
+                await ctx.send(f"{player.name} does not have enough Coins to play. You must have more than **triple** the bet amount to play the Peace War game.")
+                conn.close()
+                return
+            elif opponent_balance < 3*bet_amount:
+                await ctx.send(f"{opponent.name} does not have enough Coins to play. You must have more than **triple** the bet amount to play the Peace War game.")
                 conn.close()
                 return
 
@@ -215,28 +223,25 @@ class Game:
                 elif accept.content == "w.accept":
                     await ctx.send("You must specify the user that challenged you!")
 
-        # Check that the user isn't already playing the game
+        # Check that the user isn't already playing the game with the same opponent
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(player.id), ))
         player_status_lst = c.fetchone()[0]
-        if player_status_lst is not None:
-            if "pw" in player_status_lst:
-                await ctx.send(player.name + " is already in a game of Peace/War!")
-                conn.commit()
-                conn.close()
-                return
         c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(opponent.id), ))
         opponent_status_lst = c.fetchone()[0]
-        if opponent_status_lst is not None:
-            if "pw" in opponent_status_lst:
-                await ctx.send(opponent.name + " is already in a game of Peace/War!")
+        if player_status_lst is not None and opponent_status_lst is not None:
+            if f"pw{opponent.id}" in player_status_lst and f"pw{player.id}" in opponent_status_lst:
+                await ctx.send(f"{player.mention} and {opponent.mention} are already in a game of Peace/War!")
                 conn.commit()
                 conn.close()
                 return
         c.execute(""" UPDATE users
                     SET status = array_append(status, %s)
-                    WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
+                    WHERE ID = %s; """, (f'pw{opponent.id}', str(player.id)))
+        c.execute(""" UPDATE users
+                    SET status = array_append(status, %s)
+                    WHERE ID = %s; """, (f'pw{player.id}', str(opponent.id)))
         conn.commit()
         conn.close()
 
@@ -245,7 +250,6 @@ class Game:
         prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of Coins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of Coins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\nBet amount: {bet_amount}"
         player_prompt = await player.send(f"{prompt}\nOpponent: {opponent.name}")
         opponent_prompt = await opponent.send(f"{prompt}\nOpponent: {player.name}")
-        start_time = datetime.utcnow()
 
         # checking player's response
         def check_player(m):
@@ -255,30 +259,13 @@ class Game:
             return m.channel == opponent.dm_channel
 
         # checking opponent's response
-        timeout = False
         player_answered = False
         opponent_answered = False
-        while timeout is False and (player_answered is False or opponent_answered is False):
+        while player_answered is False or opponent_answered is False:
             try:
-                done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=10), self.bot.wait_for('message', check=check_opponent, timeout=10)], return_when=asyncio.FIRST_COMPLETED)
+                done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=120), self.bot.wait_for('message', check=check_opponent, timeout=120)], return_when=asyncio.FIRST_COMPLETED)
                 msg = done.pop().result()
-                # delta = datetime.utcnow() - start_time
-                # if delta.total_seconds() > 120:
-                #     await player_prompt.edit(content="The game has timed out!")
-                #     await opponent_prompt.edit(content="The game has timed out!")
-                #     await challenge_accepted.edit(content="Challenge accepted! Check your DMs!\nThe game has timed out!")
-                #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-                #     c = conn.cursor()
-                #     c.execute(""" UPDATE users
-                #                 SET status = array_remove(status, %s)
-                #                 WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
-                #     conn.commit()
-                #     conn.close()
-                #     timeout = True
-                #     return
             except asyncio.TimeoutError:
-                await ctx.send("testing timeout")
-                # await ctx.send("Sorry, something went wrong. Please tell Willa.")
                 await player_prompt.edit(content="The game has timed out!")
                 await opponent_prompt.edit(content="The game has timed out!")
                 await challenge_accepted.edit(content="Challenge accepted! Check your DMs!\nThe game has timed out!")
@@ -286,7 +273,10 @@ class Game:
                 c = conn.cursor()
                 c.execute(""" UPDATE users
                             SET status = array_remove(status, %s)
-                            WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
+                            WHERE ID = %s; """, (f'pw{opponent.id}', str(player.id)))
+                c.execute(""" UPDATE users
+                            SET status = array_remove(status, %s)
+                            WHERE ID = %s; """, (f'pw{player.id}', str(opponent.id)))
                 conn.commit()
                 conn.close()
                 return
@@ -356,7 +346,10 @@ class Game:
         c = conn.cursor()
         c.execute(""" UPDATE users
                     SET status = array_remove(status, %s)
-                    WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
+                    WHERE ID = %s; """, (f'pw{opponent.id}', str(player.id)))
+        c.execute(""" UPDATE users
+                    SET status = array_remove(status, %s)
+                    WHERE ID = %s; """, (f'pw{player.id}', str(opponent.id)))
         conn.commit()
         conn.close()
 
