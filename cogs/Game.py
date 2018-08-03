@@ -348,6 +348,15 @@ class Game:
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
+        c.execute(""" SELECT xp FROM users
+                    WHERE ID = %s OR ID = %s; """, (str(player.id), str(opponent.id)))
+        fetch = c.fetchall()
+        player_xp = int(fetch[0][0])
+        player_xp += random.randint(10, 20)
+        opponent_xp = int(fetch[1][0])
+        opponent_xp += random.randint(10, 20)
+        c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (player_xp, str(player.id)))
+        c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (opponent_xp, str(opponent.id)))
         c.execute(""" UPDATE users
                     SET status = array_remove(status, %s)
                     WHERE ID = %s; """, (f'pw{opponent.id}', str(player.id)))
