@@ -6,6 +6,7 @@ from discord.ext import commands
 from settings import token
 import sys
 import traceback
+import random
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -64,6 +65,11 @@ async def on_message(message):
         c.execute(""" UPDATE users SET username = %s
                         WHERE ID = %s
                         AND username != %s    ; """, (message.author.name, str(message.author.id), message.author.name))
+        c.execute(""" SELECT xp FROM users
+                    WHERE ID = %s; """, (str(message.author.id)))
+        author_xp = c.fetchone()[0]
+        author_xp += random.randint(1,10)
+        c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(author_xp), str(message.author.id)))
         conn.commit()
         conn.close()
 
