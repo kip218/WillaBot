@@ -217,11 +217,12 @@ class Game:
                 await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
                 return
             else:
-                accept_user = accept.content.replace('w.accept', '')
-                if accept_user == player.mention or accept_user in player.name or accept_user in player.display_name:
-                    accepted = True
-                elif accept.content == "w.accept":
-                    await ctx.send("You must specify the user that challenged you!")
+                if 'w.accept' in accept.content:
+                    accept_user = accept.content.replace('w.accept', '')
+                    if accept_user is '':
+                        await ctx.send("You must specify the user that challenged you!")
+                    elif accept_user == player.mention or accept_user in player.name or accept_user in player.display_name:
+                        accepted = True
 
         # Check that the user isn't already playing the game with the same opponent
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
