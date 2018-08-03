@@ -62,7 +62,7 @@ class General:
     @commands.command()
     async def daily(self, ctx):
         '''
-        Get your daily Willacoins!
+        Get your daily Coins!
         w.daily
         '''
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -78,7 +78,7 @@ class General:
             c.execute(""" UPDATE users
                         SET daily_time = %s, balance = %s
                         WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
-            await ctx.send("You got 200 WillaCoins!")
+            await ctx.send("You got 200 Coins!")
         else:
             delta = datetime.utcnow() - timestamp
             if delta.total_seconds() > 86400:
@@ -87,12 +87,12 @@ class General:
                 c.execute(""" UPDATE users
                             SET daily_time = %s, balance = %s
                             WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
-                await ctx.send("You got 200 WillaCoins!")
+                await ctx.send("You got 200 Coins!")
             else:
                 time_remaining = 86400 - int(delta.total_seconds())
                 hours, remainder = divmod(int(time_remaining), 3600)
                 minutes, seconds = divmod(remainder, 60)
-                await ctx.send("You can claim daily WillaCoins again in " + f"{hours}h {minutes}m {seconds}s")
+                await ctx.send("You can claim daily Coins again in " + f"{hours}h {minutes}m {seconds}s")
         conn.commit()
         conn.close()
 
@@ -123,7 +123,7 @@ class General:
                 level, curr_xp, next_xp = level_currxp_nextxp(xp)
                 balance = profile_lst[2]
                 embed = discord.Embed(title=f"Level {level}", description=f"{curr_xp}/{next_xp}XP", color=member.color)
-                embed.add_field(name="WillaCoins", value=balance)
+                embed.add_field(name="Coins", value=balance)
                 embed.set_author(name=member.name)
                 embed.set_thumbnail(url=member.avatar_url)
                 conn.commit()

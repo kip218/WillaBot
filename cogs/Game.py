@@ -144,7 +144,7 @@ class Game:
                         c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.author.id)))
                         conn.commit()
                         conn.close()
-                        await msg.edit(content="You found the car!\n\nYou got " + str(xp_increase) + " XP and " + str(balance_increase) + " WillaCoins.\n\n" + emotes)
+                        await msg.edit(content="You found the car!\n\nYou got " + str(xp_increase) + " XP and " + str(balance_increase) + " Coins.\n\n" + emotes)
                     else:
                         await msg.edit(content="You did not find the car. Try again!\n\n" + emotes)
                     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -191,12 +191,12 @@ class Game:
             conn.close()
             return
         else:
-            if player_balance < bet_amount or opponent_balance < bet_amount:
-                await ctx.send("One player does not have enough WillaCoins to play. You must have more than triple the bet amount to play the Peace War game.")
+            if player_balance < 3*bet_amount or opponent_balance < 3*bet_amount:
+                await ctx.send("One player does not have enough Coins to play. You must have more than triple the bet amount to play the Peace War game.")
                 conn.close()
                 return
 
-        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept\" to accept!\n\n**Bet amount: {bet_amount}")
+        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept <user>\" to accept!\n\n**Bet amount: {bet_amount}")
 
         # checking if opponent accepts challenge
         def check_accept(m):
@@ -204,13 +204,15 @@ class Game:
         accepted = False
         while accepted is False:
             try:
-                accept = await self.bot.wait_for('message', check=check_accept, timeout=120)
+                accept = await self.bot.wait_for('message', check=check_accept, timeout=60)
             except asyncio.TimeoutError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
                 return
             else:
-                if accept.content == "w.accept":
+                if accept.content == f"w.accept {player.mention}":
                     accepted = True
+                elif accept.content == "w.accept":
+                    await ctx.send("You must specify the user that challenged you!")
 
         # Check that the user isn't already playing the game
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -239,9 +241,9 @@ class Game:
 
         challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
 
-        prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of WillaCoins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of WillaCoins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\nBet amount: {bet_amount}"
-        player_prompt = await player.send(prompt)
-        opponent_prompt = await opponent.send(prompt)
+        prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of Coins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of Coins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\nBet amount: {bet_amount}"
+        player_prompt = await player.send(f"{prompt}\nOpponent: {opponent.name}")
+        opponent_prompt = await opponent.send(f"{prompt}\nOpponent: {player.name}")
         start_time = datetime.utcnow()
 
         # checking player's response
@@ -292,10 +294,10 @@ class Game:
                         opponent_war = True
                         opponent_answered = True
 
-        both_peace = f"Both players declared **PEACE** and got {bet_amount} WillaCoins!"
-        both_war = f"Both players declared **WAR** and lost {bet_amount} WillaCoins!"
-        war_peace = f"You declared **WAR** while your opponent declared **PEACE**! You won {3*bet_amount} WillaCoins while your opponent lost {3*bet_amount} WillaCoins!"
-        peace_war = f"You declared **PEACE** while your opponent declared **WAR**! You lost {3*bet_amount} WillaCoins while your opponent won {3*bet_amount} WillaCoins!"
+        both_peace = f"Both players declared **PEACE** and got {bet_amount} Coins!"
+        both_war = f"Both players declared **WAR** and lost {bet_amount} Coins!"
+        war_peace = f"You declared **WAR** while your opponent declared **PEACE**! You won {3*bet_amount} Coins while your opponent lost {3*bet_amount} Coins!"
+        peace_war = f"You declared **PEACE** while your opponent declared **WAR**! You lost {3*bet_amount} Coins while your opponent won {3*bet_amount} Coins!"
 
         def update_database_coins(player, opponent, player_add, opponent_add):
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -321,22 +323,22 @@ class Game:
             update_database_coins(player, opponent, bet_amount, bet_amount)
             await player.send(both_peace)
             await opponent.send(both_peace)
-            await ctx.send(f"{player.mention} and {opponent.mention} both declared **PEACE** and got {bet_amount} Willacoins!")
+            await ctx.send(f"{player.mention} and {opponent.mention} both declared **PEACE** and got {bet_amount} Coins!")
         elif player_war is True and opponent_war is False:
             update_database_coins(player, opponent, 3*bet_amount, -3*bet_amount)
             await player.send(war_peace)
             await opponent.send(peace_war)
-            await ctx.send(f"{player.mention} declared **WAR** while {opponent.mention} declared **PEACE**. {player.mention} won {3*bet_amount} WillaCoins while {opponent.mention} lost {3*bet_amount} WillaCoins!")
+            await ctx.send(f"{player.mention} declared **WAR** while {opponent.mention} declared **PEACE**. {player.mention} won {3*bet_amount} Coins while {opponent.mention} lost {3*bet_amount} Coins!")
         elif player_war is False and opponent_war is True:
             update_database_coins(player, opponent, -3*bet_amount, 3*bet_amount)
             await player.send(peace_war)
             await opponent.send(war_peace)
-            await ctx.send(f"{player.mention} declared **PEACE** while {opponent.mention} declared **WAR**. {player.mention} won {3*bet_amount} WillaCoins while {opponent.mention} lost {3*bet_amount} WillaCoins!")
+            await ctx.send(f"{player.mention} declared **PEACE** while {opponent.mention} declared **WAR**. {player.mention} won {3*bet_amount} Coins while {opponent.mention} lost {3*bet_amount} Coins!")
         else:
             update_database_coins(player, opponent, -bet_amount, -bet_amount)
             await player.send(both_war)
             await opponent.send(both_war)
-            await ctx.send(f"{player.mention} and {opponent.mention} both declared **WAR** and lost {bet_amount} WillaCoins!")
+            await ctx.send(f"{player.mention} and {opponent.mention} both declared **WAR** and lost {bet_amount} Coins!")
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
