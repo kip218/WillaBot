@@ -196,7 +196,7 @@ class Game:
                 conn.close()
                 return
 
-        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept <user>\" to accept!\n\n**Bet amount: {bet_amount}")
+        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept <user>\" to accept!\n\nBet amount: {bet_amount}")
 
         # checking if opponent accepts challenge
         def check_accept(m):
@@ -209,7 +209,8 @@ class Game:
                 await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
                 return
             else:
-                if accept.content == f"w.accept {player.mention}":
+                accept_user = accept.content.replace('w.accept', '')
+                if accept_user == player.mention or accept_user in player.name or accept_user in player.display_name:
                     accepted = True
                 elif accept.content == "w.accept":
                     await ctx.send("You must specify the user that challenged you!")
@@ -239,7 +240,7 @@ class Game:
         conn.commit()
         conn.close()
 
-        challenge_accepted = await ctx.send("Challenge accepted! Check your DMs!")
+        challenge_accepted = await ctx.send(f"{player.mention} {opponent.mention} Challenge accepted! Check your DMs!")
 
         prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of Coins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of Coins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\nBet amount: {bet_amount}"
         player_prompt = await player.send(f"{prompt}\nOpponent: {opponent.name}")
@@ -259,24 +260,35 @@ class Game:
         opponent_answered = False
         while timeout is False and (player_answered is False or opponent_answered is False):
             try:
-                done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player), self.bot.wait_for('message', check=check_opponent)], return_when=asyncio.FIRST_COMPLETED)
+                done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=10), self.bot.wait_for('message', check=check_opponent, timeout=10)], return_when=asyncio.FIRST_COMPLETED)
                 msg = done.pop().result()
-                delta = datetime.utcnow() - start_time
-                if delta.total_seconds() > 120:
-                    await player_prompt.edit(content="The game has timed out!")
-                    await opponent_prompt.edit(content="The game has timed out!")
-                    await challenge_accepted.edit(content="Challenge accepted! Check your DMs!\nThe game has timed out!")
-                    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-                    c = conn.cursor()
-                    c.execute(""" UPDATE users
-                                SET status = array_remove(status, %s)
-                                WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
-                    conn.commit()
-                    conn.close()
-                    timeout = True
-                    return
-            except:
-                await ctx.send("Sorry, something went wrong. Please tell Willa.")
+                # delta = datetime.utcnow() - start_time
+                # if delta.total_seconds() > 120:
+                #     await player_prompt.edit(content="The game has timed out!")
+                #     await opponent_prompt.edit(content="The game has timed out!")
+                #     await challenge_accepted.edit(content="Challenge accepted! Check your DMs!\nThe game has timed out!")
+                #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                #     c = conn.cursor()
+                #     c.execute(""" UPDATE users
+                #                 SET status = array_remove(status, %s)
+                #                 WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
+                #     conn.commit()
+                #     conn.close()
+                #     timeout = True
+                #     return
+            except asyncio.TimeoutError:
+                await ctx.send("testing timeout")
+                # await ctx.send("Sorry, something went wrong. Please tell Willa.")
+                await player_prompt.edit(content="The game has timed out!")
+                await opponent_prompt.edit(content="The game has timed out!")
+                await challenge_accepted.edit(content="Challenge accepted! Check your DMs!\nThe game has timed out!")
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+                c.execute(""" UPDATE users
+                            SET status = array_remove(status, %s)
+                            WHERE ID = %s OR ID = %s; """, ('pw', str(player.id), str(opponent.id)))
+                conn.commit()
+                conn.close()
                 return
             else:
                 if msg.author == player:
