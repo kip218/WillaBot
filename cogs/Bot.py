@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from datetime import datetime
+import random
 
 launch_time = datetime.utcnow()
 
@@ -109,10 +110,13 @@ class Bot:
         Invite Willabot to your server and help WillaBot explore different servers!
         w.invite
         '''
+        title_lst = ("Invite WillaBot to your server!", "Help WillaBot explore a new server!")
+        desc_lst = ("Please let me join your server :)", "**Nothing is pleasanter to me than exploring different discord servers.\n- WillaBot**")
+        randind = random.randint(0,1)
         embed = discord.Embed(
-            title="Invite WillaBot to your server!",
+            title=title_lst[randind],
             url="https://discordapp.com/oauth2/authorize?client_id=463398601553346581&scope=bot&permissions=1077275729",
-            description="Please let me join your server :)",
+            description=desc_lst[randind],
             color=0x48d1cc
             )
         embed.set_thumbnail(

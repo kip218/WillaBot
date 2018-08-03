@@ -3,7 +3,7 @@ import random
 import psycopg2
 import os
 import asyncio
-from datetime import datetime
+import discord
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -138,7 +138,7 @@ class Game:
                         xp = int(fetch[0])
                         balance = int(fetch[1])
                         xp_increase = random.randint(10, 20)
-                        balance_increase = random.randint(20, 40)
+                        balance_increase = random.randint(30, 60)
                         xp += xp_increase
                         balance += balance_increase
                         c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.author.id)))
@@ -204,7 +204,7 @@ class Game:
                 conn.close()
                 return
 
-        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept <@user>\" to accept!\n\nBet amount: {bet_amount}")
+        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept <@user>\" to accept!\nBet amount: {bet_amount}")
 
         # checking if opponent accepts challenge
         def check_accept(m):
@@ -214,7 +214,7 @@ class Game:
             try:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=60)
             except asyncio.TimeoutError:
-                await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
+                await challenge_msg.edit(content=challenge_msg.content + "\nThe challenge has timed out!")
                 return
             else:
                 if accept.content == 'w.accept':
@@ -246,9 +246,12 @@ class Game:
 
         challenge_accepted = await ctx.send(f"{player.mention} {opponent.mention} Challenge accepted! Check your DMs!")
 
-        prompt = f"The rules of the Peace War game are as follows:\n\n- If both players declare peace, both get the bet amount of Coins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of Coins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\nBet amount: {bet_amount}"
-        player_prompt = await player.send(f"{prompt}\nOpponent: {opponent.name}")
-        opponent_prompt = await opponent.send(f"{prompt}\nOpponent: {player.name}")
+        title = "The rules of the Peace War game are as follows:"
+        prompt = f"- If both players declare peace, both get the bet amount of Coins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of Coins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\nBet amount: {bet_amount}"
+        player_embed = discord.Embed(title=title, description=f"{prompt}\nOpponent: {opponent.name}")
+        opponent_embed = discord.Embed(title=title, description=f"{prompt}\nOpponent: {player.name}")
+        player_prompt = await player.send(embed=player_embed)
+        opponent_prompt = await opponent.send(embed=opponent_embed)
 
         # checking player's response
         def check_player(m):
@@ -265,8 +268,10 @@ class Game:
                 done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=60), self.bot.wait_for('message', check=check_opponent, timeout=60)], return_when=asyncio.FIRST_COMPLETED)
                 msg = done.pop().result()
             except asyncio.TimeoutError:
-                await player_prompt.edit(content="The game has timed out!")
-                await opponent_prompt.edit(content="The game has timed out!")
+                player_prompt.embed.add_footer(text="The game has timed out!")
+                opponent_prompt.embed.add_footter(text="The game has timed out!")
+                await player_prompt.edit(content= player_prompt)
+                await opponent_prompt.edit(embed = opponent_prompt)
                 await challenge_accepted.edit(content="Challenge accepted! Check your DMs!\nThe game has timed out!")
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
