@@ -111,7 +111,7 @@ class Bot:
         w.invite
         '''
         title_lst = ("Invite WillaBot to your server!", "Help WillaBot explore a new server!")
-        desc_lst = ("Please let me join your server :)", "**Nothing is pleasanter to me than exploring different discord servers.\n- WillaBot**")
+        desc_lst = ("Please let me join your server :)", "*Nothing is pleasanter to me than exploring different discord servers.\n- WillaBot*")
         randind = random.randint(0,1)
         embed = discord.Embed(
             title=title_lst[randind],
