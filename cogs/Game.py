@@ -204,7 +204,7 @@ class Game:
                 conn.close()
                 return
 
-        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept <user>\" to accept!\n\nBet amount: {bet_amount}")
+        challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War! Type \"w.accept <@user>\" to accept!\n\nBet amount: {bet_amount}")
 
         # checking if opponent accepts challenge
         def check_accept(m):
@@ -217,12 +217,10 @@ class Game:
                 await challenge_msg.edit(content=challenge_msg.content + "\n\nThe challenge has timed out!")
                 return
             else:
-                if 'w.accept' in accept.content:
-                    accept_user = accept.content.replace('w.accept', '')
-                    if accept_user is '':
-                        await ctx.send("You must specify the user that challenged you!")
-                    elif accept_user == player.mention or accept_user in player.name or accept_user in player.display_name:
-                        accepted = True
+                if accept.content == 'w.accept':
+                    await ctx.send("You must specify the @user that challenged you!")
+                elif accept.content == f'w.accept {player.mention}':
+                    accepted = True
 
         # Check that the user isn't already playing the game with the same opponent
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -264,7 +262,7 @@ class Game:
         opponent_answered = False
         while player_answered is False or opponent_answered is False:
             try:
-                done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=120), self.bot.wait_for('message', check=check_opponent, timeout=120)], return_when=asyncio.FIRST_COMPLETED)
+                done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=60), self.bot.wait_for('message', check=check_opponent, timeout=60)], return_when=asyncio.FIRST_COMPLETED)
                 msg = done.pop().result()
             except asyncio.TimeoutError:
                 await player_prompt.edit(content="The game has timed out!")
