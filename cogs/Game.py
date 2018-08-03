@@ -247,7 +247,7 @@ class Game:
         challenge_accepted = await ctx.send(f"{player.mention} {opponent.mention} Challenge accepted! Check your DMs!")
 
         title = "The rules of the Peace War game are as follows:"
-        prompt = f"- If both players declare peace, both get the bet amount of Coins.\n- If you declare war while your opponent declares peace, you get triple the bet amount, while your opponent loses triple the bet amount, and vice versa.\n- If both players declare war, both lose the bet amount of Coins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\n**Bet amount:** {bet_amount}"
+        prompt = f"- If both players declare peace, both get <bet amount> of Coins.\n- If you declare war while your opponent declares peace, you get triple the <bet amount> while your opponent loses triple the <bet amount>, and vice versa.\n- If both players declare war, both lose <bet amount> of Coins.\n\nType \"peace\" to declare peace and \"war\" to declare war.\n\n**Bet amount:** {bet_amount}"
         player_embed = discord.Embed(title=title, description=f"{prompt}\n**Opponent:** {opponent.name}", color=0x48d1cc)
         opponent_embed = discord.Embed(title=title, description=f"{prompt}\n**Opponent:** {player.name}", color=0x48d1cc)
         player_prompt = await player.send(embed=player_embed)
@@ -268,8 +268,8 @@ class Game:
                 done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=60), self.bot.wait_for('message', check=check_opponent, timeout=60)], return_when=asyncio.FIRST_COMPLETED)
                 msg = done.pop().result()
             except asyncio.TimeoutError:
-                player_prompt.embeds[0].add_footer(text="The game has timed out!")
-                opponent_prompt.embeds[0].add_footter(text="The game has timed out!")
+                player_prompt.embeds[0].set_footer(text="The game has timed out!")
+                opponent_prompt.embeds[0].set_footter(text="The game has timed out!")
                 await player_prompt.edit(embed=player_prompt)
                 await opponent_prompt.edit(embed=opponent_prompt)
                 await challenge_accepted.edit(content=f"{challenge_accepted.content}\n*The game has timed out!*")
