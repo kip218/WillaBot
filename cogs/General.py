@@ -3,6 +3,7 @@ from discord.ext import commands
 import psycopg2
 import os
 from datetime import datetime
+import asyncio
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -181,6 +182,58 @@ class General:
                         await ctx.send("Could not find user name \"" + user + "\" in the database.")
                         return
 
+    @commands.command()
+    async def pay(self, ctx, user, amount: int):
+        '''
+        Pay another use <amount> of coins.
+        w.pay <@user> <amount>
+        '''
+        # checking if user has sufficient balance
+        if len(ctx.message.mentions) == 0:
+            await ctx.send("You must mention a user to pay!")
+            return
+
+        receiver = ctx.message.mentions[0]
+        if receiver.bot:
+            await ctx.send("You can't pay a bot!")
+            return
+
+        if amount is None:
+            await ctx.send("You must specify the amount of payment!")
+            return
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT balance FROM users
+                    WHERE ID = %s; """, (str(ctx.author.id), ))
+        payer_balance = int(c.fetchone()[0])
+        if payer_balance < amount:
+            await ctx.send("You don't have enough coins to pay that much!")
+            conn.close()
+            return
+
+        confirm_msg = await ctx.send(f"{ctx.author.mention} Are you sure you want to pay {receiver.mention} {amount} coins?\nType \"w.confirm\" to confirm payment.")
+
+        def check_accept(m):
+            return m.author == ctx.author
+
+        try:
+            confirm = await self.bot.wait_for('message', check=check_accept, timeout=20)
+        except asyncio.TimeoutError:
+            await confirm_msg.edit(content=confirm_msg.content + "\n*The payment has timed out!*")
+            return
+        else:
+            if confirm.content == 'w.confirm':
+                payer_balance -= amount
+                c.execute(""" SELECT balance FROM users
+                            WHERE ID = %s; """, (str(user.id),))
+                receiver_balance = int(c.fetchone()[0])
+                receiver_balance += amount
+                c.execute(""" UPDATE users SET balance = %s
+                            WHERE ID = %s; """, (str(payer_balance), str(ctx.author.id)))
+                c.execute(""" UPDATE users SET balance = %s
+                            WHERE ID = %s; """, (str(receiver_balance), str(receiver.id)))
+                await ctx.send(f"Payment confirmed. {ctx.author.mention} has paid {receiver.mention} {amount} coins.")
 
 # DON'T USE EVAL IT'S DANGEROUS
     # @commands.command(aliases=["math"])
