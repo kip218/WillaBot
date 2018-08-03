@@ -102,6 +102,13 @@ class General:
         [user]'s profile. Sends your profile picture if [user] not specified.
         w.profile [user]
         '''
+        def level_currxp_nextxp(xp):
+            import math
+            level = math.floor(0.25*((xp+16)**0.5))
+            curr_xp = ((level*4)**2)-16
+            next_level_xp = (((level+1)*4)**2)-16
+            return level, curr_xp, next_level_xp
+
         def get_profile(member):
             try:
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -112,8 +119,11 @@ class General:
                 c.execute(""" SELECT username, xp, balance FROM users
                             WHERE ID = %s; """, (str(member.id), ))
                 profile_lst = c.fetchone()
-                embed = discord.Embed(title="XP", description=profile_lst[1], color=member.color)
-                embed.add_field(name="WillaCoins", value=profile_lst[2])
+                xp = int(profile_lst[1])
+                level, curr_xp, next_xp = level_currxp_nextxp(xp)
+                balance = profile_lst[2]
+                embed = discord.Embed(title=f"Level {level}", description=f"{curr_xp}/{next_xp}XP", color=member.color)
+                embed.add_field(name="WillaCoins", value=balance)
                 embed.set_author(name=member.name)
                 embed.set_thumbnail(url=member.avatar_url)
                 conn.commit()

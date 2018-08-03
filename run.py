@@ -91,7 +91,7 @@ async def on_connect():
                                         username text NOT NULL,
                                         xp text NOT NULL,
                                         balance text NOT NULL,
-                                        selected_legend text[],
+                                        selected_legend_key text,
                                         legends_lst text[][],
                                         tournament_url_list text[],
                                         todo_list text[],
