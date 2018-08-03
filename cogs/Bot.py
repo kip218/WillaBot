@@ -110,13 +110,13 @@ class Bot:
         w.invite
         '''
         embed = discord.Embed(
-            title="Help WillaBot explore a new discord server!",
+            title="Invite WillaBot to your server!",
             url="https://discordapp.com/oauth2/authorize?client_id=463398601553346581&scope=bot&permissions=1077275729",
-            description="*\"Nothing is pleasanter to me than exploring different discord servers.\"\n- WillaBot*",
+            description="Please let me join your server :)",
             color=0x48d1cc
             )
         embed.set_thumbnail(
-            url="https://www.eastbaytimes.com/wp-content/uploads/2016/07/20080622_025925_walle.jpg?w=360"
+            url=self.bot.user.avatar_url
             )
         await ctx.send(embed=embed)
 

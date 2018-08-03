@@ -6,6 +6,15 @@ import os
 DATABASE_URL = os.environ['DATABASE_URL']
 
 
+def level_currxp_nextxp(xp):
+            import math
+            xp = int(xp)
+            level = math.floor(0.1*((xp+100)**0.5))
+            curr_xp = ((level*10)**2)-100
+            next_level_xp = (((level+1)*10)**2)-100
+            return level, curr_xp, next_level_xp
+
+
 class Brawlhalla:
     '''
     Commands for Brawlhalla.
@@ -34,25 +43,17 @@ class Brawlhalla:
         - "w.b info ada/atlantean" gives default color atlantean ada
         '''
         # if no arguments given, fetch the user's selected legend
-        def level_currxp_nextxp(xp):
-            import math
-            level = math.floor(0.25*((xp+16)**0.5))
-            curr_xp = ((level*4)**2)-16
-            next_level_xp = (((level+1)*4)**2)-16
-            return level, curr_xp, next_level_xp
-
         if msg is None:
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
             c.execute("""SELECT selected_legend_key FROM users
                             WHERE ID = %s """, (str(ctx.author.id),))
-            row = c.fetchone()
+            selected_legend_key = c.fetchone()[0]
             # return if user hasn't selected a legend
-            if row is None:
+            if selected_legend_key is None:
                 await ctx.send("You have not selected a legend yet! Use \"w.b legends\" to see your legends.")
                 conn.close()
                 return
-            selected_legend_key = row[0]
             # checking legends lst for selected legend
             c.execute(""" SELECT legends_lst FROM users
                             WHERE ID = %s """, (str(ctx.author.id),))
@@ -267,6 +268,119 @@ class Brawlhalla:
             embed.set_footer(text="Some colors may be unavailable.")
             await ctx.send(embed=embed)
         conn.close()
+
+    @b.command()
+    async def legends(self, ctx):
+        '''
+        List of legends that you own.
+        w.b legends
+        '''
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT legends_lst FROM users
+                        WHERE ID = %s """, (str(ctx.author.id),))
+        legends_lst = c.fetchone()[0]
+        if legends_lst is None:
+            await ctx.send("You do not own any legends! Try \"w.b store\".")
+            conn.close()
+            return
+        # fetching all distinct legends
+        searched_legend_lst = []
+        lst_legend_row = []
+        for legend in legends_lst:
+            legend_name = legend[1]
+            if legend_name not in searched_legend_lst:
+                searched_legend_lst.append(legend_name)
+                legend_xp = legend[5]
+                level = level_currxp_nextxp(legend_xp)[0]
+                lst_legend_row.append(f"**{legend_name[0].upper()}{legend_name[1:]}** | Level {level}")
+        description = '\n'.join(lst_legend_row)
+        embed = discord.Embed(title="Legends list:", description=description, color=0x36393E)
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
+        conn.close()
+
+    @b.command(usage=" <legend> / [skin] / [color]")
+    async def select(self, ctx, *, msg):
+        '''
+        Select a main legend.
+        w.b select <legend> / [skin] / [color]
+        '''
+        # clean user input
+        def clean_input(msg):
+            if msg is not None:
+                msg_lst = msg.split('/')
+                msg_lst_clean = []
+                for value in msg_lst:
+                    value = value.replace(' ', '')
+                    value = value.replace('\'', '')
+                    value = value.replace('-', '')
+                    value = value.replace('_', '')
+                    value = value.replace('.', '')
+                    value = value.replace(',', '')
+                    value = value.lower()
+                    msg_lst_clean.append(value)
+
+                legend_name = msg_lst_clean[0]
+                try:
+                    skin = msg_lst_clean[1]
+                except IndexError:
+                    skin = ''
+                try:
+                    color = msg_lst_clean[2]
+                except IndexError:
+                    color = ''
+                return (legend_name, skin, color)
+            else:
+                return None
+
+        legend_name, skin, color = clean_input(msg)
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT legends_lst FROM users
+                        WHERE ID = %s """, (str(ctx.author.id),))
+        legends_lst = c.fetchone()[0]
+        if legends_lst is None:
+            await ctx.send("You do not own any legends! Try \"w.b store\".")
+            conn.close()
+            return
+
+        # iterate through legends to find the right legend/skin/color
+        select_legend_key = None
+        for legend in legends_lst:
+            if legend_name in legend[1] and skin in legend[2] and color in legend[3]:
+                select_legend_name = legend[1]
+                select_legend_skin = legend[2]
+                select_legend_color = legend[3]
+                select_legend_xp = legend[5]
+                select_legend_key = legend[0]
+
+        if select_legend_key is None:
+            await ctx.send("You do not own that legend/skin/color! Try \"w.b legends\" or w.b <legend> skins\" to see your legends/skins/colors.")
+            conn.close()
+            return
+
+        # update selected_legend_key in database
+        c.execute("""UPDATE users SET selected_legend_key = %s
+                        WHERE ID = %s; """, (select_legend_key, str(ctx.author.id)))
+
+        # constructing response message
+        level = level_currxp_nextxp(select_legend_xp)[0]
+        skin = select_legend_skin[0].upper() + select_legend_skin[1:]
+        legend_name = select_legend_name[0].upper() + select_legend_name[1:]
+        color = select_legend_color[0].upper() + select_legend_color[1:]
+        await ctx.send(f"You selected your Level {level} {skin} {legend_name} *({color})*.")
+        conn.commit()
+        conn.close()
+
+    @b.command()
+    async def store(self, ctx):
+        '''
+        The Brawlhalla store.
+        w.b store
+        '''
+        await ctx.send("The store hasn't opened yet!")
 
     # @b.command()
     # async def test(self, ctx):
