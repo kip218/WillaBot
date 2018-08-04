@@ -106,7 +106,10 @@ class General:
         def level_currxp_nextxp(xp):
             import math
             level = math.floor(0.25*((xp+16)**0.5))
-            curr_xp = xp - ((level*4)**2)-16
+            lower_xp_bound = 0
+            for lvl in range(1, level+1):
+                lower_xp_bound += ((lvl*4)**2)-16
+            curr_xp = xp - lower_xp_bound
             next_level_xp = (((level+1)*4)**2)-16
             return level, curr_xp, next_level_xp
 
