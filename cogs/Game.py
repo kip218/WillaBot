@@ -175,6 +175,11 @@ class Game:
             await ctx.send("You must specify a bet amount!")
             return
 
+        # checking if bet amount is less than limit
+        if bet_amount > 5000:
+            await ctx.send("Maximum bet amount is 5000 coins!")
+            return
+
         # checking if both players have sufficient balance
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
