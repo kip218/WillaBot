@@ -68,7 +68,7 @@ async def on_message(message):
         c.execute(""" SELECT xp FROM users
                     WHERE ID = %s; """, (str(message.author.id),))
         author_xp = int(c.fetchone()[0])
-        author_xp += random.randint(1, 10)
+        author_xp += random.randint(4, 8)
         c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(author_xp), str(message.author.id)))
         conn.commit()
         conn.close()

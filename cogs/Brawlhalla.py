@@ -10,11 +10,10 @@ def level_currxp_nextxp(xp):
             import math
             xp = int(xp)
             level = math.floor(0.1*((xp+100)**0.5))
-            lower_xp_bound = 0
-            for lvl in range(1, level):
-                lower_xp_bound += ((lvl*4)**2)-16
-            curr_xp = xp - lower_xp_bound
-            next_level_xp = ((level+1)*10)**2-100
+            floor_level_xp = ((level*10)**2)-100
+            curr_xp = xp - floor_level_xp
+            next_level_xp_total = (((level+1)*10)**2)-100
+            next_level_xp = next_level_xp_total - floor_level_xp
             return level, curr_xp, next_level_xp
 
 
