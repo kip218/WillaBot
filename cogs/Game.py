@@ -21,6 +21,8 @@ class Game:
         '''
         The famous Monty Hall problem.
         w.montyhall
+
+        https://en.wikipedia.org/wiki/Monty_Hall_problem
         '''
         # Check that the user isn't already playing the game
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -160,6 +162,8 @@ class Game:
         '''
         The Peace War game.
         w.pw <user> <bet amount>
+
+        https://en.wikipedia.org/wiki/Peace_war_game
         '''
         if len(ctx.message.mentions) == 0:
             await ctx.send("You must mention a user to play against!")

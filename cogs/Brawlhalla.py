@@ -375,6 +375,34 @@ class Brawlhalla:
         conn.close()
 
     @b.command()
+    async def stance(self, ctx, stance):
+        '''
+        Change the stance of your selected legend.
+        w.b stance <stance>
+
+        Available stances: Default, Strength, Dexterity, Defense, Speed.
+        '''
+        # finding the stance index for stance_lst
+        stances = ['default', 'strength', 'dexterity', 'defense', 'speed']
+        found = False
+        i = 0
+        while found is False and i <= 4:
+            if stance.lower() in stances[i]:
+                stance_ind = i
+                found = True
+            i += 1
+
+        if found is False:
+            await ctx.send("Stance not found. Your options are: Default, Strength, Dexterity, Defense, Speed.")
+            return
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT legends_lst FROM users
+                        WHERE ID = %s """, (str(ctx.author.id),))
+        legends_lst = c.fetchone()[0]
+
+    @b.command()
     async def store(self, ctx):
         '''
         The Brawlhalla store.

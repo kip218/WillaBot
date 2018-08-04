@@ -93,7 +93,7 @@ class General:
                 time_remaining = 86400 - int(delta.total_seconds())
                 hours, remainder = divmod(int(time_remaining), 3600)
                 minutes, seconds = divmod(remainder, 60)
-                await ctx.send("You can claim daily Coins again in " + f"{hours}h {minutes}m {seconds}s")
+                await ctx.send("You can claim daily coins again in " + f"{hours}h {minutes}m {seconds}s")
         conn.commit()
         conn.close()
 
