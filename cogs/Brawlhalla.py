@@ -10,7 +10,7 @@ def level_currxp_nextxp(xp):
             import math
             xp = int(xp)
             level = math.floor(0.1*((xp+100)**0.5))
-            curr_xp = ((level*10)**2)-100
+            curr_xp = xp - ((level*10)**2)-100
             next_level_xp = (((level+1)*10)**2)-100
             return level, curr_xp, next_level_xp
 
@@ -58,6 +58,7 @@ class Brawlhalla:
             c.execute(""" SELECT legends_lst FROM users
                             WHERE ID = %s """, (str(ctx.author.id),))
             legends_lst = c.fetchone()[0]
+            # searching legend_lst for legend_key
             for legend in legends_lst:
                 if legend[0] == selected_legend_key:
                     selected_legend = legend
@@ -374,33 +375,58 @@ class Brawlhalla:
         conn.commit()
         conn.close()
 
-    @b.command()
-    async def stance(self, ctx, stance):
-        '''
-        Change the stance of your selected legend.
-        w.b stance <stance>
+    # @b.command()
+    # async def stance(self, ctx, stance):
+    #     '''
+    #     Change the stance of your selected legend.
+    #     w.b stance <stance>
 
-        Available stances: Default, Strength, Dexterity, Defense, Speed.
-        '''
-        # finding the stance index for stance_lst
-        stances = ['default', 'strength', 'dexterity', 'defense', 'speed']
-        found = False
-        i = 0
-        while found is False and i <= 4:
-            if stance.lower() in stances[i]:
-                stance_ind = i
-                found = True
-            i += 1
+    #     Available stances: Default, Strength, Dexterity, Defense, Speed.
+    #     '''
+    #     # finding the stance index for stance_lst
+    #     stances = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
+    #     found = False
+    #     i = 0
+    #     while found is False and i <= 4:
+    #         if stance.lower() in stances[i].lower():
+    #             stance_ind = i
+    #             found = True
+    #         i += 1
 
-        if found is False:
-            await ctx.send("Stance not found. Your options are: Default, Strength, Dexterity, Defense, Speed.")
-            return
+    #     if found is False:
+    #         await ctx.send("Stance not found. Your options are: Default, Strength, Dexterity, Defense, Speed.")
+    #         return
 
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        c = conn.cursor()
-        c.execute("""SELECT legends_lst FROM users
-                        WHERE ID = %s """, (str(ctx.author.id),))
-        legends_lst = c.fetchone()[0]
+    #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    #     c = conn.cursor()
+    #     c.execute("""SELECT selected_legend_key, legends_lst FROM users
+    #                     WHERE ID = %s """, (str(ctx.author.id),))
+    #     row = c.fetchone()
+    #     if row is None:
+    #         await ctx.send("You have not selected a legend or do not own a legend!")
+    #         return
+    #     selected_legend_key = row[0]
+    #     legends_lst = row[1]
+    #     # searching legend_lst for legend_key
+    #     found = False
+    #     i = 0
+    #     print(legends_lst)
+    #     print(selected_legend_key)
+    #     while found is False and i < len(legends_lst):
+    #         if legends_lst[i][0] == selected_legend_key:
+    #             legend_ind = i
+    #             legend = legends_lst[legend_ind]
+    #             found = True
+    #         i += 1
+    #     print(legend_ind)
+
+    #     # changing stance_num
+    #     legend[4] = stance_ind
+    #     c.execute("""UPDATE users SET legends_lst[%s] = %s
+    #                     WHERE ID = %s; """, (legend_ind, legend, str(ctx.author.id)))
+    #     await ctx.send(f"You've selected {stances[stance_ind]} Stance.")
+    #     conn.commit()
+    #     conn.close()
 
     @b.command()
     async def store(self, ctx):

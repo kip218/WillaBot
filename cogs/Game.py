@@ -201,15 +201,15 @@ class Game:
             return
         else:
             if player_balance < 3*bet_amount and opponent_balance < 3*bet_amount:
-                await ctx.send("Both players do not have enough Coins to play. You must have more than **triple** the bet amount to play the Peace War game.")
+                await ctx.send("Both players do not have enough Coins to play.\nYou must have more than **triple** the bet amount to play the Peace War game.")
                 conn.close()
                 return
             elif player_balance < 3*bet_amount:
-                await ctx.send(f"{player.name} does not have enough Coins to play. You must have more than **triple** the bet amount to play the Peace War game.")
+                await ctx.send(f"{player.name} does not have enough Coins to play.\nYou must have more than **triple** the bet amount to play the Peace War game.")
                 conn.close()
                 return
             elif opponent_balance < 3*bet_amount:
-                await ctx.send(f"{opponent.name} does not have enough Coins to play. You must have more than **triple** the bet amount to play the Peace War game.")
+                await ctx.send(f"{opponent.name} does not have enough Coins to play.\nYou must have more than **triple** the bet amount to play the Peace War game.")
                 conn.close()
                 return
 
