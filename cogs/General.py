@@ -183,7 +183,7 @@ class General:
                         return
 
     @commands.command()
-    async def pay(self, ctx, user, amount: int):
+    async def pay(self, ctx, user, amount: int=None):
         '''
         Pay another use <amount> of coins.
         w.pay <@user> <amount>
