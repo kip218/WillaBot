@@ -278,7 +278,7 @@ class Game:
                 msg = done.pop().result()
             except asyncio.TimeoutError:
                 player_prompt.embeds[0].set_footer(text="The game has timed out!")
-                opponent_prompt.embeds[0].set_footter(text="The game has timed out!")
+                opponent_prompt.embeds[0].set_footer(text="The game has timed out!")
                 await player_prompt.edit(embed=player_prompt)
                 await opponent_prompt.edit(embed=opponent_prompt)
                 await challenge_accepted.edit(content=f"{challenge_accepted.content}\n*The game has timed out!*")

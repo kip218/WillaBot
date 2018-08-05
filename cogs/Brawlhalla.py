@@ -377,58 +377,60 @@ class Brawlhalla:
         conn.commit()
         conn.close()
 
-    # @b.command()
-    # async def stance(self, ctx, stance):
-    #     '''
-    #     Change the stance of your selected legend.
-    #     w.b stance <stance>
+    @b.command()
+    async def stance(self, ctx, stance):
+        '''
+        Change your legend stance.
+        w.b stance <stance>
 
-    #     Available stances: Default, Strength, Dexterity, Defense, Speed.
-    #     '''
-    #     # finding the stance index for stance_lst
-    #     stances = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
-    #     found = False
-    #     i = 0
-    #     while found is False and i <= 4:
-    #         if stance.lower() in stances[i].lower():
-    #             stance_ind = i
-    #             found = True
-    #         i += 1
+        Available stances: Default, Strength, Dexterity, Defense, Speed.
+        '''
+        # finding the stance index for stance_lst
+        stances = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
+        found = False
+        i = 0
+        while found is False and i <= 4:
+            if stance.lower() in stances[i].lower():
+                stance_ind = i
+                found = True
+            i += 1
 
-    #     if found is False:
-    #         await ctx.send("Stance not found. Your options are: Default, Strength, Dexterity, Defense, Speed.")
-    #         return
+        if found is False:
+            await ctx.send("Stance not found. Your options are: Default, Strength, Dexterity, Defense, Speed.")
+            return
 
-    #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    #     c = conn.cursor()
-    #     c.execute("""SELECT selected_legend_key, legends_lst FROM users
-    #                     WHERE ID = %s """, (str(ctx.author.id),))
-    #     row = c.fetchone()
-    #     if row is None:
-    #         await ctx.send("You have not selected a legend or do not own a legend!")
-    #         return
-    #     selected_legend_key = row[0]
-    #     legends_lst = row[1]
-    #     # searching legend_lst for legend_key
-    #     found = False
-    #     i = 0
-    #     print(legends_lst)
-    #     print(selected_legend_key)
-    #     while found is False and i < len(legends_lst):
-    #         if legends_lst[i][0] == selected_legend_key:
-    #             legend_ind = i
-    #             legend = legends_lst[legend_ind]
-    #             found = True
-    #         i += 1
-    #     print(legend_ind)
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT selected_legend_key, legends_lst FROM users
+                        WHERE ID = %s """, (str(ctx.author.id),))
+        row = c.fetchone()
+        if row is None:
+            await ctx.send("You have not selected a legend or do not own a legend!")
+            return
+        selected_legend_key = row[0]
+        legends_lst = row[1]
+        # searching legend_lst for legend_key
+        found = False
+        i = 0
+        while found is False and i < len(legends_lst):
+            if legends_lst[i][0] == selected_legend_key:
+                legend = legends_lst[i]
+                found = True
+            i += 1
 
-    #     # changing stance_num
-    #     legend[4] = stance_ind
-    #     c.execute("""UPDATE users SET legends_lst[%s] = %s
-    #                     WHERE ID = %s; """, (legend_ind, legend, str(ctx.author.id)))
-    #     await ctx.send(f"You've selected {stances[stance_ind]} Stance.")
-    #     conn.commit()
-    #     conn.close()
+        # removing pre-existing legend version
+        c.execute("""UPDATE users SET legends_lst = array_remove(legends_lst, %s)
+                        WHERE ID = %s; """, (list(legend), str(ctx.author.id)))
+
+        # changing stance_num and inserting new legend version
+        legend[4] = stance_ind
+        legend_name = legend[1]
+        skin = legend[2]
+        c.execute("""UPDATE users SET legends_lst = array_append(legends_lst, %s)
+                        WHERE ID = %s; """, (list(legend), str(ctx.author.id)))
+        await ctx.send(f"You've selected {stances[stance_ind]} Stance for your {skin} {legend_name}.")
+        conn.commit()
+        conn.close()
 
     @b.command()
     async def store(self, ctx):
