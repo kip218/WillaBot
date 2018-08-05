@@ -40,7 +40,7 @@ class Todo:
             description = ""
             for i in range(len(todo_list)):
                 description += "**" + str(i+1) + ")** " + todo_list[i] + "\n"
-            embed = discord.Embed(title=str(ctx.author.name) + "'s to-do list", description=description, color=0x48d1cc)
+            embed = discord.Embed(title=str(ctx.author.name) + "'s to-do list", description=description, color=ctx.author.color)
             embed.set_thumbnail(url=ctx.author.avatar_url)
             await ctx.send(embed=embed)
         conn.commit()

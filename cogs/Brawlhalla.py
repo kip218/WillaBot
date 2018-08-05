@@ -377,80 +377,158 @@ class Brawlhalla:
         conn.commit()
         conn.close()
 
+    @b.command()
+    async def stance(self, ctx, stance):
+        '''
+        Change your legend stance.
+        w.b stance <stance>
+
+        Available stances: Default, Strength, Dexterity, Defense, Speed.
+        '''
+        # finding the stance index for stance_lst
+        stances = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
+        found = False
+        i = 0
+        while found is False and i <= 4:
+            if stance.lower() in stances[i].lower():
+                stance_ind = i
+                found = True
+            else:
+                i += 1
+
+        if found is False:
+            await ctx.send("Stance not found. Your options are: Default, Strength, Dexterity, Defense, Speed.")
+            return
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT selected_legend_key, legends_lst FROM users
+                        WHERE ID = %s """, (str(ctx.author.id),))
+        row = c.fetchone()
+        if row is None:
+            await ctx.send("You have not selected a legend or do not own a legend!")
+            return
+        selected_legend_key = row[0]
+        legends_lst = row[1]
+        # searching legend_lst for legend_key
+        found = False
+        i = 0
+        while found is False and i < len(legends_lst):
+            if legends_lst[i][0] == selected_legend_key:
+                legend_ind = i
+                legend = legends_lst[legend_ind]
+                found = True
+            else:
+                i += 1
+
+        legend_name = legend[1]
+        skin = legend[2]
+        # changing stance_num
+        c.execute("""UPDATE users SET legends_lst[%s][%s] = %s
+                        WHERE ID = %s; """, (legend_ind+1, 5, stance_ind, str(ctx.author.id)))
+        await ctx.send(f"You've selected **{stances[stance_ind]}** Stance for {skin.capitalize()} {legend_name.capitalize()}.")
+        conn.commit()
+        conn.close()
+
     # @b.command()
-    # async def stance(self, ctx, stance):
+    # async def store(self, ctx):
     #     '''
-    #     Change your legend stance.
-    #     w.b stance <stance>
-
-    #     Available stances: Default, Strength, Dexterity, Defense, Speed.
+    #     The Brawlhalla store.
+    #     w.b store
     #     '''
-    #     # finding the stance index for stance_lst
-    #     stances = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
-    #     found = False
-    #     i = 0
-    #     while found is False and i <= 4:
-    #         if stance.lower() in stances[i].lower():
-    #             stance_ind = i
-    #             found = True
-    #         else:
-    #             i += 1
-
-    #     if found is False:
-    #         await ctx.send("Stance not found. Your options are: Default, Strength, Dexterity, Defense, Speed.")
-    #         return
-
     #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     #     c = conn.cursor()
-    #     c.execute("""SELECT selected_legend_key, legends_lst FROM users
+    #     c.execute("""SELECT balance FROM users
     #                     WHERE ID = %s """, (str(ctx.author.id),))
-    #     row = c.fetchone()
-    #     if row is None:
-    #         await ctx.send("You have not selected a legend or do not own a legend!")
-    #         return
-    #     selected_legend_key = row[0]
-    #     legends_lst = row[1]
-    #     # searching legend_lst for legend_key
-    #     found = False
-    #     i = 0
-    #     while found is False and i < len(legends_lst):
-    #         if legends_lst[i][0] == selected_legend_key:
-    #             legend_ind = i
-    #             legend = legends_lst[legend_ind]
-    #             found = True
+    #     balance = c.fetchone()[0]
+    #     embed = discord.Embed(description="Welcome to the store! Use \"w.b list [legend] / [skin]\" to view all purchasable legends/skins/colors!", color=0x48d1cc)
+    #     embed.set_author(name=f"Your balance: {balance} Coins", icon_url=ctx.author.avatar_url)
+    #     embed.add_field(name="Legend | 4,000 Coins", value="w.b buy <legend>", inline=False)
+    #     embed.add_field(name="Skin/Color | 10,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
+    #     embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
+    #     await ctx.send(embed=embed)
+
+    # @b.command(usage=" <item to buy>")
+    # async def buy(self, ctx, *, msg):
+    #     '''
+    #     Buy an item from the Brawlhalla store.
+    #     w.b buy <item to buy>
+    #     '''
+    #     # clean user input
+    #     def clean_input(msg):
+    #         if msg is not None:
+    #             msg_lst = msg.split('/')
+    #             msg_lst_clean = []
+    #             for value in msg_lst:
+    #                 value = value.replace(' ', '')
+    #                 value = value.replace('\'', '')
+    #                 value = value.replace('-', '')
+    #                 value = value.replace('_', '')
+    #                 value = value.replace('.', '')
+    #                 value = value.replace(',', '')
+    #                 value = value.lower()
+    #                 msg_lst_clean.append(value)
+
+    #             legend_name = msg_lst_clean[0]
+    #             try:
+    #                 skin = msg_lst_clean[1]
+    #                 if skin == '':
+    #                     skin = None
+    #             except IndexError:
+    #                 skin = None
+    #             try:
+    #                 color = msg_lst_clean[2]
+    #                 if color == '':
+    #                     color = None
+    #             except IndexError:
+    #                 color = None
+    #             return (legend_name, skin, color)
     #         else:
-    #             i += 1
+    #             return None
 
-    #     legend_name = legend[1]
-    #     skin = legend[2]
-    #     # changing stance_num
-    #     c.execute("""UPDATE users SET legends_lst[%s][%s] = %s
-    #                     WHERE ID = %s; """, (legend_ind+1, 5, stance_ind, str(ctx.author.id)))
-    #     await ctx.send(f"You've selected {stances[stance_ind]} Stance for {skin} {legend_name}.")
-    #     conn.commit()
+    #     # get embed of legend/skin/color
+    #     def get_embed(row):
+    #         full_key = row[0]
+    #         name = row[1][0].upper() + row[1][1:]
+    #         skin = row[2][0].upper() + row[2][1:]
+    #         color = row[3][0].upper() + row[3][1:]
+    #         embed = discord.Embed(title=f"{skin} {name} *({color})*", color=0x36393E)
+    #         embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
+    #         # setting up stats and weapons
+    #         default_stats = row[4][0]
+    #         weapons = row[5]
+    #         embed.add_field(name="Stats", value=f"**Str:** {default_stats[0]}\n**Dex:** {default_stats[1]}\n**Def:** {default_stats[2]}\n**Spd:** {default_stats[3]}", inline=True)
+    #         embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
+    #         return embed
+
+    #     legend_name, skin, color = clean_input(msg)
+    #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    #     c = conn.cursor()
+    #     c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+    #                     WHERE name LIKE '%%'||%s||'%%'
+    #                         AND skin LIKE '%%'||%s||'%%'
+    #                         AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
+    #     row = c.fetchone()
+    #     found = False
+    #     if row is not None:
+    #         embed = get_embed(row)
+    #         await ctx.send(embed=embed)
+    #         found = True
+    #     # search again if classic color does not exist for skin
+    #     elif color == 'classic':
+    #         c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+    #             WHERE name LIKE '%%'||%s||'%%'
+    #                 AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin))
+    #         row = c.fetchone()
+    #         # only search for color and send embed if skin can be found
+    #         if row is not None:
+    #             embed = get_embed(row)
+    #             await ctx.send(embed=embed)
+    #             found = True
+    #     # if not found, send help message
+    #     if found is False:
+    #         await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] [skin]\" to see a list of available legends/skins/colors!")
     #     conn.close()
-
-    #     # # removing pre-existing legend version
-    #     # c.execute("""UPDATE users SET legends_lst = array_remove(legends_lst, %s::text[])
-    #     #                 WHERE ID = %s; """, (legend, str(ctx.author.id)))
-
-    #     # # changing stance_num and inserting new legend version
-    #     # legend[4] = stance_ind
-    #     # legend_name = legend[1]
-    #     # skin = legend[2]
-    #     # c.execute("""UPDATE users SET legends_lst = array_append(legends_lst, %s::text[])
-    #     #                 WHERE ID = %s; """, (legend, str(ctx.author.id)))
-    #     # await ctx.send(f"You've selected {stances[stance_ind]} Stance for your {skin} {legend_name}.")
-    #     # conn.commit()
-    #     # conn.close()
-
-    @b.command()
-    async def store(self, ctx):
-        '''
-        The Brawlhalla store.
-        w.b store
-        '''
-        await ctx.send("The store hasn't opened yet!")
 
     # @b.command()
     # async def test(self, ctx):
