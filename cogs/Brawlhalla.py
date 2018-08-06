@@ -610,6 +610,8 @@ class Brawlhalla:
                         conn.close()
                         remove_status()
                         return
+            else:
+                legends_lst = []
 
         # checking that the user has enough balance
         def check_balance(user_id, required_balance):
