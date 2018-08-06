@@ -459,6 +459,33 @@ class Brawlhalla:
             await ctx.send("You must specify what to buy from the store. Try \"w.b store\".")
             return
 
+        # Check that the user isn't already purchasing an item
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(ctx.author.id), ))
+        status_lst = c.fetchone()[0]
+        if status_lst is not None:
+            if "buy" in status_lst:
+                await ctx.send("You're already in the purchase process! You must \"w.cancel\" your purchase to initiate a new purchase. This is to prevent accidental duplicate purchases.")
+                conn.commit()
+                conn.close()
+                return
+        c.execute(""" UPDATE users
+                    SET status = array_append(status, %s)
+                    WHERE ID = %s; """, ('buy', str(ctx.author.id)))
+        conn.commit()
+        conn.close()
+
+        # removing 'buy' from status_lst
+        def remove_status():
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE users
+                        SET status = array_remove(status, %s)
+                        WHERE ID = %s; """, ('buy', str(ctx.author.id)))
+            conn.commit()
+            conn.close()
+
         # clean user input
         def clean_input(msg):
             if msg is not None:
@@ -532,6 +559,7 @@ class Brawlhalla:
         if found is False:
             await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] / [skin]\" to see a list of available legends/skins/colors!")
             conn.close()
+            remove_status()
             return
 
         def check_author(m):
@@ -554,6 +582,8 @@ class Brawlhalla:
                     timeout_embed = timeout_embed.set_footer(text="The purchase has timed out!")
                     await purchase_embed.edit(embed=timeout_embed)
                     conn.close()
+                    remove_status()
+
                     return
                 else:
                     if purchase_confirm.content == 'w.confirm':
@@ -563,6 +593,8 @@ class Brawlhalla:
                         await ctx.send("Purchase canceled.")
                         answered = True
                         conn.close()
+                        remove_status()
+
                         return
 
         if confirmed is True:
@@ -576,6 +608,7 @@ class Brawlhalla:
                     if full_key in legend:
                         await ctx.send("You cannot buy what you already own!")
                         conn.close()
+                        remove_status()
                         return
 
         # checking that the user has enough balance
@@ -624,8 +657,9 @@ class Brawlhalla:
         if skin == 'base' and color == 'classic':
             if check_balance(ctx.author.id, 4000):
                 purchased_legend = [full_key, name, skin, color, '0', '0']
-                c.execute("""UPDATE users SET legends_lst = legends_lst || %s
-                                WHERE ID = %s;""", (purchased_legend, str(ctx.author.id)))
+                legends_lst.append(purchased_legend)
+                c.execute("""UPDATE users SET legends_lst = %s
+                                WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
                 update_database_coins(ctx.author.id, -4000)
                 await ctx.send(f"You have purchased {skin} {name} *({color})*!")
             else:
@@ -634,8 +668,9 @@ class Brawlhalla:
             if check_balance(ctx.author.id, 10000):
                 if check_default_legend(ctx.author.id, name):
                     purchased_legend = [full_key, name, skin, color, '0', '0']
-                    c.execute("""UPDATE users SET legends_lst = legends_lst || %s
-                                    WHERE ID = %s;""", (purchased_legend, str(ctx.author.id)))
+                    legends_lst.appent(purchased_legend)
+                    c.execute("""UPDATE users SET legends_lst = %s
+                                    WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
                     update_database_coins(ctx.author.id, -10000)
                     await ctx.send(f"You have purchased {skin} {name} *({color})*!")
                 else:
@@ -644,6 +679,7 @@ class Brawlhalla:
                 await ctx.send("You don't have enough Coins!")
         conn.commit()
         conn.close()
+        remove_status()
 
     # @b.command()
     # async def test(self, ctx):
