@@ -591,6 +591,21 @@ class Brawlhalla:
             else:
                 return True
 
+        # returns True if user owns default legend
+        def check_default_legend(user_id, legend_name):
+            key = f'images/legends/{legend_name}_base_classic.png'
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" SELECT legends_lst FROM users
+                        WHERE ID = %s; """, (str(user_id), ))
+            legends_lst = c.fetchone()[0]
+            conn.close()
+            if legends_lst is not None:
+                for legend in legends_lst:
+                    if key in legend:
+                        return True
+            return False
+
         # update balance in database
         def update_database_coins(user_id, delta_coins):
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -617,11 +632,14 @@ class Brawlhalla:
                 await ctx.send("You don't have enough Coins!")
         else:
             if check_balance(ctx.author.id, 10000):
-                purchased_legend = [full_key, name, skin, color, '0', '0']
-                c.execute("""UPDATE users SET legends_lst = legends_lst || %s
-                                WHERE ID = %s;""", (purchased_legend, str(ctx.author.id)))
-                update_database_coins(ctx.author.id, -10000)
-                await ctx.send(f"You have purchased {skin} {name} *({color})*!")
+                if check_default_legend(ctx.author.id, name):
+                    purchased_legend = [full_key, name, skin, color, '0', '0']
+                    c.execute("""UPDATE users SET legends_lst = legends_lst || %s
+                                    WHERE ID = %s;""", (purchased_legend, str(ctx.author.id)))
+                    update_database_coins(ctx.author.id, -10000)
+                    await ctx.send(f"You have purchased {skin} {name} *({color})*!")
+                else:
+                    await ctx.send("You must have the default legend before buying skins/colors!")
             else:
                 await ctx.send("You don't have enough Coins!")
         conn.commit()
