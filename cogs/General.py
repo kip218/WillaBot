@@ -241,10 +241,10 @@ class General:
                                 WHERE ID = %s; """, (str(payer_balance), str(ctx.author.id)))
                     c.execute(""" UPDATE users SET balance = %s
                                 WHERE ID = %s; """, (str(receiver_balance), str(receiver.id)))
-                    await ctx.send(f"Payment confirmed. {ctx.author.mention} has paid {receiver.mention} {amount} coins.")
+                    await confirm_msg.edit(content=f"Payment confirmed. {ctx.author.mention} has paid {receiver.mention} {amount} coins.")
                     confirmed = True
                 elif confirm.content == 'w.cancel':
-                    await ctx.send("Payment canceled.")
+                    await confirm_msg.edit(content="Payment canceled.")
                     confirmed = True
         conn.commit()
         conn.close()

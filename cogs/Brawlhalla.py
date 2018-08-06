@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import psycopg2
 import os
+import asyncio
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -493,12 +494,13 @@ class Brawlhalla:
         # get embed of legend/skin/color
         def get_embed(row):
             full_key = row[0]
-            name = row[1][0].upper() + row[1][1:]
-            skin = row[2][0].upper() + row[2][1:]
-            color = row[3][0].upper() + row[3][1:]
-            embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color?\nType \"w.confirm\" to confirm purchase.", color=0xD4AF37)
+            name = row[1].capitalize()
+            skin = row[2].capitalize()
+            color = row[3].capitalize()
+            embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color?\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=0xD4AF37)
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
             embed.set_author(name="Confirm Purchase", icon_url=self.bot.user.avatar_url)
+            embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
             return embed
 
         # divide input by keywords and determine item purchase
@@ -514,7 +516,6 @@ class Brawlhalla:
         found = False
         if row is not None:
             embed = get_embed(row)
-            await ctx.send(embed=embed)
             found = True
         # search again if classic color does not exist for skin
         elif color == 'classic':
@@ -525,11 +526,105 @@ class Brawlhalla:
             # only search for color and send embed if skin can be found
             if row is not None:
                 embed = get_embed(row)
-                await ctx.send(embed=embed)
                 found = True
+
         # if not found, send help message
         if found is False:
-            await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] [skin]\" to see a list of available legends/skins/colors!")
+            await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] / [skin]\" to see a list of available legends/skins/colors!")
+            conn.close()
+            return
+
+        def check_author(m):
+            return m.author == ctx.author
+
+        # saving elements from row above for later use
+        full_key = row[0]
+        name = row[1]
+        skin = row[2]
+        color = row[3]
+        answered = False
+        confirmed = False
+        if found is True:
+            purchase_embed = await ctx.send(embed=embed)
+            while answered is False:
+                try:
+                    purchase_confirm = await self.bot.wait_for('message', check=check_author, timeout=60)
+                except asyncio.TimeoutError:
+                    timeout_embed = purchase_embed.embeds[0]
+                    timeout_embed = timeout_embed.set_footer(text="The purchase has timed out!")
+                    await purchase_embed.edit(embed=timeout_embed)
+                    conn.close()
+                    return
+                else:
+                    if purchase_confirm.content == 'w.confirm':
+                        answered = True
+                        confirmed = True
+                    elif purchase_confirm.content == 'w.cancel':
+                        await ctx.send("Purchase canceled.")
+                        answered = True
+                        conn.close()
+                        return
+
+        if confirmed is True:
+            # checking that the user does not alreay have the item
+            c.execute(""" SELECT legends_lst FROM users
+                            WHERE ID = %s; """, (str(ctx.author.id),))
+            legends_lst = c.fetchone()[0]
+            if legends_lst is not None:
+                for legend in legends_lst:
+                    # full_key assigned above
+                    if full_key in legend:
+                        await ctx.send("You cannot buy what you already own!")
+                        conn.close()
+                        return
+
+        # checking that the user has enough balance
+        def check_balance(user_id, required_balance):
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" SELECT balance FROM users
+                            WHERE ID = %s; """, (str(user_id),))
+            balance = int(c.fetchone()[0])
+            conn.close()
+            if balance < required_balance:
+                return False
+            else:
+                return True
+
+        # update balance in database
+        def update_database_coins(user_id, delta_coins):
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" SELECT balance FROM users
+                        WHERE ID = %s; """, (str(user_id), ))
+            user_balance = int(c.fetchone()[0])
+            user_balance += delta_coins
+            c.execute(""" UPDATE users
+                        SET balance = %s
+                        WHERE ID = %s; """, (str(user_balance), str(user_id)))
+            conn.commit()
+            conn.close()
+
+        # checking what the user is buying
+        if skin == 'base' and color == 'classic':
+            if check_balance(ctx.author.id, 4000):
+                purchased_legend = [full_key, name, skin, color, '0', '0']
+                c.execute("""UPDATE users SET legends_lst = legends_lst || %s
+                                WHERE ID = %s;""", (purchased_legend, str(ctx.author.id)))
+                update_database_coins(ctx.author.id, -4000)
+                await ctx.send(f"You have purchased {skin} {name} *({color})*!")
+            else:
+                await ctx.send("You don't have enough Coins!")
+        else:
+            if check_balance(ctx.author.id, 10000):
+                purchased_legend = [full_key, name, skin, color, '0', '0']
+                c.execute("""UPDATE users SET legends_lst = legends_lst || %s
+                                WHERE ID = %s;""", (purchased_legend, str(ctx.author.id)))
+                update_database_coins(ctx.author.id, -10000)
+                await ctx.send(f"You have purchased {skin} {name} *({color})*!")
+            else:
+                await ctx.send("You don't have enough Coins!")
+        conn.commit()
         conn.close()
 
     # @b.command()
