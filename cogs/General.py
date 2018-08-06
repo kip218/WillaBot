@@ -204,6 +204,10 @@ class General:
             await ctx.send("You must specify the amount of payment!")
             return
 
+        if amount <= 0:
+            await ctx.send("Payment amount must be positive!")
+            return
+
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT balance FROM users
@@ -214,7 +218,7 @@ class General:
             conn.close()
             return
 
-        confirm_msg = await ctx.send(f"{ctx.author.mention} Are you sure you want to pay {receiver.mention} {amount} coins?\nType \"w.confirm\" to confirm payment.")
+        confirm_msg = await ctx.send(f"{ctx.author.mention} Are you sure you want to pay {receiver.mention} {amount} coins?\nType \"w.confirm\" to confirm payment and \"w.cancel\" to cancel payment.")
 
         def check_confirm(m):
             return m.author == ctx.author
@@ -238,6 +242,9 @@ class General:
                     c.execute(""" UPDATE users SET balance = %s
                                 WHERE ID = %s; """, (str(receiver_balance), str(receiver.id)))
                     await ctx.send(f"Payment confirmed. {ctx.author.mention} has paid {receiver.mention} {amount} coins.")
+                    confirmed = True
+                elif confirm.content == 'w.cancel':
+                    await ctx.send("Payment canceled.")
                     confirmed = True
         conn.commit()
         conn.close()

@@ -77,7 +77,7 @@ class Brawlhalla:
             row = c.fetchone()
             stats_lst = row[0][stance_num]
             weapons = row[1]
-            embed = discord.Embed(title=f"Level {level} {skin} {legend_name}", description=f"{curr_xp}/{next_xp}XP", color=0x36393E)
+            embed = discord.Embed(title=f"Level {level} {skin} {legend_name}", description=f"{curr_xp}/{next_xp}XP", color=ctx.author.color)
             embed.add_field(name=f"{stance_lst[stance_num]} Stance", value=f"**Str:** {stats_lst[0]}\n**Dex:** {stats_lst[1]}\n**Def:** {stats_lst[2]}\n**Spd:** {stats_lst[3]}", inline=True)
             embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
             embed.set_thumbnail(url=ctx.author.avatar_url)
@@ -430,105 +430,107 @@ class Brawlhalla:
         conn.commit()
         conn.close()
 
-    # @b.command()
-    # async def store(self, ctx):
-    #     '''
-    #     The Brawlhalla store.
-    #     w.b store
-    #     '''
-    #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    #     c = conn.cursor()
-    #     c.execute("""SELECT balance FROM users
-    #                     WHERE ID = %s """, (str(ctx.author.id),))
-    #     balance = c.fetchone()[0]
-    #     embed = discord.Embed(description="Welcome to the store! Use \"w.b list [legend] / [skin]\" to view all purchasable legends/skins/colors!", color=0x48d1cc)
-    #     embed.set_author(name=f"Your balance: {balance} Coins", icon_url=ctx.author.avatar_url)
-    #     embed.add_field(name="Legend | 4,000 Coins", value="w.b buy <legend>", inline=False)
-    #     embed.add_field(name="Skin/Color | 10,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
-    #     embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
-    #     await ctx.send(embed=embed)
+    @b.command()
+    async def store(self, ctx):
+        '''
+        The Brawlhalla store.
+        w.b store
+        '''
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT balance FROM users
+                        WHERE ID = %s """, (str(ctx.author.id),))
+        balance = c.fetchone()[0]
+        embed = discord.Embed(description="Welcome to the store!\nUse \"w.b list [legend] / [skin]\" to view all purchasable legends/skins/colors!\nYou must buy the legend before you can buy other skin/color combinations.", color=0xD4AF37)
+        embed.set_author(name=f"Your balance: {balance} Coins", icon_url=self.bot.user.avatar_url)
+        embed.add_field(name="Legend | 4,000 Coins", value="w.b buy <legend>", inline=False)
+        embed.add_field(name="Skin/Color | 10,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
+        embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
+        await ctx.send(embed=embed)
 
-    # @b.command(usage=" <item to buy>")
-    # async def buy(self, ctx, *, msg):
-    #     '''
-    #     Buy an item from the Brawlhalla store.
-    #     w.b buy <item to buy>
-    #     '''
-    #     # clean user input
-    #     def clean_input(msg):
-    #         if msg is not None:
-    #             msg_lst = msg.split('/')
-    #             msg_lst_clean = []
-    #             for value in msg_lst:
-    #                 value = value.replace(' ', '')
-    #                 value = value.replace('\'', '')
-    #                 value = value.replace('-', '')
-    #                 value = value.replace('_', '')
-    #                 value = value.replace('.', '')
-    #                 value = value.replace(',', '')
-    #                 value = value.lower()
-    #                 msg_lst_clean.append(value)
+    @b.command(usage=" <item to buy>")
+    async def buy(self, ctx, *, msg):
+        '''
+        Buy an item from the Brawlhalla store.
+        w.b buy <item to buy>
+        '''
+        if msg is None:
+            await ctx.send("You must specify what to buy from the store. Try \"w.b store\".")
+            return
 
-    #             legend_name = msg_lst_clean[0]
-    #             try:
-    #                 skin = msg_lst_clean[1]
-    #                 if skin == '':
-    #                     skin = None
-    #             except IndexError:
-    #                 skin = None
-    #             try:
-    #                 color = msg_lst_clean[2]
-    #                 if color == '':
-    #                     color = None
-    #             except IndexError:
-    #                 color = None
-    #             return (legend_name, skin, color)
-    #         else:
-    #             return None
+        # clean user input
+        def clean_input(msg):
+            if msg is not None:
+                msg_lst = msg.split('/')
+                msg_lst_clean = []
+                for value in msg_lst:
+                    value = value.replace(' ', '')
+                    value = value.replace('\'', '')
+                    value = value.replace('-', '')
+                    value = value.replace('_', '')
+                    value = value.replace('.', '')
+                    value = value.replace(',', '')
+                    value = value.lower()
+                    msg_lst_clean.append(value)
 
-    #     # get embed of legend/skin/color
-    #     def get_embed(row):
-    #         full_key = row[0]
-    #         name = row[1][0].upper() + row[1][1:]
-    #         skin = row[2][0].upper() + row[2][1:]
-    #         color = row[3][0].upper() + row[3][1:]
-    #         embed = discord.Embed(title=f"{skin} {name} *({color})*", color=0x36393E)
-    #         embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
-    #         # setting up stats and weapons
-    #         default_stats = row[4][0]
-    #         weapons = row[5]
-    #         embed.add_field(name="Stats", value=f"**Str:** {default_stats[0]}\n**Dex:** {default_stats[1]}\n**Def:** {default_stats[2]}\n**Spd:** {default_stats[3]}", inline=True)
-    #         embed.add_field(name="Weapons", value=f"{weapons[0]}\n{weapons[1]}", inline=True)
-    #         return embed
+                legend_name = msg_lst_clean[0]
+                try:
+                    skin = msg_lst_clean[1]
+                    if skin == '':
+                        skin = 'base'
+                except IndexError:
+                    skin = 'base'
+                try:
+                    color = msg_lst_clean[2]
+                    if color == '':
+                        color = 'classic'
+                except IndexError:
+                    color = 'classic'
+                return (legend_name, skin, color)
+            else:
+                return None
 
-    #     legend_name, skin, color = clean_input(msg)
-    #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    #     c = conn.cursor()
-    #     c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
-    #                     WHERE name LIKE '%%'||%s||'%%'
-    #                         AND skin LIKE '%%'||%s||'%%'
-    #                         AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
-    #     row = c.fetchone()
-    #     found = False
-    #     if row is not None:
-    #         embed = get_embed(row)
-    #         await ctx.send(embed=embed)
-    #         found = True
-    #     # search again if classic color does not exist for skin
-    #     elif color == 'classic':
-    #         c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
-    #             WHERE name LIKE '%%'||%s||'%%'
-    #                 AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin))
-    #         row = c.fetchone()
-    #         # only search for color and send embed if skin can be found
-    #         if row is not None:
-    #             embed = get_embed(row)
-    #             await ctx.send(embed=embed)
-    #             found = True
-    #     # if not found, send help message
-    #     if found is False:
-    #         await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] [skin]\" to see a list of available legends/skins/colors!")
-    #     conn.close()
+        # get embed of legend/skin/color
+        def get_embed(row):
+            full_key = row[0]
+            name = row[1][0].upper() + row[1][1:]
+            skin = row[2][0].upper() + row[2][1:]
+            color = row[3][0].upper() + row[3][1:]
+            embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color?\nType \"w.confirm\" to confirm purchase.", color=0xD4AF37)
+            embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
+            embed.set_author(name="Confirm Purchase", icon_url=self.bot.user.avatar_url)
+            return embed
+
+        # divide input by keywords and determine item purchase
+        legend_name, skin, color = clean_input(msg)
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+                        WHERE name LIKE '%%'||%s||'%%'
+                            AND skin LIKE '%%'||%s||'%%'
+                            AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
+        row = c.fetchone()
+        found = False
+        if row is not None:
+            embed = get_embed(row)
+            await ctx.send(embed=embed)
+            found = True
+        # search again if classic color does not exist for skin
+        elif color == 'classic':
+            c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+                WHERE name LIKE '%%'||%s||'%%'
+                    AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin))
+            row = c.fetchone()
+            # only search for color and send embed if skin can be found
+            if row is not None:
+                embed = get_embed(row)
+                await ctx.send(embed=embed)
+                found = True
+        # if not found, send help message
+        if found is False:
+            await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] [skin]\" to see a list of available legends/skins/colors!")
+        conn.close()
 
     # @b.command()
     # async def test(self, ctx):
