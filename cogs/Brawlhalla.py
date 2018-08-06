@@ -668,7 +668,7 @@ class Brawlhalla:
             if check_balance(ctx.author.id, 10000):
                 if check_default_legend(ctx.author.id, name):
                     purchased_legend = [full_key, name, skin, color, '0', '0']
-                    legends_lst.appent(purchased_legend)
+                    legends_lst.append(purchased_legend)
                     c.execute("""UPDATE users SET legends_lst = %s
                                     WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
                     update_database_coins(ctx.author.id, -10000)
