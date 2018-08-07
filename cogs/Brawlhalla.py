@@ -66,9 +66,17 @@ class Brawlhalla:
                 if legend[0] == selected_legend_key:
                     selected_legend = legend
             key = selected_legend[0]
-            legend_name = selected_legend[1][0].upper() + selected_legend[1][1:]
-            skin = selected_legend[2][0].upper() + selected_legend[2][1:]
-            color = selected_legend[3][0].upper() + selected_legend[3][1:]
+            legend_name = selected_legend[1].capitalize()
+            # checking spaces between legend names
+            if legend_name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
+                if legend_name.lower() == 'lordvraxx':
+                    legend_name = 'Lord Vraxx'
+                elif legend_name.lower() == 'queennai':
+                    legend_name = 'Queen Nai'
+                elif legend_name.lower() == 'sirroland':
+                    legend_name = 'Sir Roland'
+            skin = selected_legend[2].capitalize()
+            color = selected_legend[3].capitalize()
             stance_num = int(selected_legend[4])
             xp = int(selected_legend[5])
             level, curr_xp, next_xp = level_currxp_nextxp(xp)
@@ -132,9 +140,17 @@ class Brawlhalla:
         # get embed of legend/skin/color
         def get_embed(row):
             full_key = row[0]
-            name = row[1][0].upper() + row[1][1:]
-            skin = row[2][0].upper() + row[2][1:]
-            color = row[3][0].upper() + row[3][1:]
+            name = row[1].capitalize()
+            # checking spaces between legend names
+            if name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
+                if name.lower() == 'lordvraxx':
+                    name = 'Lord Vraxx'
+                elif name.lower() == 'queennai':
+                    name = 'Queen Nai'
+                elif name.lower() == 'sirroland':
+                    name = 'Sir Roland'
+            skin = row[2].capitalize()
+            color = row[3].capitalize()
             embed = discord.Embed(title=f"{skin} {name} *({color})*", color=0x36393E)
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
             # setting up stats and weapons
@@ -296,6 +312,14 @@ class Brawlhalla:
         for legend in legends_lst:
             legend_name = legend[1]
             if legend_name not in searched_legend_lst:
+                # checking spaces between legend names
+                if legend_name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
+                    if legend_name.lower() == 'lordvraxx':
+                        legend_name = 'Lord Vraxx'
+                    elif legend_name.lower() == 'queennai':
+                        legend_name = 'Queen Nai'
+                    elif legend_name.lower() == 'sirroland':
+                        legend_name = 'Sir Roland'
                 searched_legend_lst.append(legend_name)
                 legend_xp = legend[5]
                 level = level_currxp_nextxp(legend_xp)[0]
@@ -524,6 +548,14 @@ class Brawlhalla:
         def get_embed(row):
             full_key = row[0]
             name = row[1].capitalize()
+            # checking spaces between legend names
+            if name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
+                if name.lower() == 'lordvraxx':
+                    name = 'Lord Vraxx'
+                elif name.lower() == 'queennai':
+                    name = 'Queen Nai'
+                elif name.lower() == 'sirroland':
+                    name = 'Sir Roland'
             skin = row[2].capitalize()
             color = row[3].capitalize()
             embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color? Coins will be deducted from your profile.\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=0xD4AF37)
