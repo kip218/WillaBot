@@ -54,7 +54,7 @@ class Brawlhalla:
             selected_legend_key = c.fetchone()[0]
             # return if user hasn't selected a legend
             if selected_legend_key is None:
-                await ctx.send("You have not selected a legend yet! Use \"w.b legends\" to see your legends.")
+                await ctx.send("You have not selected a legend yet! Use \"w.b legends\" to see your legends and \"w.b select <legend> / <skin> / <color>\" to select a legend!")
                 conn.close()
                 return
             # checking legends lst for selected legend
@@ -84,6 +84,8 @@ class Brawlhalla:
             embed.set_thumbnail(url=ctx.author.avatar_url)
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             embed.set_image(url=f"https://s3.amazonaws.com/willabot-assets/{key}")
+            embed.set_footer(text="Use \"w.b stance <stance>\" to change the stance.")
+            # showing selected legend number out of list of legends
             # c.execute("""SELECT legends_lst FROM users
             #                 WHERE ID = %s; """, (str(ctx.author.id),))
             # legends_lst = c.fetchone()[0]
@@ -524,7 +526,7 @@ class Brawlhalla:
             name = row[1].capitalize()
             skin = row[2].capitalize()
             color = row[3].capitalize()
-            embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color?\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=0xD4AF37)
+            embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color? Coins will be deducted from your profile.\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=0xD4AF37)
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
             embed.set_author(name="Confirm Purchase", icon_url=self.bot.user.avatar_url)
             embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
