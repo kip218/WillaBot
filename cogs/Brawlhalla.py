@@ -446,8 +446,8 @@ class Brawlhalla:
         balance = c.fetchone()[0]
         embed = discord.Embed(description="Welcome to the store!\nUse \"w.b list [legend] / [skin]\" to view all purchasable legends/skins/colors!\nYou must buy the legend before you can buy other skin/color combinations.", color=0xD4AF37)
         embed.set_author(name=f"Your balance: {balance} Coins", icon_url=self.bot.user.avatar_url)
-        embed.add_field(name="Legend | 4,000 Coins", value="w.b buy <legend>", inline=False)
-        embed.add_field(name="Skin/Color | 10,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
+        embed.add_field(name="Legend | 2,000 Coins", value="w.b buy <legend>", inline=False)
+        embed.add_field(name="Skin/Color | 8,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
         embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
         await ctx.send(embed=embed)
 
@@ -585,7 +585,6 @@ class Brawlhalla:
                     await purchase_embed.edit(embed=timeout_embed)
                     conn.close()
                     remove_status()
-
                     return
                 else:
                     if purchase_confirm.content == 'w.confirm':
@@ -596,7 +595,6 @@ class Brawlhalla:
                         answered = True
                         conn.close()
                         remove_status()
-
                         return
 
         if confirmed is True:
@@ -659,20 +657,19 @@ class Brawlhalla:
 
         # checking what the user is buying
         if skin == 'base' and color == 'classic':
-            if check_balance(ctx.author.id, 4000):
+            if check_balance(ctx.author.id, 2000):
                 purchased_legend = [full_key, name, skin, color, '0', '0']
                 legends_lst.append(purchased_legend)
                 c.execute("""UPDATE users SET legends_lst = %s
                                 WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
                 conn.commit()
                 conn.close()
-                update_database_coins(ctx.author.id, -4000)
+                update_database_coins(ctx.author.id, -2000)
                 await ctx.send(f"You have purchased {skin} {name} *({color})*!")
             else:
                 await ctx.send("You don't have enough Coins!")
-
         else:
-            if check_balance(ctx.author.id, 10000):
+            if check_balance(ctx.author.id, 8000):
                 if check_default_legend(ctx.author.id, name):
                     purchased_legend = [full_key, name, skin, color, '0', '0']
                     legends_lst.append(purchased_legend)
@@ -680,7 +677,7 @@ class Brawlhalla:
                                     WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
                     conn.commit()
                     conn.close()
-                    update_database_coins(ctx.author.id, -10000)
+                    update_database_coins(ctx.author.id, -8000)
                     await ctx.send(f"You have purchased {skin} {name} *({color})*!")
                 else:
                     await ctx.send("You must have the default legend before buying skins/colors!")
