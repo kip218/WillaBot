@@ -650,8 +650,8 @@ class Brawlhalla:
             user_balance = int(c.fetchone()[0])
             user_balance += delta_coins
             c.execute(""" UPDATE users
-                        SET balance = %s
-                        WHERE ID = %s; """, (str(user_balance), str(user_id)))
+                            SET balance = %s
+                            WHERE ID = %s; """, (str(user_balance), str(user_id)))
             conn.commit()
             conn.close()
 
@@ -662,17 +662,22 @@ class Brawlhalla:
                 legends_lst.append(purchased_legend)
                 c.execute("""UPDATE users SET legends_lst = %s
                                 WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
+                conn.commit()
+                conn.close()
                 update_database_coins(ctx.author.id, -4000)
                 await ctx.send(f"You have purchased {skin} {name} *({color})*!")
             else:
                 await ctx.send("You don't have enough Coins!")
+
         else:
             if check_balance(ctx.author.id, 10000):
                 if check_default_legend(ctx.author.id, name):
                     purchased_legend = [full_key, name, skin, color, '0', '0']
                     legends_lst.append(purchased_legend)
                     c.execute("""UPDATE users SET legends_lst = %s
-                                    WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
+                                    WHERE ID = %s;""", ([legends_lst], str(ctx.author.id)))
+                    conn.commit()
+                    conn.close()
                     update_database_coins(ctx.author.id, -10000)
                     await ctx.send(f"You have purchased {skin} {name} *({color})*!")
                 else:
