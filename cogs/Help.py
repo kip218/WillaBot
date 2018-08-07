@@ -55,7 +55,7 @@ class Help:
             timeout = False
             while timeout is False:
                 try:
-                    done, pending = await asyncio.wait([self.bot.wait_for('reaction_add', check=check, timeout=300), self.bot.wait_for('reaction_remove', check=check, timeout=300)], return_when=asyncio.FIRST_COMPLETED)
+                    done, pending = await asyncio.wait([self.bot.wait_for('reaction_add', check=check, timeout=180), self.bot.wait_for('reaction_remove', check=check, timeout=180)], return_when=asyncio.FIRST_COMPLETED)
                     reaction = done.pop().result()[0]
                 except asyncio.TimeoutError:
                     timeout = True
