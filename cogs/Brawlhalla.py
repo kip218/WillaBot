@@ -675,7 +675,7 @@ class Brawlhalla:
                     purchased_legend = [full_key, name, skin, color, '0', '0']
                     legends_lst.append(purchased_legend)
                     c.execute("""UPDATE users SET legends_lst = %s
-                                    WHERE ID = %s;""", ([legends_lst], str(ctx.author.id)))
+                                    WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
                     conn.commit()
                     conn.close()
                     update_database_coins(ctx.author.id, -10000)
