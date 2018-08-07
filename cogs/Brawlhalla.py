@@ -643,17 +643,17 @@ class Brawlhalla:
 
         # update balance in database
         def update_database_coins(user_id, delta_coins):
-            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-            c = conn.cursor()
-            c.execute(""" SELECT balance FROM users
+            conn2 = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c2 = conn.cursor()
+            c2.execute(""" SELECT balance FROM users
                         WHERE ID = %s; """, (str(user_id), ))
             user_balance = int(c.fetchone()[0])
             user_balance += delta_coins
-            c.execute(""" UPDATE users
+            c2.execute(""" UPDATE users
                             SET balance = %s
                             WHERE ID = %s; """, (str(user_balance), str(user_id)))
-            conn.commit()
-            conn.close()
+            conn2.commit()
+            conn2.close()
 
         # checking what the user is buying
         if skin == 'base' and color == 'classic':
@@ -662,8 +662,6 @@ class Brawlhalla:
                 legends_lst.append(purchased_legend)
                 c.execute("""UPDATE users SET legends_lst = %s
                                 WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
-                conn.commit()
-                conn.close()
                 update_database_coins(ctx.author.id, -2000)
                 await ctx.send(f"You have purchased {skin} {name} *({color})*!")
             else:
@@ -675,8 +673,6 @@ class Brawlhalla:
                     legends_lst.append(purchased_legend)
                     c.execute("""UPDATE users SET legends_lst = %s
                                     WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
-                    conn.commit()
-                    conn.close()
                     update_database_coins(ctx.author.id, -8000)
                     await ctx.send(f"You have purchased {skin} {name} *({color})*!")
                 else:
