@@ -184,7 +184,7 @@ class General:
                         await ctx.send("Could not find user name \"" + user + "\" in the database.")
                         return
 
-    @commands.command()
+    @commands.command(usage="<user> <amount>")
     async def pay(self, ctx, user, amount: int=None):
         '''
         Pay another use <amount> of coins.

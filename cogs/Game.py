@@ -220,7 +220,7 @@ class Game:
         challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War!\nType \"w.accept <@user>\" to accept!\n**Bet amount:** {bet_amount}")
 
         # removing pw from status_lst
-        def remove_status():
+        def remove_status(player, opponent):
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
             c.execute(""" UPDATE users
@@ -241,7 +241,7 @@ class Game:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=60)
             except asyncio.TimeoutError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
-                remove_status()
+                remove_status(player, opponent)
                 return
             else:
                 if accept.content == 'w.accept':
@@ -300,7 +300,7 @@ class Game:
                 await player_prompt.edit(embed=player_prompt.embeds[0])
                 await opponent_prompt.edit(embed=opponent_prompt.embeds[0])
                 await challenge_accepted.edit(content=f"{challenge_accepted.content}\n*The game has timed out!*")
-                remove_status()
+                remove_status(player, opponent)
                 return
             else:
                 if msg.author == player:
@@ -377,7 +377,7 @@ class Game:
         c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(opponent_xp), str(opponent.id)))
         conn.commit()
         conn.close()
-        remove_status()
+        remove_status(player, opponent)
 
 
 def setup(bot):

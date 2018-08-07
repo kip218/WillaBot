@@ -330,7 +330,7 @@ class Brawlhalla:
         await ctx.send(embed=embed)
         conn.close()
 
-    @b.command(usage=" <legend> / [skin] / [color]")
+    @b.command(usage="<legend> / [skin] / [color]")
     async def select(self, ctx, *, msg):
         '''
         Select a main legend.
@@ -475,7 +475,7 @@ class Brawlhalla:
         embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
         await ctx.send(embed=embed)
 
-    @b.command(usage=" <item to buy>")
+    @b.command(usage="<item to buy>")
     async def buy(self, ctx, *, msg):
         '''
         Buy an item from the Brawlhalla store.
