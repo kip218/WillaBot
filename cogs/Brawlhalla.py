@@ -647,7 +647,7 @@ class Brawlhalla:
             c2 = conn.cursor()
             c2.execute(""" SELECT balance FROM users
                         WHERE ID = %s; """, (str(user_id), ))
-            user_balance = int(c.fetchone()[0])
+            user_balance = int(c2.fetchone()[0])
             user_balance += delta_coins
             c2.execute(""" UPDATE users
                             SET balance = %s
