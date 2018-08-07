@@ -363,7 +363,7 @@ class Brawlhalla:
                 select_legend_key = legend[0]
 
         if select_legend_key is None:
-            await ctx.send("You do not own that legend/skin/color! Try \"w.b legends\" or w.b <legend> skins\" to see your legends/skins/colors.")
+            await ctx.send("The legend/skin/color could not be found! Try \"w.b legends\" or w.b skin <legend>\" to see your legends/skins/colors.")
             conn.close()
             return
 
