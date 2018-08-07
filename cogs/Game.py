@@ -219,6 +219,19 @@ class Game:
 
         challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War!\nType \"w.accept <@user>\" to accept!\n**Bet amount:** {bet_amount}")
 
+        # removing pw from status_lst
+        def remove_status():
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE users
+                        SET status = array_remove(status, %s)
+                        WHERE ID = %s; """, (f'pw{opponent.id}', str(player.id)))
+            c.execute(""" UPDATE users
+                        SET status = array_remove(status, %s)
+                        WHERE ID = %s; """, (f'pw{player.id}', str(opponent.id)))
+            conn.commit()
+            conn.close()
+
         # checking if opponent accepts challenge
         def check_accept(m):
             return m.author == opponent
@@ -228,6 +241,7 @@ class Game:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=60)
             except asyncio.TimeoutError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
+                remove_status()
                 return
             else:
                 if accept.content == 'w.accept':
@@ -286,16 +300,7 @@ class Game:
                 await player_prompt.edit(embed=player_prompt)
                 await opponent_prompt.edit(embed=opponent_prompt)
                 await challenge_accepted.edit(content=f"{challenge_accepted.content}\n*The game has timed out!*")
-                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-                c = conn.cursor()
-                c.execute(""" UPDATE users
-                            SET status = array_remove(status, %s)
-                            WHERE ID = %s; """, (f'pw{opponent.id}', str(player.id)))
-                c.execute(""" UPDATE users
-                            SET status = array_remove(status, %s)
-                            WHERE ID = %s; """, (f'pw{player.id}', str(opponent.id)))
-                conn.commit()
-                conn.close()
+                remove_status()
                 return
             else:
                 if msg.author == player:
@@ -370,14 +375,9 @@ class Game:
         opponent_xp += random.randint(10, 20)
         c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(player_xp), str(player.id)))
         c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(opponent_xp), str(opponent.id)))
-        c.execute(""" UPDATE users
-                    SET status = array_remove(status, %s)
-                    WHERE ID = %s; """, (f'pw{opponent.id}', str(player.id)))
-        c.execute(""" UPDATE users
-                    SET status = array_remove(status, %s)
-                    WHERE ID = %s; """, (f'pw{player.id}', str(opponent.id)))
         conn.commit()
         conn.close()
+        remove_status()
 
 
 def setup(bot):
