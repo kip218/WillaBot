@@ -432,11 +432,11 @@ class Brawlhalla:
         c.execute("""SELECT selected_legend_key, legends_lst FROM users
                         WHERE ID = %s """, (str(ctx.author.id),))
         row = c.fetchone()
-        if row is None:
-            await ctx.send("You have not selected a legend or do not own a legend!")
-            return
         selected_legend_key = row[0]
         legends_lst = row[1]
+        if selected_legend_key is None or legends_lst is None:
+            await ctx.send("You have not selected a legend or do not own a legend!")
+            return
         # searching legend_lst for legend_key
         found = False
         i = 0
