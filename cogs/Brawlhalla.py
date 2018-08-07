@@ -565,7 +565,7 @@ class Brawlhalla:
             return
 
         def check_author(m):
-            return m.author == ctx.author
+            return m.author == ctx.author and m.content.lower() in ['w.confirm', 'w.cancel']
 
         # saving elements from row above for later use
         full_key = row[0]
@@ -683,9 +683,13 @@ class Brawlhalla:
                     await ctx.send("You must have the default legend before buying skins/colors!")
             else:
                 await ctx.send("You don't have enough Coins!")
+        print(1)
         conn.commit()
+        print(2)
         conn.close()
+        print(3)
         remove_status()
+        print(4)
 
     # @b.command()
     # async def test(self, ctx):

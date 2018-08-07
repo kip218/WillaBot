@@ -59,6 +59,9 @@ class Help:
                     reaction = done.pop().result()[0]
                 except asyncio.TimeoutError:
                     timeout = True
+                    help_page_embed = help_page.embeds[0]
+                    help_page_embed.set_footer(text="The help page has timed out!")
+                    await help_page.edit(embed=help_page_embed)
                     return
                 else:
                     if reaction.emoji == '\U0001F448':
