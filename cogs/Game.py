@@ -357,7 +357,7 @@ class Game:
             update_database_coins(player, opponent, -3*bet_amount, 3*bet_amount)
             await player.send(peace_war)
             await opponent.send(war_peace)
-            await ctx.send(f"{player.mention} declared **PEACE** while {opponent.mention} declared **WAR**. {player.mention} won {3*bet_amount} Coins while {opponent.mention} lost {3*bet_amount} Coins!")
+            await ctx.send(f"{player.mention} declared **PEACE** while {opponent.mention} declared **WAR**. {player.mention} lost {3*bet_amount} Coins while {opponent.mention} won {3*bet_amount} Coins!")
         else:
             update_database_coins(player, opponent, -bet_amount, -bet_amount)
             await player.send(both_war)
