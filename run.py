@@ -77,6 +77,38 @@ async def on_message(message):
 
 
 @bot.event
+async def on_guild_join(guild):
+    # notify me when bot joins server
+    embed = discord.Embed(
+            title="WillaBot joined a new server!",
+            description=f"Server name: {guild.name}\nServer ID: {guild.id}\nMember count: {guild.member_count}\nServer owner: {guild.owner}",
+            color=0x4CC417
+            )
+    embed.set_thumbnail(
+            url=guild.icon_url
+            )
+    owner = bot.get_user(161774631303249921)
+    await owner.send(embed=embed)
+    print(f"WillaBot joined a new server!\nServer name: {guild.name}\nServer ID: {guild.id}\nMember count: {guild.member_count}\nServer owner: {guild.owner}")
+
+
+@bot.event
+async def on_guild_remove(guild):
+    # notify me when bot leaves server)
+    embed = discord.Embed(
+            title="WillaBot left a server!",
+            description=f"\nServer name: {guild.name}\nServer ID: {guild.id}\nMember count: {guild.member_count}\nServer owner: {guild.owner}\n",
+            color=0xED1C24
+            )
+    embed.set_thumbnail(
+            url=guild.icon_url
+            )
+    owner = bot.get_user(161774631303249921)
+    await owner.send(embed=embed)
+    print(f"\nWillaBot left a server!\nServer name: {guild.name}\nServer ID: {guild.id}\nMember count: {guild.member_count}\nServer owner: {guild.owner}\n")
+
+
+@bot.event
 async def on_connect():
     connect_time = str(datetime.utcnow().replace(microsecond=0))
     print("-------------------")

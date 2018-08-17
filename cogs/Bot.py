@@ -34,7 +34,7 @@ class Bot:
         '''
         if server_name is None:
             title = ctx.guild.name
-            member_count = str(len(ctx.guild.members))
+            member_count = str(ctx.guild.member_count)
             icon_url = ctx.guild.icon_url
         else:
             try:
@@ -47,7 +47,7 @@ class Bot:
                     curr_server = server_lst[ind]
                     if server_name.lower().replace(" ", "") in curr_server.name.lower().replace(" ", ""):
                         title = curr_server.name
-                        member_count = str(len(curr_server.members))
+                        member_count = str(curr_server.member_count)
                         icon_url = curr_server.icon_url
                         found = True
                     else:
@@ -59,7 +59,7 @@ class Bot:
                 if 1 <= server_num <= len(self.bot.guilds):
                     server = self.bot.guilds[server_num-1]
                     title = server.name
-                    member_count = str(len(server.members))
+                    member_count = str(curr_server.member_count)
                     icon_url = server.icon_url
                 else:
                     await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(self.bot.guilds)))
