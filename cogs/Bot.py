@@ -43,7 +43,7 @@ class Bot:
                 server_lst = self.bot.guilds
                 ind = 0
                 found = False
-                while found == False and ind < len(server_lst):
+                while found is False and ind < len(server_lst):
                     curr_server = server_lst[ind]
                     if server_name.lower().replace(" ", "") in curr_server.name.lower().replace(" ", ""):
                         title = curr_server.name
@@ -52,7 +52,7 @@ class Bot:
                         found = True
                     else:
                         ind += 1
-                if found == False:
+                if found is False:
                     await ctx.send("Could not find server named \"" + server_num + "\"")
                     return
             else:
@@ -112,7 +112,7 @@ class Bot:
         '''
         title_lst = ("Invite WillaBot to your server!", "Help WillaBot explore a new server!")
         desc_lst = ("Please let me join your server :)", "*Nothing is pleasanter to me than exploring different discord servers.\n- WillaBot*")
-        randind = random.randint(0,1)
+        randind = random.randint(0, 1)
         embed = discord.Embed(
             title=title_lst[randind],
             url="https://discordapp.com/oauth2/authorize?client_id=463398601553346581&scope=bot&permissions=1077275729",
@@ -124,6 +124,7 @@ class Bot:
             )
         await ctx.send(embed=embed)
 
+    @commands.cooldown(rate=1, per=180, type=commands.BucketType.user)
     @commands.command()
     async def report(self, ctx, *, message):
         '''
@@ -142,6 +143,18 @@ class Bot:
         await owner.send(embed=embed)
         print(f"\n{ctx.author} reports: {message}\n")
         await ctx.send(f"Your message *\"{message}\"* has been sent to Willa! Thank you for your feedback!")
+
+    @report.error
+    async def report_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            error_msg = str(error)
+            T_ind = error_msg.find("T")
+            error_msg = error_msg[T_ind:]
+            user = ctx.message.author
+            await ctx.send("Slow down " + user.mention + "! The command is on cooldown! " + error_msg + ".")
+        else:
+            await ctx.send("Unknown error. Please tell Willa.")
+            print(error)
 
 
 def setup(bot):

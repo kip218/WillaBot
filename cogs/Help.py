@@ -33,7 +33,7 @@ class Help:
             embed = format_help_page(bot, self.lst_cogs[i], i+1, len(self.lst_cogs))
             self.lst_cogs_embed.append(embed)
 
-    @commands.cooldown(rate=1, per=3, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)
     @commands.group(invoke_without_command=True)
     async def help(self, ctx, *, command: str=None):
         '''
