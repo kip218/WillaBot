@@ -124,6 +124,24 @@ class Bot:
             )
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def report(self, ctx, *, message):
+        '''
+        Report bugs or send suggestions to Willa!
+        w.report <message>
+        '''
+        embed = discord.Embed(
+            description=f"\"{message}\"",
+            color=0xF5DE50
+            )
+        embed.set_author(
+            name=f"{ctx.author}",
+            icon_url=ctx.author.avatar_url
+                )
+        owner = self.bot.get_user(161774631303249921)
+        await owner.send(embed=embed)
+        print(f"\n{ctx.author} reports: {message}\n")
+
 
 def setup(bot):
     bot.add_cog(Bot(bot))
