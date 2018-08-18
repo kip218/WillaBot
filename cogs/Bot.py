@@ -131,7 +131,7 @@ class Bot:
         w.report <message>
         '''
         embed = discord.Embed(
-            description=f"\"{message}\"",
+            description=f"*\"{message}\"*",
             color=0xF5DE50
             )
         embed.set_author(
@@ -141,6 +141,7 @@ class Bot:
         owner = self.bot.get_user(161774631303249921)
         await owner.send(embed=embed)
         print(f"\n{ctx.author} reports: {message}\n")
+        await ctx.send(f"Your message *\"{message}\"* has been sent to Willa! Thank you for your feedback!")
 
 
 def setup(bot):
