@@ -42,7 +42,7 @@ class Game:
         conn.close()
 
         def check(m):
-            return not m.author.bot and m.author == ctx.author and m.content.lower() in ['1', '2', '3', 'y', 'n']
+            return not m.author.bot and m.author == ctx.author and m.content.lower() in ['1', '2', '3', 'y', 'n'] and m.channel == ctx.channel
 
         options = [1, 2, 3]
         car = random.randint(1, 3)
@@ -234,7 +234,7 @@ class Game:
 
         # checking if opponent accepts challenge
         def check_accept(m):
-            return m.author == opponent and m.content.startswith('w.accept')
+            return m.author == opponent and m.content.startswith('w.accept') and m.channel == ctx.channel
         accepted = False
         while accepted is False:
             try:

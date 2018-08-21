@@ -492,7 +492,7 @@ class Brawlhalla:
         status_lst = c.fetchone()[0]
         if status_lst is not None:
             if "buy" in status_lst:
-                await ctx.send("You're already in the purchase process! You must \"w.cancel\" your purchase to initiate a new purchase. This is to prevent accidental duplicate purchases.")
+                await ctx.send("You're already in the purchase process! You must \"w.cancel\" your purchase to initiate a new purchase. This is to prevent accidental duplicate purchases. If you initiated a purchase process in another server/channel, make sure that purchase process is canceled or timed out. If this error continues to persist, please report it to Willa using \"w.report\".")
                 conn.commit()
                 conn.close()
                 return
@@ -596,8 +596,8 @@ class Brawlhalla:
             remove_status()
             return
 
-        def check_author(m):
-            return m.author == ctx.author and m.content.lower() in ['w.confirm', 'w.cancel']
+        def check(m):
+            return m.author == ctx.author and m.content.lower() in ['w.confirm', 'w.cancel'] and m.channel == ctx.channel
 
         # saving elements from row above for later use
         full_key = row[0]
@@ -610,7 +610,7 @@ class Brawlhalla:
             purchase_embed = await ctx.send(embed=embed)
             while answered is False:
                 try:
-                    purchase_confirm = await self.bot.wait_for('message', check=check_author, timeout=60)
+                    purchase_confirm = await self.bot.wait_for('message', check=check, timeout=60)
                 except asyncio.TimeoutError:
                     timeout_embed = purchase_embed.embeds[0]
                     timeout_embed = timeout_embed.set_footer(text="The purchase has timed out!")
