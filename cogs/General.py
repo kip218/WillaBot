@@ -113,6 +113,7 @@ class General:
             return level, curr_xp, next_level_xp
 
         def get_profile(member):
+            print(member.name)
             try:
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
@@ -181,7 +182,7 @@ class General:
                         embed = get_profile(member)
                         await ctx.send(embed=embed)
                     except:
-                        await ctx.send("Could not find user name \"" + user + "\" in the database.")
+                        await ctx.send("Could not find user named \"" + user + "\" in the database.")
                         return
 
     @commands.command(usage="<user> <amount>")
