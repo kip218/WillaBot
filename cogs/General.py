@@ -113,7 +113,6 @@ class General:
             return level, curr_xp, next_level_xp
 
         def get_profile(member):
-            print(member.name)
             try:
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
@@ -156,34 +155,34 @@ class General:
                     await ctx.send("Could not find user.")
                     return
             else:
-                await ctx.send("Bots don't have profiles!")
+                await ctx.send(f"{member.mention} is a bot. Bots don't have profiles!")
         else:
-            lst_members = ctx.guild.members
-            # loop to search name
-            ind = 0
-            found = False
-            while found is False and ind < len(lst_members):
-                curr_member = lst_members[ind]
+            lst_members = []
+            # loop to search name and retrieve list of members from server that match
+            for guild_member in ctx.guild.members:
+                curr_member = guild_member
                 if user.lower() in (curr_member.name.lower() + "#" + curr_member.discriminator.lower()):
-                    member = curr_member
-                    found = True
+                    lst_members.insert(0, curr_member)
                 elif user.lower() in curr_member.display_name.lower():
-                    member = curr_member
-                    found = True
-                else:
-                    ind += 1
-            if found is False:
+                    lst_members.append(curr_member)
+            if len(lst_members) == 0:
                 await ctx.send("Could not find user named \"" + user + "\" in the server.")
             else:
-                if member.bot:
-                    await ctx.send(member.mention + " is a bot. Bots don't have profiles!")
-                else:
+                found_in_db = False
+                i = 0
+                while found_in_db is False and i < len(lst_members):
                     try:
+                        member = lst_members[i]
                         embed = get_profile(member)
-                        await ctx.send(embed=embed)
                     except:
-                        await ctx.send("Could not find user named \"" + user + "\" in the database.")
-                        return
+                        i += 1
+                        pass
+                    else:
+                        await ctx.send(embed=embed)
+                        found_in_db = True
+                # sending error message if user not found in database
+                if found_in_db is False:
+                    await ctx.send("Could not find user named \"" + user + "\" in the database.")
 
     @commands.command(usage="<user> <amount>")
     async def pay(self, ctx, user, amount: int=None):
