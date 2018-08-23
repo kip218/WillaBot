@@ -162,6 +162,7 @@ class General:
             for guild_member in ctx.guild.members:
                 curr_member = guild_member
                 if user.lower() in (curr_member.name.lower() + "#" + curr_member.discriminator.lower()):
+                    # inserting to prioritize member.name over member.display_name
                     lst_members.insert(0, curr_member)
                 elif user.lower() in curr_member.display_name.lower():
                     lst_members.append(curr_member)
@@ -174,12 +175,11 @@ class General:
                     try:
                         member = lst_members[i]
                         embed = get_profile(member)
+                        await ctx.send(embed=embed)
+                        found_in_db = True
                     except:
                         i += 1
                         pass
-                    else:
-                        await ctx.send(embed=embed)
-                        found_in_db = True
                 # sending error message if user not found in database
                 if found_in_db is False:
                     await ctx.send("Could not find user named \"" + user + "\" in the database.")
