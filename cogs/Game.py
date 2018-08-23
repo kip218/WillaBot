@@ -139,8 +139,8 @@ class Game:
                         fetch = c.fetchone()
                         xp = int(fetch[0])
                         balance = int(fetch[1])
-                        xp_increase = random.randint(10, 20)
-                        balance_increase = random.randint(30, 60)
+                        xp_increase = random.randint(15, 30)
+                        balance_increase = random.randint(40, 70)
                         xp += xp_increase
                         balance += balance_increase
                         c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.author.id)))
