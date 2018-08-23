@@ -132,16 +132,19 @@ class Bot:
         w.report <message>
         '''
         embed = discord.Embed(
-            description=f"*\"{message}\"*",
+            description=f"*{message}*",
             color=0xF5DE50
-            )
+                )
         embed.set_author(
             name=f"{ctx.author}",
             icon_url=ctx.author.avatar_url
                 )
+        embed.set_footer(
+            text=f"{ctx.guild} | {ctx.channel}"
+                )
         owner = self.bot.get_user(161774631303249921)
         await owner.send(embed=embed)
-        print(f"\n{ctx.author} reports: {message}\n")
+        print(f"\n{ctx.guild} | {ctx.channel}\n{ctx.author} reports: {message}\n")
         await ctx.send(f"Your message *\"{message}\"* has been sent to Willa! Thank you for your feedback!")
 
     @report.error
