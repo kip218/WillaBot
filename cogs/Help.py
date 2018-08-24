@@ -1,24 +1,23 @@
 import discord
 from discord.ext import commands
-from datetime import datetime
 import asyncio
 
 
 def format_help_page(bot, cog_name, curr_page, max_page):
-    lst_commands = bot.get_cog_commands(cog_name)
-    embed = discord.Embed(
-        title=cog_name + " commands",
-        description="Page " + str(curr_page) + " of " + str(max_page) + ". React with :point_left: or :point_right: below to view other pages.\n\"w.help [command]\" for info on a specific command.",
-        color=0x48d1cc
-        )
-    embed.set_author(name="WillaBot", icon_url=bot.user.avatar_url)
-    embed.set_footer(text="Prefix is \"w.\"")
-    for command in lst_commands:
-        embed.add_field(name=command.signature, value=command.short_doc, inline=False)
-        if isinstance(command, commands.core.Group):
-            for subcommand in command.commands:
-                embed.add_field(name=subcommand.signature, value=subcommand.short_doc, inline=False)
-    return embed
+            lst_commands = bot.get_cog_commands(cog_name)
+            embed = discord.Embed(
+                title=cog_name + " commands",
+                description=f"Page {curr_page} of {max_page}. React with :point_left: or :point_right: below to view other pages.\n\"w.help [command]\" for info on a specific command.",
+                color=0x48d1cc
+                )
+            embed.set_author(name="WillaBot", icon_url="https://cdn.discordapp.com/avatars/161774631303249921/a049f60a2696129e0f9cc2714b27403e.webp?size=1024")
+            embed.set_footer(text="Prefix is \"w.\"")
+            for command in lst_commands:
+                embed.add_field(name=command.signature, value=command.short_doc, inline=False)
+                if isinstance(command, commands.core.Group):
+                    for subcommand in command.commands:
+                        embed.add_field(name=subcommand.signature, value=subcommand.short_doc, inline=False)
+            return embed
 
 
 class Help:
@@ -30,7 +29,7 @@ class Help:
         self.lst_cogs = ['General', 'Game', 'Todo', 'Chat', 'Brawlhalla', 'Challonge', 'Bot']
         self.lst_cogs_embed = []
         for i in range(len(self.lst_cogs)):
-            embed = format_help_page(bot, self.lst_cogs[i], i+1, len(self.lst_cogs))
+            embed = format_help_page(self.bot, self.lst_cogs[i], i+1, len(self.lst_cogs))
             self.lst_cogs_embed.append(embed)
 
     @commands.cooldown(rate=1, per=2, type=commands.BucketType.user)

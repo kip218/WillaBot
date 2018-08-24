@@ -146,6 +146,13 @@ async def on_connect():
                                         weapons text[] NOT NULL
                                         ); """
 
+    create_server_channel_table = """ CREATE TABLE IF NOT EXISTS channels (
+                                        channel_id text PRIMARY KEY,
+                                        channel_name text NOT NULL,
+                                        server_id text NOT NULL,
+                                        server_name text NOT NULL,
+                                        status text[]); """
+
     # conn = psycopg2.connect(database='willabot_db')
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
@@ -154,6 +161,9 @@ async def on_connect():
     c.execute(create_legends_table)
     c.execute("ALTER TABLE users DROP COLUMN status;")
     c.execute("ALTER TABLE users ADD COLUMN status text[];")
+
+    c.execute(create_server_channel_table)
+
     conn.commit()
     conn.close()
 
