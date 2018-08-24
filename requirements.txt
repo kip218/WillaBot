@@ -5,5 +5,5 @@ pychal
 python-dateutil
 python-string-utils
 psycopg2-binary
-randomwordgenerator
 pypandoc
+randomwordgenerator
