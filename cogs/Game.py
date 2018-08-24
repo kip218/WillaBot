@@ -394,7 +394,7 @@ class Game:
         w.typeracer [number of words]
 
         Number of words defaults to 5 if not specified.
-        Type "w.stop" to stop the game.
+        Type "w.stop" to stop the game. Only the game starter and server admins can stop the game.
         '''
         if num_words > 25 or num_words < 1:
             await ctx.send("Number of words must be between 1 and 25!")
@@ -405,7 +405,7 @@ class Game:
         else:
             words_lst = randomwordgenerator.generate_random_words(n=num_words)
 
-        await ctx.send("*The race has started!\nFirst to type the word wins!\nThe word to type is...*")
+        await ctx.send("*The race has started!\nThe word to type is...*")
         scoreboard_dict = {}
         for i in range(len(words_lst)):
             word = words_lst[i]
@@ -414,16 +414,25 @@ class Game:
             msg = await ctx.send(embed=embed)
 
             def check(m):
-                return not m.author.bot and (m.content == word or m.content == 'w.stop') and m.channel == ctx.channel
+                return not m.author.bot and (m.content == word or (m.content == 'w.stop' and (m.author == ctx.author or m.author.permissions_in(ctx.channel).administrator))) and m.channel == ctx.channel
 
             def get_scoreboard_embed(sorted_lst):
-                embed = discord.Embed(title="Final Scoreboard", color=0x48d1cc)
+                embed = discord.Embed(color=0x48d1cc)
+                temp = None
+                offset = 0
                 for i in range(len(sorted_lst)):
                     player_score = sorted_lst[i]
                     player = player_score[0]
                     score = player_score[1]
+                    # checking to make sure people don't have same scores
+                    if score == temp:
+                        offset += 1
+                    else:
+                        offset = 0
+                    temp = score
                     xp_increase, balance_increase = update_db_and_return_increase(player, score)
-                    embed.add_field(name=f"{i+1}. {player.name}", value=f"**{score} words** *(+{xp_increase} XP, +{balance_increase} Coins)*")
+                    embed.add_field(name=f"{i+1-offset}. {player.name}", value=f"**{score} words** *(+{xp_increase} XP, +{balance_increase} Coins)*", inline=False)
+                    embed.set_author(name="Final Scoreboard", icon_url=self.bot.user.avatar_url)
                 return embed
 
             def update_db_and_return_increase(player, score):
@@ -447,7 +456,7 @@ class Game:
                 return xp_increase, balance_increase
 
             try:
-                answer = await self.bot.wait_for('message', check=check, timeout=20)
+                answer = await self.bot.wait_for('message', check=check, timeout=25)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
                                     title=word,
@@ -480,8 +489,12 @@ class Game:
                     embed.set_footer(text=f"{i+1}/{len(words_lst)}")
                     await msg.edit(embed=embed)
                     break
-        sorted_lst = sorted(scoreboard_dict.items(), key=lambda x: x[1])
-        await ctx.send(embed=get_scoreboard_embed(sorted_lst))
+
+        if len(scoreboard_dict) > 0:
+            # gives sorted list in order of decreasing score
+            sorted_lst = sorted(scoreboard_dict.items(), key=lambda x: x[1])
+            sorted_lst.reverse()
+            await ctx.send(embed=get_scoreboard_embed(sorted_lst))
 
 
 def setup(bot):
