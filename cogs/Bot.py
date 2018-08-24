@@ -30,7 +30,7 @@ class Bot:
         total_users = len(id_name_dict)
         await ctx.send(f"WillaBot is currently exploring {num} different servers with {total_users} unique users!")
 
-    @commands.command()
+    @commands.command(usage="[server name]")
     async def server(self, ctx, *, server_name: str=None):
         '''
         Gives current server info if [server name] not specified. Name of the server can be specified to show info of that server. WillaBot needs to be a member of the server.
