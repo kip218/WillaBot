@@ -140,8 +140,8 @@ class Game:
                         fetch = c.fetchone()
                         xp = int(fetch[0])
                         balance = int(fetch[1])
-                        xp_increase = random.randint(15, 30)
-                        balance_increase = random.randint(40, 70)
+                        xp_increase = random.randint(25, 40)
+                        balance_increase = random.randint(50, 80)
                         xp += xp_increase
                         balance += balance_increase
                         c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.author.id)))
@@ -446,8 +446,8 @@ class Game:
                 xp_increase = 0
                 balance_increase = 0
                 for i in range(score):
-                    xp_increase += random.randint(1, 10)
-                    balance_increase += random.randint(15, 30)
+                    xp_increase += random.randint(12, 20)
+                    balance_increase += random.randint(25, 40)
                 xp += xp_increase
                 balance += balance_increase
                 c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(player.id)))
