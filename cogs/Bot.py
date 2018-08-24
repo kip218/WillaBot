@@ -59,7 +59,7 @@ class Bot:
                 if 1 <= server_num <= len(self.bot.guilds):
                     server = self.bot.guilds[server_num-1]
                     title = server.name
-                    member_count = str(curr_server.member_count)
+                    member_count = str(server.member_count)
                     icon_url = server.icon_url
                 else:
                     await ctx.send("Not a valid number. Please use an integer between 0 and " + str(len(self.bot.guilds)))
