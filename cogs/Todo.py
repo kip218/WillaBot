@@ -68,7 +68,7 @@ class Todo:
         conn.commit()
         conn.close()
 
-    @todo.command()
+    @todo.command(usage="<task number>")
     async def remove(self, ctx, task_number):
         '''
         Removes a task from your to-do list.
@@ -97,7 +97,7 @@ class Todo:
         conn.commit()
         conn.close()
 
-    @todo.command()
+    @todo.command(usage="<task number>")
     async def check(self, ctx, task_number):
         '''
         Checks or unchecks a task from your to-do list.

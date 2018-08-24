@@ -79,7 +79,7 @@ class General:
             c.execute(""" UPDATE users
                         SET daily_time = %s, balance = %s
                         WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
-            await ctx.send("You got 200 Coins!")
+            embed_name = "You got 200 Coins!"
         else:
             delta = datetime.utcnow() - timestamp
             if delta.total_seconds() > 86400:
@@ -88,14 +88,18 @@ class General:
                 c.execute(""" UPDATE users
                             SET daily_time = %s, balance = %s
                             WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
-                await ctx.send("You got 200 Coins!")
+                embed_name = "You got 200 Coins!"
             else:
                 time_remaining = 86400 - int(delta.total_seconds())
                 hours, remainder = divmod(int(time_remaining), 3600)
                 minutes, seconds = divmod(remainder, 60)
-                await ctx.send("You can claim daily coins again in " + f"{hours}h {minutes}m {seconds}s")
+                embed_name = f"You can claim daily coins again in {hours}h {minutes}m {seconds}s"
         conn.commit()
         conn.close()
+        embed = discord.Embed(color=0x48d1cc)
+        embed.set_author(name=embed_name, icon_url=self.bot.user.avatar_url)
+        embed.set_footer(text="Check out the new typeracer game! \"w.help typeracer\" for more info.")
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def profile(self, ctx, *, user: str=None):

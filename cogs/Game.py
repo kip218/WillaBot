@@ -4,6 +4,7 @@ import psycopg2
 import os
 import asyncio
 import discord
+from randomwordgenerator import randomwordgenerator
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -157,7 +158,7 @@ class Game:
         conn.commit()
         conn.close()
 
-    @commands.command()
+    @commands.command(usage="<user> [bet amount]")
     async def pw(self, ctx, user, bet_amount: int=None):
         '''
         The Peace War game.
@@ -378,6 +379,109 @@ class Game:
         conn.commit()
         conn.close()
         remove_status(player, opponent)
+
+    # @commands.command()
+    # async def speed(self):
+    #     '''
+    #     A game to test your reaction time
+    #     w.speed
+    #     '''
+
+    @commands.command(usage="[number of words]")
+    async def typeracer(self, ctx, num_words: int=5):
+        '''
+        A game to test your typing speed
+        w.typeracer [number of words]
+
+        Number of words defaults to 5 if not specified.
+        Type "w.stop" to stop the game.
+        '''
+        if num_words > 25 or num_words < 1:
+            await ctx.send("Number of words must be between 1 and 25!")
+            return
+        # edge case for when num_words == 1
+        if num_words == 1:
+            words_lst = [randomwordgenerator.generate_random_words(n=num_words)]
+        else:
+            words_lst = randomwordgenerator.generate_random_words(n=num_words)
+
+        await ctx.send("*The race has started!\nFirst to type the word wins!\nThe word to type is...*")
+        scoreboard_dict = {}
+        for i in range(len(words_lst)):
+            word = words_lst[i]
+            embed = discord.Embed(title=word, color=0xF5DE50)
+            embed.set_footer(text=f"{i+1}/{len(words_lst)}")
+            msg = await ctx.send(embed=embed)
+
+            def check(m):
+                return not m.author.bot and (m.content == word or m.content == 'w.stop') and m.channel == ctx.channel
+
+            def get_scoreboard_embed(sorted_lst):
+                embed = discord.Embed(title="Final Scoreboard", color=0x48d1cc)
+                for i in range(len(sorted_lst)):
+                    player_score = sorted_lst[i]
+                    player = player_score[0]
+                    score = player_score[1]
+                    xp_increase, balance_increase = update_db_and_return_increase(player, score)
+                    embed.add_field(name=f"{i+1}. {player.name}", value=f"**{score} words** *(+{xp_increase} XP, +{balance_increase} Coins)*")
+                return embed
+
+            def update_db_and_return_increase(player, score):
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+                c.execute(""" SELECT xp, balance FROM users
+                            WHERE ID = %s; """, (str(player.id), ))
+                fetch = c.fetchone()
+                xp = int(fetch[0])
+                balance = int(fetch[1])
+                xp_increase = 0
+                balance_increase = 0
+                for i in range(score):
+                    xp_increase += random.randint(1, 10)
+                    balance_increase += random.randint(15, 30)
+                xp += xp_increase
+                balance += balance_increase
+                c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(player.id)))
+                conn.commit()
+                conn.close()
+                return xp_increase, balance_increase
+
+            try:
+                answer = await self.bot.wait_for('message', check=check, timeout=20)
+            except asyncio.TimeoutError:
+                embed = discord.Embed(
+                                    title=word,
+                                    description="The type race has timed out!",
+                                    color=0xED1C24
+                                    )
+                embed.set_footer(text=f"{i+1}/{len(words_lst)}")
+                await msg.edit(embed=embed)
+                break
+            else:
+                if answer.content == word:
+                    embed = discord.Embed(
+                                    title=word,
+                                    description=f"{msg.content}\n{answer.author.mention} got it right!",
+                                    color=0x4CC417
+                                    )
+                    embed.set_footer(text=f"{i+1}/{len(words_lst)}")
+                    await msg.edit(embed=embed)
+                    # update scoreboard
+                    if answer.author in scoreboard_dict:
+                        scoreboard_dict[answer.author] += 1
+                    else:
+                        scoreboard_dict[answer.author] = 1
+                elif answer.content == 'w.stop':
+                    embed = discord.Embed(
+                                    title=word,
+                                    description="The type race has been stopped",
+                                    color=0xED1C24
+                                    )
+                    embed.set_footer(text=f"{i+1}/{len(words_lst)}")
+                    await msg.edit(embed=embed)
+                    break
+        sorted_lst = sorted(scoreboard_dict.items(), key=lambda x: x[1])
+        await ctx.send(embed=get_scoreboard_embed(sorted_lst))
 
 
 def setup(bot):

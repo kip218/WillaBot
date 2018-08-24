@@ -331,7 +331,7 @@ class Challonge:
             await ctx.send(embed=embed)
         conn.close()
 
-    @chal.command()
+    @chal.command(usage="<tournament number>")
     async def remove(self, ctx, tournament_number):
         '''
         Removes a challonge tournament.
