@@ -132,7 +132,7 @@ class Bot:
         w.report <message>
         '''
         embed = discord.Embed(
-            description=f"*{message}*",
+            description=f"***{message}***",
             color=0xF5DE50
                 )
         embed.set_author(
