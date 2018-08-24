@@ -523,6 +523,5 @@ class Game:
         conn.close()
 
 
-
 def setup(bot):
     bot.add_cog(Game(bot))

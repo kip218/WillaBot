@@ -168,7 +168,8 @@ async def on_connect():
     c.execute(create_server_channel_table)
     c.execute("ALTER TABLE users DROP COLUMN status;")
     c.execute("ALTER TABLE users ADD COLUMN status text[];")
-    c.execute("TRUNCATE TABLE channels;")
+    c.execute("ALTER TABLE channels DROP COLUMN status;")
+    c.execute("ALTER TABLE channels ADD COLUMN status text[];")
     conn.commit()
     conn.close()
 
