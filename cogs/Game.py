@@ -28,7 +28,7 @@ class Game:
         # Check that the user isn't already playing the game
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
-        c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(ctx.author.id), ))
+        c.execute(""" SELECT status FROM users WHERE ID = %s;""", (str(ctx.author.id), ))
         status_lst = c.fetchone()[0]
         if status_lst is not None:
             if "montyhall" in status_lst:
@@ -396,6 +396,23 @@ class Game:
         Number of words defaults to 5 if not specified.
         Type "w.stop" to stop the game. Only the game starter and server admins can stop the game.
         '''
+        # Check that the game isn't already running in the channel
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT status FROM channels WHERE channel_id = %s;""", (str(ctx.channel.id), ))
+        status_lst = c.fetchone()[0]
+        if status_lst is not None:
+            if "typeracer" in status_lst:
+                await ctx.send("This channel is already in a game of typeracer!")
+                conn.commit()
+                conn.close()
+                return
+        c.execute(""" UPDATE channels
+                    SET status = array_append(status, %s)
+                    WHERE channel_id = %s; """, ('typeracer', str(ctx.channel.id)))
+        conn.commit()
+        conn.close()
+
         if num_words > 25 or num_words < 1:
             await ctx.send("Number of words must be between 1 and 25!")
             return
@@ -495,6 +512,16 @@ class Game:
             sorted_lst = sorted(scoreboard_dict.items(), key=lambda x: x[1])
             sorted_lst.reverse()
             await ctx.send(embed=get_scoreboard_embed(sorted_lst))
+
+        # remove 'typeracer' status from channel
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" UPDATE channels
+                    SET status = array_remove(status, %s)
+                    WHERE channel_id = %s; """, ('typeracer', str(ctx.channel.id)))
+        conn.commit()
+        conn.close()
+
 
 
 def setup(bot):

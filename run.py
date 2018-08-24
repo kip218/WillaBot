@@ -63,13 +63,19 @@ async def on_message(message):
                     ON CONFLICT (ID)
                     DO NOTHING;""", (message.author.id, message.author.name, 0, 0))
         c.execute(""" UPDATE users SET username = %s
-                        WHERE ID = %s
-                        AND username != %s    ; """, (message.author.name, str(message.author.id), message.author.name))
+                    WHERE ID = %s
+                    AND username != %s    ; """, (message.author.name, str(message.author.id), message.author.name))
         c.execute(""" SELECT xp FROM users
                     WHERE ID = %s; """, (str(message.author.id),))
         author_xp = int(c.fetchone()[0])
         author_xp += random.randint(4, 8)
         c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(author_xp), str(message.author.id)))
+
+        # add channel to database
+        c.execute(""" INSERT INTO channels (channel_id, channel_name, guild_id, guild_name)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (channel_id)
+                    DO NOTHING;""", (message.channel.id, message.channel.name, message.guild.id, message.guild.name))
         conn.commit()
         conn.close()
 
@@ -149,8 +155,8 @@ async def on_connect():
     create_server_channel_table = """ CREATE TABLE IF NOT EXISTS channels (
                                         channel_id text PRIMARY KEY,
                                         channel_name text NOT NULL,
-                                        server_id text NOT NULL,
-                                        server_name text NOT NULL,
+                                        guild_id text NOT NULL,
+                                        guild_name text NOT NULL,
                                         status text[]); """
 
     # conn = psycopg2.connect(database='willabot_db')
@@ -159,11 +165,10 @@ async def on_connect():
     c.execute(create_tournaments_table)
     c.execute(create_users_table)
     c.execute(create_legends_table)
+    c.execute(create_server_channel_table)
     c.execute("ALTER TABLE users DROP COLUMN status;")
     c.execute("ALTER TABLE users ADD COLUMN status text[];")
-
-    c.execute(create_server_channel_table)
-
+    c.execute("TRUNCATE TABLE channels;")
     conn.commit()
     conn.close()
 
