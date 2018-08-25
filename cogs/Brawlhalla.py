@@ -365,6 +365,9 @@ class Brawlhalla:
                 return None
 
         legend_name, skin, color = clean_input(msg)
+        if skin == '' and color == '':
+            skin = 'base'
+            color = 'classic'
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
@@ -378,6 +381,7 @@ class Brawlhalla:
 
         # iterate through legends to find the right legend/skin/color
         select_legend_key = None
+        legend_owned = False
         for legend in legends_lst:
             if legend_name in legend[1] and skin in legend[2] and color in legend[3]:
                 select_legend_name = legend[1]
@@ -385,8 +389,15 @@ class Brawlhalla:
                 select_legend_color = legend[3]
                 select_legend_xp = legend[5]
                 select_legend_key = legend[0]
+            if legend_name in legend[1] and 'base' in legend[2] and 'classic' in legend[3]:
+                legend_owned = True
 
-        if select_legend_key is None:
+        # legend/skin/color can only be selected if legend is owned
+        if legend_owned is False and select_legend_key is not None:
+            await ctx.send("You must first own the legend before you can select the skin/color!")
+            conn.close()
+            return
+        elif select_legend_key is None:
             await ctx.send("The legend/skin/color could not be found! Try \"w.b legends\" or w.b skin <legend>\" to see your legends/skins/colors.")
             conn.close()
             return
@@ -471,7 +482,8 @@ class Brawlhalla:
         embed = discord.Embed(description="Welcome to the store!\nUse \"w.b list [legend] / [skin]\" to view all purchasable legends/skins/colors!\nYou must buy the legend before you can buy other skin/color combinations.", color=0xD4AF37)
         embed.set_author(name=f"Your balance: {balance} Coins", icon_url=self.bot.user.avatar_url)
         embed.add_field(name="Legend | 1,000 Coins", value="w.b buy <legend>", inline=False)
-        embed.add_field(name="Skin/Color | 6,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
+        embed.add_field(name="Odin's Chest | 3,000 Coins", value="w.b buy chest", inline=False)
+        embed.add_field(name="Skin/Color | 7,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
         embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
         await ctx.send(embed=embed)
 
@@ -545,7 +557,7 @@ class Brawlhalla:
                 return None
 
         # get embed of legend/skin/color
-        def get_embed(row):
+        def get_embed(row, color_code):
             full_key = row[0]
             name = row[1].capitalize()
             # checking spaces between legend names
@@ -558,92 +570,11 @@ class Brawlhalla:
                     name = 'Sir Roland'
             skin = row[2].capitalize()
             color = row[3].capitalize()
-            embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color? Coins will be deducted from your profile.\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=0xD4AF37)
+            embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color? Coins will be deducted from your profile.\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=color_code)
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
             embed.set_author(name="Confirm Purchase", icon_url=self.bot.user.avatar_url)
             embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
             return embed
-
-        # divide input by keywords and determine item purchase
-        legend_name, skin, color = clean_input(msg)
-
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        c = conn.cursor()
-        c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
-                        WHERE name LIKE '%%'||%s||'%%'
-                            AND skin LIKE '%%'||%s||'%%'
-                            AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
-        row = c.fetchone()
-        found = False
-        if row is not None:
-            embed = get_embed(row)
-            found = True
-        # search again if classic color does not exist for skin
-        elif color == 'classic':
-            c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
-                WHERE name LIKE '%%'||%s||'%%'
-                    AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin))
-            row = c.fetchone()
-            # only search for color and send embed if skin can be found
-            if row is not None:
-                embed = get_embed(row)
-                found = True
-
-        # if not found, send help message
-        if found is False:
-            await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] / [skin]\" to see a list of available legends/skins/colors!")
-            conn.close()
-            remove_status()
-            return
-
-        def check(m):
-            return m.author == ctx.author and m.content.lower() in ['w.confirm', 'w.cancel'] and m.channel == ctx.channel
-
-        # saving elements from row above for later use
-        full_key = row[0]
-        name = row[1]
-        skin = row[2]
-        color = row[3]
-        answered = False
-        confirmed = False
-        if found is True:
-            purchase_embed = await ctx.send(embed=embed)
-            while answered is False:
-                try:
-                    purchase_confirm = await self.bot.wait_for('message', check=check, timeout=60)
-                except asyncio.TimeoutError:
-                    timeout_embed = purchase_embed.embeds[0]
-                    timeout_embed = timeout_embed.set_footer(text="The purchase has timed out!")
-                    await purchase_embed.edit(embed=timeout_embed)
-                    conn.close()
-                    remove_status()
-                    return
-                else:
-                    if purchase_confirm.content == 'w.confirm':
-                        answered = True
-                        confirmed = True
-                    elif purchase_confirm.content == 'w.cancel':
-                        await ctx.send("Purchase canceled.")
-                        answered = True
-                        conn.close()
-                        remove_status()
-                        return
-
-        if confirmed is True:
-            # checking that the user does not alreay have the item
-            c.execute(""" SELECT legends_lst FROM users
-                            WHERE ID = %s; """, (str(ctx.author.id),))
-            legends_lst = c.fetchone()[0]
-            if legends_lst is not None:
-                for legend in legends_lst:
-                    # full_key assigned above
-                    if full_key in legend:
-                        await ctx.send("You cannot buy what you already own!")
-                        conn.close()
-                        remove_status()
-                        return
-            else:
-                legends_lst = []
 
         # checking that the user has enough balance
         def check_balance(user_id, required_balance):
@@ -659,6 +590,7 @@ class Brawlhalla:
                 return True
 
         # returns True if user owns default legend
+        # opens a new connection
         def check_default_legend(user_id, legend_name):
             key = f'images/legends/{legend_name}_base_classic.png'
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -674,45 +606,231 @@ class Brawlhalla:
             return False
 
         # update balance in database
-        def update_database_coins(user_id, delta_coins):
-            conn2 = psycopg2.connect(DATABASE_URL, sslmode='require')
-            c2 = conn.cursor()
-            c2.execute(""" SELECT balance FROM users
+        # does not open new connection and takes passed connection
+        def update_database_coins(user_id, delta_coins, conn):
+            c = conn.cursor()
+            c.execute(""" SELECT balance FROM users
                         WHERE ID = %s; """, (str(user_id), ))
-            user_balance = int(c2.fetchone()[0])
+            user_balance = int(c.fetchone()[0])
             user_balance += delta_coins
-            c2.execute(""" UPDATE users
+            c.execute(""" UPDATE users
                             SET balance = %s
                             WHERE ID = %s; """, (str(user_balance), str(user_id)))
-            conn2.commit()
-            conn2.close()
 
-        # checking what the user is buying
-        if skin == 'base' and color == 'classic':
-            if check_balance(ctx.author.id, 1000):
-                purchased_legend = [full_key, name, skin, color, '0', '0']
-                legends_lst.append(purchased_legend)
-                c.execute("""UPDATE users SET legends_lst = %s
-                                WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
-                update_database_coins(ctx.author.id, -1000)
-                await ctx.send(f"You have purchased {skin} {name} *({color})*!")
-            else:
-                await ctx.send("You don't have enough Coins!")
-        else:
-            if check_balance(ctx.author.id, 6000):
-                if check_default_legend(ctx.author.id, name):
+        # buying legend/skin/color
+        async def buying_legend(msg):
+            # divide input by keywords and determine item purchase
+            legend_name, skin, color = clean_input(msg)
+
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+                            WHERE name LIKE '%%'||%s||'%%'
+                                AND skin LIKE '%%'||%s||'%%'
+                                AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
+            row = c.fetchone()
+            found = False
+            if row is not None:
+                embed = get_embed(row, 0xD4AF37)
+                found = True
+            # search again if classic color does not exist for skin
+            elif color == 'classic':
+                c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+                    WHERE name LIKE '%%'||%s||'%%'
+                        AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin))
+                row = c.fetchone()
+                # only search for color and send embed if skin can be found
+                if row is not None:
+                    embed = get_embed(row, 0xD4AF37)
+                    found = True
+
+            # if not found, send help message
+            if found is False:
+                await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] / [skin]\" to see a list of available legends/skins/colors!")
+                conn.close()
+                remove_status()
+                return
+
+            def check(m):
+                return m.author == ctx.author and m.content.lower() in ['w.confirm', 'w.cancel'] and m.channel == ctx.channel
+
+            # saving elements from row above for later use
+            full_key = row[0]
+            name = row[1]
+            skin = row[2]
+            color = row[3]
+            answered = False
+            confirmed = False
+            if found is True:
+                purchase_embed = await ctx.send(embed=embed)
+                while answered is False:
+                    try:
+                        purchase_confirm = await self.bot.wait_for('message', check=check, timeout=60)
+                    except asyncio.TimeoutError:
+                        timeout_embed = get_embed(row, 0xED1C24)
+                        timeout_embed = timeout_embed.set_footer(text="The purchase has timed out!")
+                        await purchase_embed.edit(embed=timeout_embed)
+                        conn.close()
+                        remove_status()
+                        return
+                    else:
+                        if purchase_confirm.content == 'w.confirm':
+                            answered = True
+                            confirmed = True
+                        elif purchase_confirm.content == 'w.cancel':
+                            await ctx.send("Purchase canceled.")
+                            answered = True
+                            conn.close()
+                            embed = get_embed(row, 0xED1C24)
+                            await purchase_embed.edit(embed=embed)
+                            remove_status()
+                            return
+
+            if confirmed is True:
+                # checking that the user does not alreay have the item
+                c.execute(""" SELECT legends_lst FROM users
+                                WHERE ID = %s; """, (str(ctx.author.id),))
+                legends_lst = c.fetchone()[0]
+                if legends_lst is not None:
+                    for legend in legends_lst:
+                        # full_key assigned above
+                        if full_key in legend:
+                            await ctx.send("You cannot buy what you already own!")
+                            conn.close()
+                            embed = get_embed(row, 0xED1C24)
+                            await purchase_embed.edit(embed=embed)
+                            remove_status()
+                            return
+                else:
+                    legends_lst = []
+
+            # checking what the user is buying
+            if skin == 'base' and color == 'classic':
+                if check_balance(ctx.author.id, 1000):
                     purchased_legend = [full_key, name, skin, color, '0', '0']
                     legends_lst.append(purchased_legend)
                     c.execute("""UPDATE users SET legends_lst = %s
                                     WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
-                    update_database_coins(ctx.author.id, -6000)
+                    update_database_coins(ctx.author.id, -1000, conn)
                     await ctx.send(f"You have purchased {skin} {name} *({color})*!")
+                    color_code = 0x4CC417
                 else:
-                    await ctx.send("You must have the default legend before buying skins/colors!")
+                    await ctx.send("You don't have enough Coins!")
+                    color_code = 0xED1C24
             else:
+                if check_balance(ctx.author.id, 7000):
+                    if check_default_legend(ctx.author.id, name):
+                        purchased_legend = [full_key, name, skin, color, '0', '0']
+                        legends_lst.append(purchased_legend)
+                        c.execute("""UPDATE users SET legends_lst = %s
+                                        WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
+                        update_database_coins(ctx.author.id, -7000, conn)
+                        await ctx.send(f"You have purchased {skin} {name} *({color})*!")
+                        color_code = 0x4CC417
+                    else:
+                        await ctx.send("You must have the default legend before buying skins/colors!")
+                        color_code = 0xED1C24
+                else:
+                    await ctx.send("You don't have enough Coins!")
+                    color_code = 0xED1C24
+
+            embed = get_embed(row, color_code)
+            await purchase_embed.edit(embed=embed)
+            conn.commit()
+            conn.close()
+
+        def get_closed_chest_embed(row, color_code):
+            embed = discord.Embed(description="The Odin's Chest is being opened!", color=color_code)
+            embed.set_image(url="https://s3.amazonaws.com/willabot-assets/images/store/Chest_Animation.gif")
+            embed.set_author(name="Odin's Chest", icon_url="https://s3.amazonaws.com/willabot-assets/images/store/Closed_Chest.png")
+            return embed
+
+        def get_opened_chest_embed(row, color_code):
+            full_key = row[0]
+            name = row[1].capitalize()
+            # checking spaces between legend names
+            if name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
+                if name.lower() == 'lordvraxx':
+                    name = 'Lord Vraxx'
+                elif name.lower() == 'queennai':
+                    name = 'Queen Nai'
+                elif name.lower() == 'sirroland':
+                    name = 'Sir Roland'
+            skin = row[2].capitalize()
+            color = row[3].capitalize()
+            embed = discord.Embed(title=f"{skin} {name} *({color})*", description=f"You opened the Odin's Chest and got {skin} {name} *({color})*!", color=color_code)
+            embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
+            embed.set_thumbnail(url="https://s3.amazonaws.com/willabot-assets/images/store/Chest_Animation.gif")
+            embed.set_author(name="Odin's Chest", icon_url="https://s3.amazonaws.com/willabot-assets/images/store/Open_Chest.png")
+            embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
+            return embed
+
+        # buying chest
+        async def buying_chest():
+            if not check_balance(ctx.author.id, 3000):
                 await ctx.send("You don't have enough Coins!")
-        conn.commit()
-        conn.close()
+                return
+            else:
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+
+                # get legends_lst from user to check for chest rerolls
+                c.execute(""" SELECT legends_lst FROM users
+                                WHERE ID = %s; """, (str(ctx.author.id),))
+                legends_lst = c.fetchone()[0]
+                if legends_lst is None:
+                    legends_lst = []
+
+                # reroll random legend until unowned random legend found
+                random_found = False
+                while random_found is False:
+                    c.execute("""SELECT key, name, skin, color, stance_stats, weapons FROM legends
+                                WHERE skin != 'base' AND color != 'classic'
+                                ORDER BY random()
+                                LIMIT 1; """)
+                    random_legend = c.fetchone()
+                    random_legend_key = random_legend[0]
+
+                    # looping to find if legend is already owned
+                    already_owned = False
+                    for owned_legend in legends_lst:
+                        if owned_legend[0] == random_legend_key:
+                            random_found = True
+                    if already_owned is False:
+                        random_found = True
+
+                # actual transaction
+                full_key = random_legend[0]
+                name = random_legend[1]
+                skin = random_legend[2]
+                color = random_legend[3]
+                purchased_legend = [full_key, name, skin, color, '0', '0']
+                legends_lst.append(purchased_legend)
+                c.execute("""UPDATE users SET legends_lst = %s
+                                WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
+                update_database_coins(ctx.author.id, -3000, conn)
+                conn.commit()
+                conn.close()
+
+                # send closed chest embed
+                embed = get_closed_chest_embed(random_legend, 0x3A2166)
+                chest_embed_msg = await ctx.send(embed=embed)
+
+                def check(m):
+                    return False
+
+                # timer to reveal legend
+                try:
+                    timer = await self.bot.wait_for('message', check=check, timeout=2)
+                except asyncio.TimeoutError:
+                    # edit to open chest embed
+                    embed = get_opened_chest_embed(random_legend, 0x502D8C)
+                    await chest_embed_msg.edit(embed=embed)
+
+        if msg == 'chest':
+            await buying_chest()
+        else:
+            await buying_legend(msg)
         remove_status()
 
     # @b.command()
