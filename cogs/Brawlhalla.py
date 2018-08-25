@@ -739,10 +739,10 @@ class Brawlhalla:
             conn.commit()
             conn.close()
 
-        def get_closed_chest_embed(row, color_code):
+        def get_opening_chest_embed(row, color_code):
             embed = discord.Embed(description="The Odin's Chest is being opened!", color=color_code)
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/images/store/Chest_Animation.gif")
-            embed.set_author(name="Odin's Chest", icon_url="https://s3.amazonaws.com/willabot-assets/images/store/Closed_Chest.png")
+            embed.set_author(name="Odin's Chest", icon_url="https://s3.amazonaws.com/willabot-assets/images/store/Chest_Animation.gif")
             return embed
 
         def get_opened_chest_embed(row, color_code):
@@ -813,7 +813,7 @@ class Brawlhalla:
                 conn.close()
 
                 # send closed chest embed
-                embed = get_closed_chest_embed(random_legend, 0x3A2166)
+                embed = get_opening_chest_embed(random_legend, 0x3A2166)
                 chest_embed_msg = await ctx.send(embed=embed)
 
                 def check(m):
@@ -821,7 +821,7 @@ class Brawlhalla:
 
                 # timer to reveal legend
                 try:
-                    timer = await self.bot.wait_for('message', check=check, timeout=2)
+                    timer = await self.bot.wait_for('message', check=check, timeout=1.8)
                 except asyncio.TimeoutError:
                     # edit to open chest embed
                     embed = get_opened_chest_embed(random_legend, 0x502D8C)
