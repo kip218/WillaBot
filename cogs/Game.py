@@ -422,6 +422,55 @@ class Game:
         else:
             words_lst = randomwordgenerator.generate_random_words(n=num_words)
 
+        def get_scoreboard_embed(sorted_lst):
+            embed = discord.Embed(color=0x48d1cc)
+            temp = None
+            offset = 0
+            for i in range(len(sorted_lst)):
+                player_score = sorted_lst[i]
+                player = player_score[0]
+                score = player_score[1]
+                # checking to make sure people don't have same scores
+                if score == temp:
+                    offset += 1
+                else:
+                    offset = 0
+                temp = score
+                xp_increase, balance_increase = update_db_and_return_increase(player, score)
+                embed.add_field(name=f"{i+1-offset}. {player.name}", value=f"**{score} words** *(+{xp_increase} XP, +{balance_increase} Coins)*", inline=False)
+                embed.set_author(name="Final Scoreboard", icon_url=self.bot.user.avatar_url)
+            return embed
+
+        def update_db_and_return_increase(player, score):
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" SELECT xp, balance FROM users
+                        WHERE ID = %s; """, (str(player.id), ))
+            fetch = c.fetchone()
+            xp = int(fetch[0])
+            balance = int(fetch[1])
+            xp_increase = 0
+            balance_increase = 0
+            for i in range(score):
+                xp_increase += random.randint(12, 20)
+                balance_increase += random.randint(25, 40)
+            xp += xp_increase
+            balance += balance_increase
+            c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(player.id)))
+            conn.commit()
+            conn.close()
+            return xp_increase, balance_increase
+
+        # remove 'typeracer' status from channel
+        def remove_status():
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE channels
+                        SET status = array_remove(status, %s)
+                        WHERE channel_id = %s; """, ('typeracer', str(ctx.channel.id)))
+            conn.commit()
+            conn.close()
+
         await ctx.send("*The race has started!\nThe word to type is...*")
         scoreboard_dict = {}
         for i in range(len(words_lst)):
@@ -432,45 +481,6 @@ class Game:
 
             def check(m):
                 return not m.author.bot and (m.content == word or (m.content == 'w.stop' and (m.author == ctx.author or m.author.permissions_in(ctx.channel).administrator))) and m.channel == ctx.channel
-
-            def get_scoreboard_embed(sorted_lst):
-                embed = discord.Embed(color=0x48d1cc)
-                temp = None
-                offset = 0
-                for i in range(len(sorted_lst)):
-                    player_score = sorted_lst[i]
-                    player = player_score[0]
-                    score = player_score[1]
-                    # checking to make sure people don't have same scores
-                    if score == temp:
-                        offset += 1
-                    else:
-                        offset = 0
-                    temp = score
-                    xp_increase, balance_increase = update_db_and_return_increase(player, score)
-                    embed.add_field(name=f"{i+1-offset}. {player.name}", value=f"**{score} words** *(+{xp_increase} XP, +{balance_increase} Coins)*", inline=False)
-                    embed.set_author(name="Final Scoreboard", icon_url=self.bot.user.avatar_url)
-                return embed
-
-            def update_db_and_return_increase(player, score):
-                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-                c = conn.cursor()
-                c.execute(""" SELECT xp, balance FROM users
-                            WHERE ID = %s; """, (str(player.id), ))
-                fetch = c.fetchone()
-                xp = int(fetch[0])
-                balance = int(fetch[1])
-                xp_increase = 0
-                balance_increase = 0
-                for i in range(score):
-                    xp_increase += random.randint(12, 20)
-                    balance_increase += random.randint(25, 40)
-                xp += xp_increase
-                balance += balance_increase
-                c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(player.id)))
-                conn.commit()
-                conn.close()
-                return xp_increase, balance_increase
 
             try:
                 answer = await self.bot.wait_for('message', check=check, timeout=25)
@@ -513,14 +523,7 @@ class Game:
             sorted_lst.reverse()
             await ctx.send(embed=get_scoreboard_embed(sorted_lst))
 
-        # remove 'typeracer' status from channel
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        c = conn.cursor()
-        c.execute(""" UPDATE channels
-                    SET status = array_remove(status, %s)
-                    WHERE channel_id = %s; """, ('typeracer', str(ctx.channel.id)))
-        conn.commit()
-        conn.close()
+        remove_status()
 
 
 def setup(bot):
