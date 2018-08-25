@@ -30,8 +30,17 @@ class Brawlhalla:
     async def b(self, ctx):
         '''
         Brawlhalla commands.
-        w.b
+        w.b <subcommand>
+
+        Type "w.b" for a list of subcommands.
         '''
+        if ctx.invoked_subcommand is None:
+            b_group_command = self.bot.get_command('b')
+            subcommands_lst = []
+            for subcommand in b_group_command.commands:
+                subcommands_lst.append(f"`{subcommand.name}`")
+            help_msg = ', '.join(subcommands_lst)
+            await ctx.send(f"Subcommands: {help_msg}")
 
     @b.command(usage="[legend] / [skin] / [color]")
     async def info(self, ctx, *, msg: str=None):

@@ -19,9 +19,16 @@ class Todo:
         '''
         To-do list commands.
         w.todo <subcommand>
+
+        Type "w.todo" for a list of subcommands.
         '''
         if ctx.invoked_subcommand is None:
-            await ctx.send("Subcommands: list, add, remove, check, clean")
+            todo_group_command = self.bot.get_command('todo')
+            subcommands_lst = []
+            for subcommand in todo_group_command.commands:
+                subcommands_lst.append(f"`{subcommand.name}`")
+            help_msg = ', '.join(subcommands_lst)
+            await ctx.send(f"Subcommands: {help_msg}")
 
     @todo.command()
     async def list(self, ctx):

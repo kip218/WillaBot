@@ -27,9 +27,17 @@ class Challonge:
     async def chal(self, ctx):
         '''
         Group of challonge commands
+        w.chal <subcommand>
+
+        Type "w.chal" for a list of subcommands.
         '''
         if ctx.invoked_subcommand is None:
-            await ctx.send("Subcommands: list, create, remove, info")
+            chal_group_command = self.bot.get_command('chal')
+            subcommands_lst = []
+            for subcommand in chal_group_command.commands:
+                subcommands_lst.append(f"`{subcommand.name}`")
+            help_msg = ', '.join(subcommands_lst)
+            await ctx.send(f"Subcommands: {help_msg}")
 
     @chal.command()
     async def create(self, ctx):
