@@ -311,7 +311,9 @@ class Brawlhalla:
         lst_legend_row = []
         for legend in legends_lst:
             legend_name = legend[1]
-            if legend_name not in searched_legend_lst:
+            skin = legend[2]
+            color = legend[3]
+            if skin == 'base' and color == 'classic':
                 # checking spaces between legend names
                 if legend_name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
                     if legend_name.lower() == 'lordvraxx':
