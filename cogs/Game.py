@@ -525,6 +525,30 @@ class Game:
 
         remove_status()
 
+    @montyhall.error
+    @typeracer.error
+    async def game_error(self, ctx, error):
+        if isinstance(error, commands.CommandInvokeError):
+            if ctx.command.name == 'montyhall':
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+                c.execute(""" UPDATE users
+                            SET status = array_remove(status, %s)
+                            WHERE ID = %s; """, ('montyhall', str(ctx.author.id)))
+                conn.commit()
+                conn.close()
+            elif ctx.command.name == 'typeracer':
+                conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+                c = conn.cursor()
+                c.execute(""" UPDATE channels
+                            SET status = array_remove(status, %s)
+                            WHERE channel_id = %s; """, ('typeracer', str(ctx.channel.id)))
+                conn.commit()
+                conn.close()
+        else:
+            await ctx.send("Unknown error. Please tell Willa.")
+            print(error)
+
 
 def setup(bot):
     bot.add_cog(Game(bot))
