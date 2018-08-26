@@ -252,12 +252,14 @@ class Brawlhalla:
         await ctx.send(embed=embed)
         conn.close()
 
-    @inven.command()
-    async def skins(self, ctx, legend):
-        '''
-        Lists the skins that you own for the legend.
-        w.b inven skins <legend>
-        '''
+    # @inven.command()
+    # async def skins(self, ctx, legend: str=None):
+    #     '''
+    #     Lists the skins that you own for the legend.
+    #     w.b inven skins <legend>
+    #     '''
+    #     if legend is None:
+    #         await ctx.send("")
 
     @b.command(usage="<legend> / [skin] / [color]")
     async def select(self, ctx, *, msg):
