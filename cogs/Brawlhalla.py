@@ -844,6 +844,20 @@ class Brawlhalla:
             await buying_legend(msg)
         remove_status()
 
+    @buy.error
+    async def buy_error(self, ctx, error):
+        if isinstance(error, commands.CommandInvokeError):
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE users
+                        SET status = array_remove(status, %s)
+                        WHERE ID = %s; """, ('buy', str(ctx.author.id)))
+            conn.commit()
+            conn.close()
+        else:
+            await ctx.send("Unknown error. Please tell Willa.")
+            print(error)
+
     # @b.command()
     # async def test(self, ctx):
     #     '''
