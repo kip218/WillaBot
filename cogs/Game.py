@@ -4,7 +4,7 @@ import psycopg2
 import os
 import asyncio
 import discord
-from randomwordgenerator import randomwordgenerator
+from random_word import RandomWords
 import requests
 
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -467,11 +467,10 @@ class Game:
             await ctx.send("Number of words must be between 1 and 25!")
             remove_status()
             return
-        # edge case for when num_words == 1
-        if num_words == 1:
-            words_lst = [randomwordgenerator.generate_random_words(n=num_words)]
-        else:
-            words_lst = randomwordgenerator.generate_random_words(n=num_words)
+
+        # getting list of words
+        r = RandomWords()
+        words_lst = r.get_random_words(limit=num_words)
 
         await ctx.send("*The race has started!\nThe word to type is...*")
         scoreboard_dict = {}
