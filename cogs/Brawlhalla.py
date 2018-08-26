@@ -195,7 +195,7 @@ class Brawlhalla:
                 found = True
         # if not found, send help message
         if found is False:
-            await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] [skin]\" to see a list of available legends/skins/colors!")
+            await ctx.send("Legend/skin/color not found! Use \"w.b store stock [legend] [skin]\" to see a list of available legends/skins/colors!")
         conn.close()
 
     @b.group(invoke_without_command=True)
@@ -474,7 +474,7 @@ class Brawlhalla:
                             WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
             row = c.fetchone()
             if row is None:
-                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available.")
+                await ctx.send("Could not find legend. Try \"w.b store stock\" to see the list of legends available.")
                 return
             legend_name = row[0]
             # get list of skins
@@ -495,7 +495,7 @@ class Brawlhalla:
                             WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
             row = c.fetchone()
             if row is None:
-                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available.")
+                await ctx.send("Could not find legend. Try \"w.b store stock\" to see the list of legends available.")
                 return
             legend_name = row[0]
             # find skin matching input
@@ -505,7 +505,7 @@ class Brawlhalla:
             row = c.fetchone()
             if row is None:
                 if row is None:
-                    await ctx.send("Could not find skin. Try \"w.b list [legend]\" to see the list of skins available for that legend.")
+                    await ctx.send("Could not find skin. Try \"w.b store stock [legend]\" to see the list of skins available for that legend.")
                 return
             skin_name = row[0]
             # get list of colors
@@ -682,7 +682,7 @@ class Brawlhalla:
 
             # if not found, send help message
             if found is False:
-                await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] / [skin]\" to see a list of available legends/skins/colors!")
+                await ctx.send("Legend/skin/color not found! Use \"w.b store stock [legend] / [skin]\" to see a list of available legends/skins/colors!")
                 conn.close()
                 remove_status()
                 return
