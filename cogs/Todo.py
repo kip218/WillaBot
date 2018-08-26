@@ -14,7 +14,7 @@ class Todo:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def todo(self, ctx):
         '''
         To-do list commands.
@@ -22,13 +22,13 @@ class Todo:
 
         Type "w.todo" for a list of subcommands.
         '''
-        if ctx.invoked_subcommand is None:
-            todo_group_command = self.bot.get_command('todo')
-            subcommands_lst = []
-            for subcommand in todo_group_command.commands:
+        todo_group_command = self.bot.get_command('todo')
+        subcommands_lst = []
+        for subcommand in todo_group_command.commands:
+            if subcommand.full_parent_name == 'todo':
                 subcommands_lst.append(f"`{subcommand.name}`")
-            help_msg = ', '.join(subcommands_lst)
-            await ctx.send(f"Subcommands: {help_msg}")
+        help_msg = ', '.join(subcommands_lst)
+        await ctx.send(f"**w.todo** subcommands: {help_msg}")
 
     @todo.command()
     async def list(self, ctx):

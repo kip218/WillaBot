@@ -26,7 +26,7 @@ class Brawlhalla:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def b(self, ctx):
         '''
         Brawlhalla commands.
@@ -34,13 +34,13 @@ class Brawlhalla:
 
         Type "w.b" for a list of subcommands.
         '''
-        if ctx.invoked_subcommand is None:
-            b_group_command = self.bot.get_command('b')
-            subcommands_lst = []
-            for subcommand in b_group_command.commands:
+        b_group_command = self.bot.get_command('b')
+        subcommands_lst = []
+        for subcommand in b_group_command.commands:
+            if subcommand.full_parent_name == 'b':
                 subcommands_lst.append(f"`{subcommand.name}`")
-            help_msg = ', '.join(subcommands_lst)
-            await ctx.send(f"Subcommands: {help_msg}")
+        help_msg = ', '.join(subcommands_lst)
+        await ctx.send(f"**w.b** subcommands: {help_msg}")
 
     @b.command(usage="[legend] / [skin] / [color]")
     async def info(self, ctx, *, msg: str=None):
@@ -198,113 +198,24 @@ class Brawlhalla:
             await ctx.send("Legend/skin/color not found! Use \"w.b list [legend] [skin]\" to see a list of available legends/skins/colors!")
         conn.close()
 
-    @b.command(usage="[legend] / [skin]")
-    async def list(self, ctx, *, msg: str=None):
+    @b.group(invoke_without_command=True)
+    async def inven(self, ctx):
         '''
-        Lists all available legends in the database. Specify [legend] to view all available skins for that legend. Specify [skin] to view all available colors for that skin.
-        w.b list [legend] / [skin]
-
-        Isaiah, Jiro, Lin fei, and Zariel are currently unavailable.
-        Not all skins and colors may be available.
+        Your Brawlhalla inventory.
+        w.b inventory
         '''
-        # clean user input
-        def clean_input(msg):
-            if msg is not None:
-                msg_lst = msg.split('/')
-                msg_lst_clean = []
-                for value in msg_lst:
-                    value = value.replace(' ', '')
-                    value = value.replace('\'', '')
-                    value = value.replace('-', '')
-                    value = value.replace('_', '')
-                    value = value.replace('.', '')
-                    value = value.replace(',', '')
-                    value = value.lower()
-                    msg_lst_clean.append(value)
+        inven_group_command = self.bot.get_command('b inven')
+        subcommands_lst = []
+        for subcommand in inven_group_command.commands:
+            subcommands_lst.append(f"`{subcommand.name}`")
+        help_msg = ', '.join(subcommands_lst)
+        await ctx.send(f"Subcommands: {help_msg}")
 
-                legend_name = msg_lst_clean[0]
-                try:
-                    skin = msg_lst_clean[1]
-                    if skin == '':
-                        skin = None
-                except IndexError:
-                    skin = None
-                return (legend_name, skin)
-            else:
-                return (None, None)
-
-        legend_input, skin_input = clean_input(msg)
-
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        c = conn.cursor()
-        if msg is None:
-            c.execute("""SELECT DISTINCT name FROM legends; """)
-            rows = c.fetchall()
-            legends_lst = []
-            for row in rows:
-                legend = row[0][0].upper() + row[0][1:]
-                legends_lst.append(legend)
-            embed = discord.Embed(title="List of legends", description=', '.join(legends_lst), color=0x36393E)
-            embed.set_footer(text="Isaiah, Jiro, Lin fei, and Zariel are currently unavailable.")
-            await ctx.send(embed=embed)
-        elif skin_input is None:
-            # find legend matching input
-            c.execute(""" SELECT DISTINCT name FROM legends
-                            WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
-            row = c.fetchone()
-            if row is None:
-                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available.")
-                return
-            legend_name = row[0]
-            # get list of skins
-            c.execute(""" SELECT DISTINCT skin FROM legends
-                            WHERE name = %s; """, (legend_name,))
-            rows = c.fetchall()
-            skins_lst = []
-            for row in rows:
-                skin = row[0][0].upper() + row[0][1:]
-                skins_lst.append(skin)
-            embed = discord.Embed(title=f"List of {legend_name} skins", description=', '.join(skins_lst), color=0x36393E)
-            embed.set_footer(text="Some skins may be unavailable.")
-            await ctx.send(embed=embed)
-        else:
-            # find legend matching input
-            c.execute(""" SELECT DISTINCT name FROM legends
-                            WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
-            row = c.fetchone()
-            if row is None:
-                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available.")
-                return
-            legend_name = row[0]
-            # find skin matching input
-            c.execute(""" SELECT DISTINCT skin FROM legends
-                            WHERE name = %s
-                            AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin_input))
-            row = c.fetchone()
-            if row is None:
-                if row is None:
-                    await ctx.send("Could not find skin. Try \"w.b list [legend]\" to see the list of skins available for that legend.")
-                return
-            skin_name = row[0]
-            # get list of colors
-            c.execute(""" SELECT color FROM legends
-                            WHERE name = %s
-                            AND skin = %s; """, (legend_name, skin_name))
-            rows = c.fetchall()
-            colors_lst = []
-            for row in rows:
-                color = row[0][0].upper() + row[0][1:]
-                colors_lst.append(color)
-            embed = discord.Embed(title=f"List of available colors for {skin_name} {legend_name}", description=', '.join(colors_lst), color=0x36393E)
-            embed.set_footer(text="Some colors may be unavailable.")
-            await ctx.send(embed=embed)
-        conn.close()
-
-    @b.command()
+    @inven.command()
     async def legends(self, ctx):
         '''
-        List of legends that you own.
-        w.b legends
+        Lists legends that you own.
+        w.b inven legends
         '''
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
@@ -340,6 +251,13 @@ class Brawlhalla:
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
         conn.close()
+
+    @inven.command()
+    async def skins(self, ctx, legend):
+        '''
+        Lists the skins that you own for the legend.
+        w.b inven skins <legend>
+        '''
 
     @b.command(usage="<legend> / [skin] / [color]")
     async def select(self, ctx, *, msg):
@@ -479,7 +397,7 @@ class Brawlhalla:
         conn.commit()
         conn.close()
 
-    @b.command()
+    @b.group(invoke_without_command=True)
     async def store(self, ctx):
         '''
         The Brawlhalla store.
@@ -490,13 +408,118 @@ class Brawlhalla:
         c.execute("""SELECT balance FROM users
                         WHERE ID = %s """, (str(ctx.author.id),))
         balance = c.fetchone()[0]
-        embed = discord.Embed(description="Welcome to the store!\nUse \"w.b list [legend] / [skin]\" to view all purchasable legends/skins/colors!\nYou must buy the legend before you can buy other skin/color combinations.", color=0xD4AF37)
+        embed = discord.Embed(description="Welcome to the store!\nUse \"w.b store stock [legend] / [skin]\" to view all purchasable legends/skins/colors!\nYou must buy the legend before you can buy other skin/color combinations.", color=0xD4AF37)
         embed.set_author(name=f"Your balance: {balance} Coins", icon_url=self.bot.user.avatar_url)
         embed.add_field(name="Legend | 1,000 Coins", value="w.b buy <legend>", inline=False)
         embed.add_field(name="Odin's Chest | 3,000 Coins", value="w.b buy chest", inline=False)
-        embed.add_field(name="Skin/Color | 7,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
+        embed.add_field(name="Skin/Color | 8,000 Coins", value="w.b buy <legend> / <skin> / <color>", inline=False)
         embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
         await ctx.send(embed=embed)
+
+    @store.command(usage="[legend] / [skin]")
+    async def stock(self, ctx, *, msg: str=None):
+        '''
+        Lists all available legends in the store. Specify [legend] to view all available skins for that legend. Specify [skin] to view all available colors for that skin.
+        w.b store stock [legend] / [skin]
+
+        Isaiah, Jiro, Lin fei, and Zariel are currently unavailable.
+        Not all skins and colors may be available.
+        '''
+        # clean user input
+        def clean_input(msg):
+            if msg is not None:
+                msg_lst = msg.split('/')
+                msg_lst_clean = []
+                for value in msg_lst:
+                    value = value.replace(' ', '')
+                    value = value.replace('\'', '')
+                    value = value.replace('-', '')
+                    value = value.replace('_', '')
+                    value = value.replace('.', '')
+                    value = value.replace(',', '')
+                    value = value.lower()
+                    msg_lst_clean.append(value)
+
+                legend_name = msg_lst_clean[0]
+                try:
+                    skin = msg_lst_clean[1]
+                    if skin == '':
+                        skin = None
+                except IndexError:
+                    skin = None
+                return (legend_name, skin)
+            else:
+                return (None, None)
+
+        legend_input, skin_input = clean_input(msg)
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        if msg is None:
+            c.execute("""SELECT DISTINCT name FROM legends; """)
+            rows = c.fetchall()
+            legends_lst = []
+            for row in rows:
+                legend = row[0][0].upper() + row[0][1:]
+                legends_lst.append(f"`{legend}`")
+            embed = discord.Embed(description=', '.join(legends_lst), color=0x36393E)
+            embed.set_author(name="Available legends", icon_url=self.bot.user.avatar_url)
+            embed.set_footer(text="Isaiah, Jiro, Lin fei, and Zariel are currently unavailable.")
+            await ctx.send(embed=embed)
+        elif skin_input is None:
+            # find legend matching input
+            c.execute(""" SELECT DISTINCT name FROM legends
+                            WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
+            row = c.fetchone()
+            if row is None:
+                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available.")
+                return
+            legend_name = row[0]
+            # get list of skins
+            c.execute(""" SELECT DISTINCT skin FROM legends
+                            WHERE name = %s; """, (legend_name,))
+            rows = c.fetchall()
+            skins_lst = []
+            for row in rows:
+                skin = row[0][0].upper() + row[0][1:]
+                skins_lst.append(f"`{skin}`")
+            embed = discord.Embed(description=', '.join(skins_lst), color=0x36393E)
+            embed.set_author(name=f"Available skins for {legend_name}", icon_url=self.bot.user.avatar_url)
+            embed.set_footer(text="Some skins may be unavailable.")
+            await ctx.send(embed=embed)
+        else:
+            # find legend matching input
+            c.execute(""" SELECT DISTINCT name FROM legends
+                            WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
+            row = c.fetchone()
+            if row is None:
+                await ctx.send("Could not find legend. Try \"w.b list\" to see the list of legends available.")
+                return
+            legend_name = row[0]
+            # find skin matching input
+            c.execute(""" SELECT DISTINCT skin FROM legends
+                            WHERE name = %s
+                            AND skin LIKE '%%'||%s||'%%'; """, (legend_name, skin_input))
+            row = c.fetchone()
+            if row is None:
+                if row is None:
+                    await ctx.send("Could not find skin. Try \"w.b list [legend]\" to see the list of skins available for that legend.")
+                return
+            skin_name = row[0]
+            # get list of colors
+            c.execute(""" SELECT color FROM legends
+                            WHERE name = %s
+                            AND skin = %s; """, (legend_name, skin_name))
+            rows = c.fetchall()
+            colors_lst = []
+            for row in rows:
+                color = row[0][0].upper() + row[0][1:]
+                colors_lst.append(f"`{color}`")
+            embed = discord.Embed(description=', '.join(colors_lst), color=0x36393E)
+            embed.set_author(name=f"Available colors for {skin_name} {legend_name}", icon_url=self.bot.user.avatar_url)
+            embed.set_footer(text="Some colors may be unavailable.")
+            await ctx.send(embed=embed)
+        conn.close()
 
     @b.command(usage="<item to buy>")
     async def buy(self, ctx, *, msg):
@@ -729,13 +752,13 @@ class Brawlhalla:
                     await ctx.send("You don't have enough Coins!")
                     color_code = 0xED1C24
             else:
-                if check_balance(ctx.author.id, 7000):
+                if check_balance(ctx.author.id, 8000):
                     if check_default_legend(ctx.author.id, name):
                         purchased_legend = [full_key, name, skin, color, '0', '0']
                         legends_lst.append(purchased_legend)
                         c.execute("""UPDATE users SET legends_lst = %s
                                         WHERE ID = %s;""", (legends_lst, str(ctx.author.id)))
-                        update_database_coins(ctx.author.id, -7000, conn)
+                        update_database_coins(ctx.author.id, -8000, conn)
                         await ctx.send(f"You have purchased {skin} {name} *({color})*!")
                         color_code = 0x4CC417
                     else:

@@ -23,7 +23,7 @@ class Challonge:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group()
+    @commands.group(invoke_without_command=True)
     async def chal(self, ctx):
         '''
         Group of challonge commands
@@ -31,13 +31,13 @@ class Challonge:
 
         Type "w.chal" for a list of subcommands.
         '''
-        if ctx.invoked_subcommand is None:
-            chal_group_command = self.bot.get_command('chal')
-            subcommands_lst = []
-            for subcommand in chal_group_command.commands:
+        chal_group_command = self.bot.get_command('chal')
+        subcommands_lst = []
+        for subcommand in chal_group_command.commands:
+            if subcommand.full_parent_name == 'chal':
                 subcommands_lst.append(f"`{subcommand.name}`")
-            help_msg = ', '.join(subcommands_lst)
-            await ctx.send(f"Subcommands: {help_msg}")
+        help_msg = ', '.join(subcommands_lst)
+        await ctx.send(f"**w.chal** subcommands: {help_msg}")
 
     @chal.command()
     async def create(self, ctx):

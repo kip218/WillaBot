@@ -16,7 +16,8 @@ def format_help_page(bot, cog_name, curr_page, max_page):
                 embed.add_field(name=command.signature, value=command.short_doc, inline=False)
                 if isinstance(command, commands.core.Group):
                     for subcommand in command.commands:
-                        embed.add_field(name=subcommand.signature, value=subcommand.short_doc, inline=False)
+                        if subcommand.full_parent_name == command.name:
+                            embed.add_field(name=subcommand.signature, value=subcommand.short_doc, inline=False)
             return embed
 
 
