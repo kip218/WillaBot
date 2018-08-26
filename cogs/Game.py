@@ -5,6 +5,7 @@ import os
 import asyncio
 import discord
 from randomwordgenerator import randomwordgenerator
+import requests
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -475,7 +476,12 @@ class Game:
         scoreboard_dict = {}
         for i in range(len(words_lst)):
             word = words_lst[i]
-            embed = discord.Embed(title=word, color=0xF5DE50)
+            img_url_of_word = requests.get(f"http://api.img4me.com/?text={word}&font=arial&fcolor=FFFFFF&size=15&bcolor=32363C&type=png").text
+            embed = discord.Embed(description="The word is:", color=0xF5DE50)
+            embed.set_image(url=img_url_of_word)
+            embed.set_author(
+                        name="Type the word!",
+                        icon_url="http://www.law.uj.edu.pl/kpk/strona/wp-content/uploads/2016/03/52646-200.png")
             embed.set_footer(text=f"{i+1}/{len(words_lst)}")
             msg = await ctx.send(embed=embed)
 
@@ -486,20 +492,26 @@ class Game:
                 answer = await self.bot.wait_for('message', check=check, timeout=25)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
-                                    title=word,
-                                    description="The type race has timed out!",
+                                    description="The word was:",
                                     color=0xED1C24
                                     )
+                embed.set_image(url=img_url_of_word)
+                embed.set_author(
+                        name="The type race has timed out!",
+                        icon_url="http://cdn.onlinewebfonts.com/svg/img_96745.png")
                 embed.set_footer(text=f"{i+1}/{len(words_lst)}")
                 await msg.edit(embed=embed)
                 break
             else:
                 if answer.content == word:
                     embed = discord.Embed(
-                                    title=word,
-                                    description=f"{msg.content}\n{answer.author.mention} got it right!",
+                                    description="The word was:",
                                     color=0x4CC417
                                     )
+                    embed.set_image(url=img_url_of_word)
+                    embed.set_author(
+                                name=f"{answer.author.name} got it right!",
+                                icon_url=answer.author.avatar_url)
                     embed.set_footer(text=f"{i+1}/{len(words_lst)}")
                     await msg.edit(embed=embed)
                     # update scoreboard
@@ -509,10 +521,13 @@ class Game:
                         scoreboard_dict[answer.author] = 1
                 elif answer.content == 'w.stop':
                     embed = discord.Embed(
-                                    title=word,
-                                    description="The type race has been stopped",
+                                    description="The word was:",
                                     color=0xED1C24
                                     )
+                    embed.set_image(url=img_url_of_word)
+                    embed.set_author(
+                        name="The type race has been stopped",
+                        icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Black_close_x.svg/2000px-Black_close_x.svg.png")
                     embed.set_footer(text=f"{i+1}/{len(words_lst)}")
                     await msg.edit(embed=embed)
                     break
