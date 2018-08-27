@@ -879,6 +879,8 @@ class Brawlhalla:
                         WHERE ID = %s; """, ('buy', str(ctx.author.id)))
             conn.commit()
             conn.close()
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("You must specify the item to buy!")
         else:
             await ctx.send("Unknown error. Please tell Willa.")
             print(error)
