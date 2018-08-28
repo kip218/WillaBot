@@ -57,7 +57,7 @@ class Bot:
                     else:
                         ind += 1
                 if found is False:
-                    await ctx.send("Could not find server named \"" + server_num + "\"")
+                    await ctx.send("Could not find server named \"" + server_name + "\"")
                     return
             else:
                 if 1 <= server_num <= len(self.bot.guilds):

@@ -74,6 +74,25 @@ class Chat:
                     )
                 await ctx.send(embed=embed)
 
+    @commands.command()
+    async def purge(self, ctx, number: int=1):
+        '''
+        Purges <number> of messages. Only members with admin perms can use this command.
+        w.purge <number>
+
+        <number> defaults to 1 and has to be between 1 and 100.
+        '''
+        permissions = ctx.author.permissions_in(ctx.channel)
+        if permissions.administrator:
+            if not 1 <= number <= 100:
+                await ctx.send("<number> must be between 1 and 100!")
+            else:
+                messages = await ctx.channel.history(limit=number+1).flatten()
+                for message in messages:
+                    await message.delete()
+        else:
+            await ctx.send("You don't have admin permissions in this channel!")
+
     @echo.error
     @delete.error
     async def echo_on_cooldown(self, ctx, error):
