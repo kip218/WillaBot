@@ -7,3 +7,4 @@ python-string-utils
 psycopg2-binary
 pypandoc
 random-word
+gibberish

@@ -6,6 +6,7 @@ import asyncio
 import discord
 from random_word import RandomWords
 import requests
+import gibberish
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -391,7 +392,7 @@ class Game:
     @commands.command(usage="[number of words]")
     async def typeracer(self, ctx, num_words: int=5):
         '''
-        A game to test your typing speed
+        A game to test your typing speed.
         w.typeracer [number of words]
 
         Number of words defaults to 5 if not specified.
@@ -540,6 +541,158 @@ class Game:
 
         remove_status()
 
+    @commands.command(usage="[number of words]")
+    async def shittytyperacer(self, ctx, num_words: int=5):
+        '''
+        A game to test your typing speed?
+        w.typeracer [number of words]
+
+        Number of words defaults to 5 if not specified.
+        Type "w.stop" to stop the game. Only the game starter and server admins can stop the game.
+        '''
+        def get_scoreboard_embed(sorted_lst):
+            embed = discord.Embed(color=0x48d1cc)
+            temp = None
+            offset = 0
+            for i in range(len(sorted_lst)):
+                player_score = sorted_lst[i]
+                player = player_score[0]
+                score = player_score[1]
+                # checking to make sure people don't have same scores
+                if score == temp:
+                    offset += 1
+                else:
+                    offset = 0
+                temp = score
+                xp_increase, balance_increase = update_db_and_return_increase(player, score)
+                embed.add_field(name=f"{i+1-offset}. {player.name}", value=f"**{score} words** *(+{xp_increase} XP, +{balance_increase} Coins)*", inline=False)
+                embed.set_author(name="Final Scoreboard", icon_url=self.bot.user.avatar_url)
+            return embed
+
+        def update_db_and_return_increase(player, score):
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" SELECT xp, balance FROM users
+                        WHERE ID = %s; """, (str(player.id), ))
+            fetch = c.fetchone()
+            xp = int(fetch[0])
+            balance = int(fetch[1])
+            xp_increase = 0
+            balance_increase = 0
+            for i in range(score):
+                xp_increase += random.randint(12, 20)
+                balance_increase += random.randint(25, 40)
+            xp += xp_increase
+            balance += balance_increase
+            c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(player.id)))
+            conn.commit()
+            conn.close()
+            return xp_increase, balance_increase
+
+        # remove 'typeracer' status from channel
+        def remove_status():
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE channels
+                        SET status = array_remove(status, %s)
+                        WHERE channel_id = %s; """, ('typeracer', str(ctx.channel.id)))
+            conn.commit()
+            conn.close()
+
+        # Check that the game isn't already running in the channel
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT status FROM channels WHERE channel_id = %s;""", (str(ctx.channel.id), ))
+        status_lst = c.fetchone()[0]
+        if status_lst is not None:
+            if "typeracer" in status_lst:
+                await ctx.send("This channel is already in a game of typeracer!")
+                conn.commit()
+                conn.close()
+                return
+        c.execute(""" UPDATE channels
+                    SET status = array_append(status, %s)
+                    WHERE channel_id = %s; """, ('typeracer', str(ctx.channel.id)))
+        conn.commit()
+        conn.close()
+
+        if num_words > 25 or num_words < 1:
+            await ctx.send("Number of words must be between 1 and 25!")
+            remove_status()
+            return
+
+        # getting list of words
+        words_lst = gibberish.generate_words(num_words)
+
+        await ctx.send("*The race has started!\nThe word to type is...*")
+        scoreboard_dict = {}
+        for i in range(len(words_lst)):
+            word = words_lst[i]
+            img_url_of_word = requests.get(f"http://api.img4me.com/?text={word}&font=arial&fcolor=FFFFFF&size=15&bcolor=32363C&type=png").text
+            embed = discord.Embed(description="The word is:", color=0xF5DE50)
+            embed.set_image(url=img_url_of_word)
+            embed.set_author(
+                        name="Type the word!",
+                        icon_url="http://www.law.uj.edu.pl/kpk/strona/wp-content/uploads/2016/03/52646-200.png")
+            embed.set_footer(text=f"{i+1}/{len(words_lst)}")
+            msg = await ctx.send(embed=embed)
+
+            def check(m):
+                return not m.author.bot and (m.content == word or (m.content == 'w.stop' and (m.author == ctx.author or m.author.permissions_in(ctx.channel).administrator))) and m.channel == ctx.channel
+
+            try:
+                answer = await self.bot.wait_for('message', check=check, timeout=25)
+            except asyncio.TimeoutError:
+                embed = discord.Embed(
+                                    description="The word was:",
+                                    color=0xED1C24
+                                    )
+                embed.set_image(url=img_url_of_word)
+                embed.set_author(
+                        name="The type race has timed out!",
+                        icon_url="http://cdn.onlinewebfonts.com/svg/img_96745.png")
+                embed.set_footer(text=f"{i+1}/{len(words_lst)}")
+                await msg.edit(embed=embed)
+                break
+            else:
+                if answer.content == word:
+                    embed = discord.Embed(
+                                    description="The word was:",
+                                    color=0x4CC417
+                                    )
+                    embed.set_image(url=img_url_of_word)
+                    embed.set_author(
+                                name=f"{answer.author.name} got it right!",
+                                icon_url=answer.author.avatar_url)
+                    embed.set_footer(text=f"{i+1}/{len(words_lst)}")
+                    await msg.edit(embed=embed)
+                    # update scoreboard
+                    if answer.author in scoreboard_dict:
+                        scoreboard_dict[answer.author] += 1
+                    else:
+                        scoreboard_dict[answer.author] = 1
+                elif answer.content == 'w.stop':
+                    embed = discord.Embed(
+                                    description="The word was:",
+                                    color=0xED1C24
+                                    )
+                    embed.set_image(url=img_url_of_word)
+                    embed.set_author(
+                        name="The type race has been stopped",
+                        icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Black_close_x.svg/2000px-Black_close_x.svg.png")
+                    embed.set_footer(text=f"{i+1}/{len(words_lst)}")
+                    await msg.edit(embed=embed)
+                    break
+
+        if len(scoreboard_dict) > 0:
+            # gives sorted list in order of decreasing score
+            sorted_lst = sorted(scoreboard_dict.items(), key=lambda x: x[1])
+            sorted_lst.reverse()
+            await ctx.send(embed=get_scoreboard_embed(sorted_lst))
+
+        remove_status()
+
+    @shittytyperacer.error
     @montyhall.error
     @typeracer.error
     async def game_error(self, ctx, error):
@@ -552,7 +705,7 @@ class Game:
                             WHERE ID = %s; """, ('montyhall', str(ctx.author.id)))
                 conn.commit()
                 conn.close()
-            elif ctx.command.name == 'typeracer':
+            elif ctx.command.name == 'typeracer' or ctx.command.name == 'shittytyperacer':
                 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
                 c = conn.cursor()
                 c.execute(""" UPDATE channels

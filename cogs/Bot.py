@@ -111,7 +111,7 @@ class Bot:
     @commands.command()
     async def invite(self, ctx):
         '''
-        Invite Willabot to your server and help WillaBot explore different servers!
+        Invite Willabot to your server! Or get an invite to Willa's Server!
         w.invite
         '''
         title_lst = ("Invite WillaBot to your server!", "Help WillaBot explore a new server!")
@@ -128,7 +128,7 @@ class Bot:
             )
         embed.set_footer(
             text="Click the link to invite WillaBot to your server!")
-        await ctx.send(embed=embed)
+        await ctx.send(content="https://discord.gg/UAp5ZTZ", embed=embed)
 
     @commands.cooldown(rate=1, per=180, type=commands.BucketType.user)
     @commands.command()
