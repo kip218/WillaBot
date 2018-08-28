@@ -550,16 +550,6 @@ class Brawlhalla:
         conn.commit()
         conn.close()
 
-        # removing 'buy' from status_lst
-        def remove_status():
-            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-            c = conn.cursor()
-            c.execute(""" UPDATE users
-                        SET status = array_remove(status, %s)
-                        WHERE ID = %s; """, ('buy', str(ctx.author.id)))
-            conn.commit()
-            conn.close()
-
         # clean user input
         def clean_input(msg):
             if msg is not None:
@@ -592,8 +582,21 @@ class Brawlhalla:
             else:
                 return None
 
+        def check_confirm(m):
+                return m.author == ctx.author and m.content.lower() in ['w.confirm', 'w.cancel'] and m.channel == ctx.channel
+
+        # removing 'buy' from status_lst
+        def remove_status():
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
+            c.execute(""" UPDATE users
+                        SET status = array_remove(status, %s)
+                        WHERE ID = %s; """, ('buy', str(ctx.author.id)))
+            conn.commit()
+            conn.close()
+
         # get embed of legend/skin/color
-        def get_embed(row, color_code):
+        def get_embed(row, color_code, price):
             full_key = row[0]
             name = row[1].capitalize()
             # checking spaces between legend names
@@ -606,7 +609,7 @@ class Brawlhalla:
                     name = 'Sir Roland'
             skin = row[2].capitalize()
             color = row[3].capitalize()
-            embed = discord.Embed(title=f"{skin} {name} *({color})*", description="Are you sure you want to buy this legend/skin/color? Coins will be deducted from your profile.\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=color_code)
+            embed = discord.Embed(title=f"{skin} {name} *({color})*", description=f"Are you sure you want to buy this legend/skin/color?\n{price} Coins will be deducted from your profile.\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=color_code)
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/" + full_key)
             embed.set_author(name="Confirm Purchase", icon_url=self.bot.user.avatar_url)
             embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
@@ -665,9 +668,16 @@ class Brawlhalla:
                                 AND skin LIKE '%%'||%s||'%%'
                                 AND color LIKE '%%'||%s||'%%'; """, (legend_name, skin, color))
             row = c.fetchone()
+
+            # get price for embed
+            if skin == 'base' and color == 'classic':
+                price = 1000
+            else:
+                price = 8000
+
             found = False
             if row is not None:
-                embed = get_embed(row, 0xD4AF37)
+                embed = get_embed(row, 0xD4AF37, price)
                 found = True
             # search again if classic color does not exist for skin
             elif color == 'classic':
@@ -677,7 +687,7 @@ class Brawlhalla:
                 row = c.fetchone()
                 # only search for color and send embed if skin can be found
                 if row is not None:
-                    embed = get_embed(row, 0xD4AF37)
+                    embed = get_embed(row, 0xD4AF37, price)
                     found = True
 
             # if not found, send help message
@@ -686,9 +696,6 @@ class Brawlhalla:
                 conn.close()
                 remove_status()
                 return
-
-            def check(m):
-                return m.author == ctx.author and m.content.lower() in ['w.confirm', 'w.cancel'] and m.channel == ctx.channel
 
             # saving elements from row above for later use
             full_key = row[0]
@@ -701,9 +708,9 @@ class Brawlhalla:
                 purchase_embed = await ctx.send(embed=embed)
                 while answered is False:
                     try:
-                        purchase_confirm = await self.bot.wait_for('message', check=check, timeout=60)
+                        purchase_confirm = await self.bot.wait_for('message', check=check_confirm, timeout=60)
                     except asyncio.TimeoutError:
-                        timeout_embed = get_embed(row, 0xED1C24)
+                        timeout_embed = get_embed(row, 0xED1C24, price)
                         timeout_embed = timeout_embed.set_footer(text="The purchase has timed out!")
                         await purchase_embed.edit(embed=timeout_embed)
                         conn.close()
@@ -717,7 +724,7 @@ class Brawlhalla:
                             await ctx.send("Purchase canceled.")
                             answered = True
                             conn.close()
-                            embed = get_embed(row, 0xED1C24)
+                            embed = get_embed(row, 0xED1C24, price)
                             await purchase_embed.edit(embed=embed)
                             remove_status()
                             return
@@ -733,7 +740,7 @@ class Brawlhalla:
                         if full_key in legend:
                             await ctx.send("You cannot buy what you already own!")
                             conn.close()
-                            embed = get_embed(row, 0xED1C24)
+                            embed = get_embed(row, 0xED1C24, price)
                             await purchase_embed.edit(embed=embed)
                             remove_status()
                             return
@@ -770,15 +777,24 @@ class Brawlhalla:
                     await ctx.send("You don't have enough Coins!")
                     color_code = 0xED1C24
 
-            embed = get_embed(row, color_code)
+            embed = get_embed(row, color_code, price)
             await purchase_embed.edit(embed=embed)
             conn.commit()
             conn.close()
+
+        # get embed of chest
+        def get_embed_chest(color_code, price):
+            embed = discord.Embed(title=f"Odin's Chest", description=f"Are you sure you want to buy the Odin's Chest?\n{price} Coins will be deducted from your profile.\nType \"w.confirm\" to confirm purchase and \"w.cancel\" to cancel.", color=color_code)
+            embed.set_image(url="https://s3.amazonaws.com/willabot-assets/images/store/Closed_Chest.png")
+            embed.set_author(name="Confirm Purchase", icon_url="https://s3.amazonaws.com/willabot-assets/images/store/Closed_Chest.png")
+            embed.set_footer(text="Odin's Chest will give a random legend/skin/color from all available options in the store.")
+            return embed
 
         def get_opening_chest_embed(row, color_code):
             embed = discord.Embed(description="The Odin's Chest is being opened!", color=color_code)
             embed.set_image(url="https://s3.amazonaws.com/willabot-assets/images/store/Chest_Animation.gif")
             embed.set_author(name="Odin's Chest", icon_url="https://s3.amazonaws.com/willabot-assets/images/store/Chest_Animation.gif")
+            embed.set_footer(text="Odin's Chest will give a random legend/skin/color from all available options in the store.")
             return embed
 
         def get_opened_chest_embed(row, color_code):
@@ -803,6 +819,29 @@ class Brawlhalla:
 
         # buying chest
         async def buying_chest():
+            embed = get_embed_chest(0xD4AF37, 3000)
+            purchase_embed = await ctx.send(embed=embed)
+            answered = False
+            while answered is False:
+                try:
+                    purchase_confirm = await self.bot.wait_for('message', check=check_confirm, timeout=60)
+                except asyncio.TimeoutError:
+                    timeout_embed = get_embed(0xED1C24, 3000)
+                    timeout_embed = timeout_embed.set_footer(text="The purchase has timed out!")
+                    await purchase_embed.edit(embed=timeout_embed)
+                    remove_status()
+                    return
+                else:
+                    if purchase_confirm.content == 'w.confirm':
+                        answered = True
+                    elif purchase_confirm.content == 'w.cancel':
+                        await ctx.send("Purchase canceled.")
+                        answered = True
+                        embed = get_embed(0xED1C24, 3000)
+                        await purchase_embed.edit(embed=embed)
+                        remove_status()
+                        return
+
             if not check_balance(ctx.author.id, 3000):
                 await ctx.send("You don't have enough Coins!")
                 return
@@ -848,9 +887,9 @@ class Brawlhalla:
                 conn.commit()
                 conn.close()
 
-                # send closed chest embed
+                # send opening chest embed
                 embed = get_opening_chest_embed(random_legend, 0x3A2166)
-                chest_embed_msg = await ctx.send(embed=embed)
+                await purchase_embed.edit(embed=embed)
 
                 def check(m):
                     return False
@@ -861,7 +900,7 @@ class Brawlhalla:
                 except asyncio.TimeoutError:
                     # edit to open chest embed
                     embed = get_opened_chest_embed(random_legend, 0x502D8C)
-                    await chest_embed_msg.edit(embed=embed)
+                    await purchase_embed.edit(embed=embed)
 
         if msg == 'chest':
             await buying_chest()
