@@ -88,8 +88,7 @@ class Chat:
                 await ctx.send("<number> must be between 1 and 100!")
             else:
                 messages = await ctx.channel.history(limit=number+1).flatten()
-                for message in messages:
-                    await message.delete()
+                await ctx.channel.delete_messages(messages)
         else:
             await ctx.send("You don't have admin permissions in this channel!")
 
