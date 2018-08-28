@@ -63,7 +63,7 @@ class Brawlhalla:
             selected_legend_key = c.fetchone()[0]
             # return if user hasn't selected a legend
             if selected_legend_key is None:
-                await ctx.send("You have not selected a legend yet! Use \"w.b legends\" to see your legends and \"w.b select <legend>/<skin>/<color>\" to select a legend!")
+                await ctx.send("You have not selected a legend yet! Use \"w.b inven legends\" to see your legends and \"w.b select <legend>/<skin>/<color>\" to select a legend!")
                 conn.close()
                 return
             # checking legends lst for selected legend
@@ -329,7 +329,7 @@ class Brawlhalla:
             conn.close()
             return
         elif select_legend_key is None:
-            await ctx.send("The legend/skin/color could not be found! Try \"w.b legends\" or w.b skin <legend>\" to see your legends/skins/colors.")
+            await ctx.send("The legend/skin/color could not be found! Try \"w.b inven legends\" or w.b skin <legend>\" to see your legends/skins/colors.")
             conn.close()
             return
 

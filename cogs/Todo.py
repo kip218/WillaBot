@@ -76,16 +76,11 @@ class Todo:
         conn.close()
 
     @todo.command(usage="<task number>")
-    async def remove(self, ctx, task_number):
+    async def remove(self, ctx, task_number: int):
         '''
         Removes a task from your to-do list.
         w.todo remove <task number>
         '''
-        try:
-            num = int(task_number)
-        except:
-            await ctx.send("You must input an integer.")
-            return
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
@@ -93,28 +88,23 @@ class Todo:
         todo_list = c.fetchone()[0]
         if todo_list is None:
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
-        elif 1 <= num <= len(todo_list):
-            task_to_remove = todo_list[num-1]
+        elif 1 <= task_number <= len(todo_list):
+            task_to_remove = todo_list[task_number-1]
             c.execute(""" UPDATE users
                         SET todo_list = array_remove(todo_list, %s)
                         WHERE ID = %s; """, (task_to_remove, str(ctx.author.id)))
             await ctx.send("Removed task: \"" + task_to_remove + "\"")
         else:
-            await ctx.send("You must input an integer between 1 and " + str(len(todo_list)))
+            await ctx.send("You must input <task number> as an integer between 1 and " + str(len(todo_list)))
         conn.commit()
         conn.close()
 
     @todo.command(usage="<task number>")
-    async def check(self, ctx, task_number):
+    async def check(self, ctx, task_number: int):
         '''
         Checks or unchecks a task from your to-do list.
         w.todo check <task number>
         '''
-        try:
-            num = int(task_number)
-        except:
-            await ctx.send("You must input an integer.")
-            return
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
@@ -122,8 +112,8 @@ class Todo:
         todo_list = c.fetchone()[0]
         if todo_list is None:
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
-        elif 1 <= num <= len(todo_list):
-            task_to_check = todo_list[num-1]
+        elif 1 <= task_number <= len(todo_list):
+            task_to_check = todo_list[task_number-1]
             if task_to_check[:2] == "~~" and task_to_check[-2:] == "~~":
                 c.execute(""" UPDATE users
                             SET todo_list = array_replace(todo_list, %s, %s)
@@ -135,9 +125,64 @@ class Todo:
                             WHERE ID = %s; """, (task_to_check, "~~"+task_to_check+"~~", str(ctx.author.id)))
                 await ctx.send("Checked task: \"" + task_to_check + "\"")
         else:
-            await ctx.send("You must input an integer between 1 and " + str(len(todo_list)))
+            await ctx.send("You must input <task number> as an integer between 1 and " + str(len(todo_list)))
         conn.commit()
         conn.close()
+
+    @remove.error
+    @check.error
+    async def todo_error(self, ctx, error):
+        if isinstance(error, commands.BadArgument) or isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("You must input the <task number> as an integer!")
+        else:
+            await ctx.send("Unknown error. Please tell Willa.")
+            print(error)
+
+    @todo.command(usage="<task number> <new task number>")
+    async def move(self, ctx, task_number: int, new_task_number: int):
+        '''
+        Moves a task to a new location on the list.
+        w.todo move <task number> <new_task_number>
+        '''
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute(""" SELECT todo_list FROM users
+                    WHERE ID = %s; """, (str(ctx.author.id), ))
+        todo_list = c.fetchone()[0]
+        if todo_list is None:
+            await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
+        elif 1 <= task_number <= len(todo_list) and 1 <= new_task_number <= len(todo_list)+1:
+            task_to_move = todo_list[task_number-1]
+            if task_number < new_task_number:
+                todo_list.insert(new_task_number, task_to_move)
+                todo_list.remove(task_to_move)
+                c.execute(""" UPDATE users
+                            SET todo_list = %s
+                            WHERE ID = %s; """, (todo_list, str(ctx.author.id)))
+                await ctx.send(f"Moved task: \"{task_to_move}\" to number {new_task_number} on the list")
+            elif task_number > new_task_number:
+                todo_list.remove(task_to_move)
+                todo_list.insert(new_task_number-1, task_to_move)
+                c.execute(""" UPDATE users
+                            SET todo_list = %s
+                            WHERE ID = %s; """, (todo_list, str(ctx.author.id)))
+                await ctx.send(f"Moved task: \"{task_to_move}\" to number {new_task_number} on the list")
+            else:
+                await ctx.send(f"Task is already in number {new_task_number} on the list!")
+        elif 1 <= task_number <= len(todo_list):
+            await ctx.send("You must input <new task number> as an integer between 1 and " + str(len(todo_list)+1))
+        else:
+            await ctx.send("You must input <task number> as an integer between 1 and " + str(len(todo_list)))
+        conn.commit()
+        conn.close()
+
+    @move.error
+    async def todo_error(self, ctx, error):
+        if isinstance(error, commands.BadArgument) or isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("You must input the <task number> and <new task number> as integers!")
+        else:
+            await ctx.send("Unknown error. Please tell Willa.")
+            print(error)
 
     @todo.command()
     async def clean(self, ctx):
