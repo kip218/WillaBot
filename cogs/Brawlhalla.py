@@ -870,7 +870,8 @@ class Brawlhalla:
                     already_owned = False
                     for owned_legend in legends_lst:
                         if owned_legend[0] == random_legend_key:
-                            random_found = True
+                            already_owned = True
+                    # if legend/skin/color already owned, repeat the while loop
                     if already_owned is False:
                         random_found = True
 
