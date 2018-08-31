@@ -645,10 +645,16 @@ class Game:
             remove_status()
             return
 
+        await ctx.send("*The race has started!\nThe word to type is...*")
         # getting list of words
         words_lst = gibberish.generate_words(num_words)
 
-        await ctx.send("*The race has started!\nThe word to type is...*")
+        # getting list of img_urls
+        img_url_lst = []
+        for word in words_lst:
+            img_url = requests.get(f"http://api.img4me.com/?text={word}&font=arial&fcolor=FFFFFF&size=15&bcolor=32363C&type=png").text
+            img_url_lst.append(img_url)
+
         scoreboard_dict = {}
         for i in range(len(words_lst)):
             word = words_lst[i]
