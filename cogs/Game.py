@@ -491,19 +491,14 @@ class Game:
                 new_word = get_new_word(char_to_exclude)
                 words_lst[i] = new_word
 
-        # shuffling words_lst and getting img_url_lst
+        # shuffling words_lst
         random.shuffle(words_lst)
-        img_url_lst = []
-        for word in words_lst:
-            img_url = requests.get(f"http://api.img4me.com/?text={word}&font=arial&fcolor=FFFFFF&size=15&bcolor=32363C&type=png").text
-            img_url_lst.append(img_url)
 
         scoreboard_dict = {}
         for i in range(len(words_lst)):
             word = words_lst[i]
-            curr_img_url = img_url_lst[i]
-            embed = discord.Embed(description="The word is:", color=0xF5DE50)
-            embed.set_image(url=curr_img_url)
+            word_display = "`" + word.replace("", "\u200B") + "`"
+            embed = discord.Embed(title="The word is:", description=word_display, color=0xF5DE50)
             embed.set_author(
                         name="Type the word!",
                         icon_url="http://www.law.uj.edu.pl/kpk/strona/wp-content/uploads/2016/03/52646-200.png")
@@ -517,10 +512,10 @@ class Game:
                 answer = await self.bot.wait_for('message', check=check, timeout=25)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
-                                    description="The word was:",
+                                    title="The word was:",
+                                    description=word_display,
                                     color=0xED1C24
                                     )
-                embed.set_image(url=curr_img_url)
                 embed.set_author(
                         name="The type race has timed out!",
                         icon_url="http://cdn.onlinewebfonts.com/svg/img_96745.png")
@@ -530,10 +525,10 @@ class Game:
             else:
                 if answer.content == word:
                     embed = discord.Embed(
-                                    description="The word was:",
+                                    title="The word was:",
+                                    description=word_display,
                                     color=0x4CC417
                                     )
-                    embed.set_image(url=curr_img_url)
                     embed.set_author(
                                 name=f"{answer.author.name} got it right!",
                                 icon_url=answer.author.avatar_url)
@@ -546,10 +541,10 @@ class Game:
                         scoreboard_dict[answer.author] = 1
                 elif answer.content == 'w.stop':
                     embed = discord.Embed(
-                                    description="The word was:",
+                                    title="The word was:",
+                                    description=word_display,
                                     color=0xED1C24
                                     )
-                    embed.set_image(url=curr_img_url)
                     embed.set_author(
                         name="The type race has been stopped",
                         icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Black_close_x.svg/2000px-Black_close_x.svg.png")
@@ -649,18 +644,11 @@ class Game:
         # getting list of words
         words_lst = gibberish.generate_words(num_words)
 
-        # getting list of img_urls
-        img_url_lst = []
-        for word in words_lst:
-            img_url = requests.get(f"http://api.img4me.com/?text={word}&font=arial&fcolor=FFFFFF&size=15&bcolor=32363C&type=png").text
-            img_url_lst.append(img_url)
-
         scoreboard_dict = {}
         for i in range(len(words_lst)):
             word = words_lst[i]
-            img_url_of_word = requests.get(f"http://api.img4me.com/?text={word}&font=arial&fcolor=FFFFFF&size=15&bcolor=32363C&type=png").text
-            embed = discord.Embed(description="The word is:", color=0xF5DE50)
-            embed.set_image(url=img_url_of_word)
+            word_display = "`" + word.replace("", "\u200B") + "`"
+            embed = discord.Embed(title="The word is:", description=word_display, color=0xF5DE50)
             embed.set_author(
                         name="Type the word!",
                         icon_url="http://www.law.uj.edu.pl/kpk/strona/wp-content/uploads/2016/03/52646-200.png")
@@ -674,10 +662,10 @@ class Game:
                 answer = await self.bot.wait_for('message', check=check, timeout=25)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
-                                    description="The word was:",
+                                    title="The word was:",
+                                    description=word_display,
                                     color=0xED1C24
                                     )
-                embed.set_image(url=img_url_of_word)
                 embed.set_author(
                         name="The type race has timed out!",
                         icon_url="http://cdn.onlinewebfonts.com/svg/img_96745.png")
@@ -687,10 +675,10 @@ class Game:
             else:
                 if answer.content == word:
                     embed = discord.Embed(
-                                    description="The word was:",
+                                    title="The word was:",
+                                    description=word_display,
                                     color=0x4CC417
                                     )
-                    embed.set_image(url=img_url_of_word)
                     embed.set_author(
                                 name=f"{answer.author.name} got it right!",
                                 icon_url=answer.author.avatar_url)
@@ -703,10 +691,10 @@ class Game:
                         scoreboard_dict[answer.author] = 1
                 elif answer.content == 'w.stop':
                     embed = discord.Embed(
-                                    description="The word was:",
+                                    title="The word was:",
+                                    description=word_display,
                                     color=0xED1C24
                                     )
-                    embed.set_image(url=img_url_of_word)
                     embed.set_author(
                         name="The type race has been stopped",
                         icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Black_close_x.svg/2000px-Black_close_x.svg.png")
