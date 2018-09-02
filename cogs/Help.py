@@ -12,12 +12,18 @@ def format_help_page(bot, cog_name, curr_page, max_page):
                 )
             embed.set_author(name="WillaBot", icon_url="https://cdn.discordapp.com/avatars/161774631303249921/a049f60a2696129e0f9cc2714b27403e.webp?size=1024")
             embed.set_footer(text="Prefix is \"w.\"")
-            for command in lst_commands:
-                embed.add_field(name=command.signature, value=command.short_doc, inline=False)
-                if isinstance(command, commands.core.Group):
-                    for subcommand in command.commands:
-                        if subcommand.full_parent_name == command.name:
-                            embed.add_field(name=subcommand.signature, value=subcommand.short_doc, inline=False)
+            # special case for Brawlhalla cog
+            if cog_name == 'Brawlhalla':
+                for command in lst_commands:
+                    if command.full_parent_name == '':
+                        embed.add_field(name=command.signature, value=command.short_doc, inline=False)
+            else:
+                for command in lst_commands:
+                    embed.add_field(name=command.signature, value=command.short_doc, inline=False)
+                    if isinstance(command, commands.core.Group):
+                        for subcommand in command.commands:
+                            if subcommand.full_parent_name == command.name:
+                                embed.add_field(name=subcommand.signature, value=subcommand.short_doc, inline=False)
             return embed
 
 
@@ -83,7 +89,6 @@ class Help:
             if cmd is None:
                 cog = command.lower().capitalize()
                 if cog in self.lst_cogs:
-                    lst_commands = self.bot.get_cog_commands(cog)
                     cog_help = self.bot.get_cog(cog).__doc__
                     embed = discord.Embed(
                         title=cog + " commands",
@@ -92,12 +97,7 @@ class Help:
                         )
                     embed.set_author(name="WillaBot", icon_url="https://cdn.discordapp.com/avatars/161774631303249921/a049f60a2696129e0f9cc2714b27403e.webp?size=1024")
                     embed.set_footer(text="Prefix is \"w.\"")
-                    for command in lst_commands:
-                        embed.add_field(name=command.signature, value=command.short_doc, inline=False)
-                        if isinstance(command, commands.core.Group):
-                            for subcommand in command.commands:
-                                if subcommand.full_parent_name == command.name:
-                                    embed.add_field(name=subcommand.signature, value=subcommand.short_doc, inline=False)
+                    embed = format_help_page(self.bot, cog, 1, 1)
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send(f"Command \"{command}\" not found.")

@@ -1063,74 +1063,74 @@ class Brawlhalla:
             await ctx.send("Unknown error. Please tell Willa.")
             print(error)
 
-    @commands.command()
-    async def test(self, ctx):
-        '''
-        test
-        '''
+    # @commands.command()
+    # async def test(self, ctx):
+    #     '''
+    #     test
+    #     '''
 
-        def get_legend_url(legend_key, flip=False):
-            builder = imgix.UrlBuilder("willabot-assets.imgix.net")
-            slash_ind = legend_key.rfind('/')
-            underscore_ind = legend_key.find('_')
-            legend_name = legend_key[slash_ind+1:underscore_ind]
-            legends_to_reverse = ['scarlet', 'lucien']
-            if legend_name.lower() in legends_to_reverse:
-                flip = not flip
-            if flip:
-                url = builder.create_url(legend_key, {
-                    'w': 500,
-                    'h': 500,
-                    'flip': 'h'
-                    })
-            else:
-                url = builder.create_url(legend_key, {
-                    'w': 500,
-                    'h': 500
-                    })
-            return url
+    #     def get_legend_url(legend_key, flip=False):
+    #         builder = imgix.UrlBuilder("willabot-assets.imgix.net")
+    #         slash_ind = legend_key.rfind('/')
+    #         underscore_ind = legend_key.find('_')
+    #         legend_name = legend_key[slash_ind+1:underscore_ind]
+    #         legends_to_reverse = ['scarlet', 'lucien']
+    #         if legend_name.lower() in legends_to_reverse:
+    #             flip = not flip
+    #         if flip:
+    #             url = builder.create_url(legend_key, {
+    #                 'w': 500,
+    #                 'h': 500,
+    #                 'flip': 'h'
+    #                 })
+    #         else:
+    #             url = builder.create_url(legend_key, {
+    #                 'w': 500,
+    #                 'h': 500
+    #                 })
+    #         return url
 
-        def get_legend_height_width(legend_key):
-            builder = imgix.UrlBuilder("willabot-assets.imgix.net")
-            url = builder.create_url(legend_key, {
-                    'fm': 'json'
-                })
-            json = requests.get(url).json()
-            height = json['PixelHeight']
-            width = json['PixelWidth']
-            return height, width
+    #     def get_legend_height_width(legend_key):
+    #         builder = imgix.UrlBuilder("willabot-assets.imgix.net")
+    #         url = builder.create_url(legend_key, {
+    #                 'fm': 'json'
+    #             })
+    #         json = requests.get(url).json()
+    #         height = json['PixelHeight']
+    #         width = json['PixelWidth']
+    #         return height, width
 
-        # get brawl battle img url through imgix
-        def get_brawl_img_url(legend_key1, legend_key2):
-            player1_legend_url = get_legend_url(legend_key1)
-            height1, width1 = get_legend_height_width(legend_key1)
-            player2_legend_url = get_legend_url(legend_key2, True)
-            height2, width2 = get_legend_height_width(legend_key2)
+    #     # get brawl battle img url through imgix
+    #     def get_brawl_img_url(legend_key1, legend_key2):
+    #         player1_legend_url = get_legend_url(legend_key1)
+    #         height1, width1 = get_legend_height_width(legend_key1)
+    #         player2_legend_url = get_legend_url(legend_key2, True)
+    #         height2, width2 = get_legend_height_width(legend_key2)
 
-            background_height = height1+height2
-            background_width = 2*(width1+width2)
+    #         background_height = height1+height2
+    #         background_width = 2*(width1+width2)
 
-            builder = imgix.UrlBuilder("willabot-assets.imgix.net")
-            url = builder.create_url("/images/backgrounds/Mammoth_BG.png", {
-                    'fit': 'scale',
-                    'w': background_width,
-                    'h': background_height,
-                    'mark': player1_legend_url,
-                    'markfit': 'clip',
-                    'markw': width1,
-                    'markh': height1,
-                    'markx': 0.12*background_width,
-                    'marky': 0.8*background_height-height1,
-                    'blend': player2_legend_url,
-                    'bm': 'normal',
-                    'balph': 100,
-                    'bf': 'clip',
-                    'bw': width2,
-                    'bh': height2,
-                    'bx': 0.88*background_width-width2,
-                    'by': 0.8*background_height-height2
-                    })
-            return url
+    #         builder = imgix.UrlBuilder("willabot-assets.imgix.net")
+    #         url = builder.create_url("/images/backgrounds/Mammoth_BG.png", {
+    #                 'fit': 'scale',
+    #                 'w': background_width,
+    #                 'h': background_height,
+    #                 'mark': player1_legend_url,
+    #                 'markfit': 'clip',
+    #                 'markw': width1,
+    #                 'markh': height1,
+    #                 'markx': 0.12*background_width,
+    #                 'marky': 0.8*background_height-height1,
+    #                 'blend': player2_legend_url,
+    #                 'bm': 'normal',
+    #                 'balph': 100,
+    #                 'bf': 'clip',
+    #                 'bw': width2,
+    #                 'bh': height2,
+    #                 'bx': 0.88*background_width-width2,
+    #                 'by': 0.8*background_height-height2
+    #                 })
+    #         return url
 
     # @b.command()
     # async def test(self, ctx):
