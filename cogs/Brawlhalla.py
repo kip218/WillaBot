@@ -49,7 +49,7 @@ class Brawlhalla:
             selected_legend_key = c.fetchone()[0]
             # return if user hasn't selected a legend
             if selected_legend_key is None:
-                await ctx.send("You have not selected a legend yet! Use \"w. inven legends\" to see your legends and \"w. select <legend>/<skin>/<color>\" to select a legend!")
+                await ctx.send("You have not selected a legend yet! Use \"w.inven legends\" to see your legends and \"w.select <legend>/<skin>/<color>\" to select a legend!")
                 conn.close()
                 return
             # checking legends lst for selected legend
@@ -87,7 +87,7 @@ class Brawlhalla:
             embed.set_thumbnail(url=ctx.author.avatar_url)
             embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
             embed.set_image(url=f"https://s3.amazonaws.com/willabot-assets/{key}")
-            embed.set_footer(text="Use \"w. stance <stance>\" to change the stance.")
+            embed.set_footer(text="Use \"w.stance <stance>\" to change the stance.")
             # showing selected legend number out of list of legends
             # c.execute("""SELECT legends_lst FROM users
             #                 WHERE ID = %s; """, (str(ctx.author.id),))
@@ -181,7 +181,7 @@ class Brawlhalla:
                 found = True
         # if not found, send help message
         if found is False:
-            await ctx.send("Legend/skin/color not found! Use \"w. store stock [legend] [skin]\" to see a list of available legends/skins/colors!")
+            await ctx.send("Legend/skin/color not found! Use \"w.store stock [legend] [skin]\" to see a list of available legends/skins/colors!")
         conn.close()
 
     @commands.group(invoke_without_command=True)
@@ -190,7 +190,7 @@ class Brawlhalla:
         Your Brawlhalla inventory.
         w.inven
         '''
-        inven_group_command = self.bot.get_command('b inven')
+        inven_group_command = self.bot.get_command('inven')
         subcommands_lst = []
         for subcommand in inven_group_command.commands:
             subcommands_lst.append(f"`{subcommand.name}`")
@@ -208,17 +208,18 @@ class Brawlhalla:
         c.execute("""SELECT legends_lst FROM users
                         WHERE ID = %s """, (str(ctx.author.id),))
         legends_lst = c.fetchone()[0]
+        conn.close()
         if legends_lst is None:
-            await ctx.send("You do not own any legends! Try \"w. store\".")
-            conn.close()
+            await ctx.send("You do not own any legends! Try \"w.store\".")
             return
+
         # fetching all distinct legends
         searched_legend_lst = []
         lst_legend_row = []
-        for legend in legends_lst:
-            legend_name = legend[1]
-            skin = legend[2]
-            color = legend[3]
+        for row in legends_lst:
+            legend_name = row[1]
+            skin = row[2]
+            color = row[3]
             if skin == 'base' and color == 'classic':
                 # checking spaces between legend names
                 if legend_name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
@@ -229,23 +230,174 @@ class Brawlhalla:
                     elif legend_name.lower() == 'sirroland':
                         legend_name = 'Sir Roland'
                 searched_legend_lst.append(legend_name)
-                legend_xp = legend[5]
+                legend_xp = row[5]
                 level = level_currxp_nextxp(legend_xp)[0]
-                lst_legend_row.append(f"**{legend_name[0].upper()}{legend_name[1:]}** | Level {level}")
+                lst_legend_row.append(f"**{legend_name.capitalize()}** | Level {level}")
         description = '\n'.join(lst_legend_row)
-        embed = discord.Embed(title="Legends list:", description=description, color=0x36393E)
+        embed = discord.Embed(title="Your legends:", description=description, color=0x36393E)
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
+
+    @inven.command()
+    async def skins(self, ctx, legend: str=None):
+        '''
+        Lists the skins that you own for the legend.
+        w.inven skins <legend>
+        '''
+        if legend is None:
+            await ctx.send("You must specify the legend!")
+            return
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT legends_lst FROM users
+                        WHERE ID = %s """, (str(ctx.author.id),))
+        legends_lst = c.fetchone()[0]
         conn.close()
 
-    # @inven.command()
-    # async def skins(self, ctx, legend: str=None):
-    #     '''
-    #     Lists the skins that you own for the legend.
-    #     w.inven skins <legend>
-    #     '''
-    #     if legend is None:
-    #         await ctx.send("")
+        if legends_lst is None:
+            await ctx.send("You do not own any legends! Try \"w.store\".")
+            return
+
+        # cleaning input
+        legend = legend.replace(' ', '')
+        legend = legend.replace('\'', '')
+        legend = legend.replace('-', '')
+        legend = legend.replace('_', '')
+        legend = legend.replace('.', '')
+        legend = legend.replace(',', '')
+        legend = legend.lower()
+
+        # find legend in legends_lst
+        found = False
+        for row in legends_lst:
+            legend_name = row[1]
+            if legend in legend_name:
+                legend = legend_name
+                found = True
+
+        if found is False:
+            await ctx.send(f"Legend \"{legend}\" not found.")
+            return
+
+        # fetching all distinct skins for legend
+        searched_skin_lst = []
+        for row in legends_lst:
+            legend_name = row[1]
+            skin = row[2]
+            if skin.capitalize() not in searched_skin_lst and legend_name == legend:
+                searched_skin_lst.append(skin.capitalize())
+
+        # checking spaces between legend names for formatting
+        if legend_name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
+            if legend_name.lower() == 'lordvraxx':
+                legend_name = 'Lord Vraxx'
+            elif legend_name.lower() == 'queennai':
+                legend_name = 'Queen Nai'
+            elif legend_name.lower() == 'sirroland':
+                legend_name = 'Sir Roland'
+
+        # if has no skins
+        if len(searched_skin_lst) == 0:
+            await ctx.send(f"You do not have any skins for {legend.capitalize()}!")
+            return
+
+        description = '\n'.join(searched_skin_lst)
+        embed = discord.Embed(title=f"Your skins for {legend.capitalize()}:", description=description, color=0x36393E)
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
+
+    @inven.command(usage="<legend> / <skin>")
+    async def colors(self, ctx, legend_skin: str=None):
+        '''
+        Lists the colors that you own for the skin.
+        w.inven colors <legend> / <skin>
+        '''
+        # clean user input
+        def clean_input(msg):
+            if msg is not None:
+                msg_lst = msg.split('/')
+                msg_lst_clean = []
+                for value in msg_lst:
+                    value = value.replace(' ', '')
+                    value = value.replace('\'', '')
+                    value = value.replace('-', '')
+                    value = value.replace('_', '')
+                    value = value.replace('.', '')
+                    value = value.replace(',', '')
+                    value = value.lower()
+                    msg_lst_clean.append(value)
+
+                legend_name = msg_lst_clean[0]
+                try:
+                    skin = msg_lst_clean[1]
+                    if skin == '':
+                        skin = None
+                except IndexError:
+                    skin = None
+                return (legend_name, skin)
+            else:
+                return (None, None)
+
+        # cleaning input
+        legend, skin = clean_input(legend_skin)
+
+        if skin is None or legend is None:
+            await ctx.send("You must specify the legend/skin!")
+            return
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        c = conn.cursor()
+        c.execute("""SELECT legends_lst FROM users
+                        WHERE ID = %s """, (str(ctx.author.id),))
+        legends_lst = c.fetchone()[0]
+        conn.close()
+
+        if legends_lst is None:
+            await ctx.send("You do not own any legends! Try \"w.store\".")
+            return
+
+        # find legend/skin in legends_lst
+        found = False
+        for row in legends_lst:
+            legend_name = row[1]
+            skin_name = row[2]
+            if legend in legend_name and skin in skin_name:
+                legend = legend_name
+                skin = skin_name
+                found = True
+
+        if found is False:
+            await ctx.send(f"Legend/skin \"{legend}/{skin}\" not found.")
+            return
+
+        # fetching all distinct colors for skin
+        searched_color_lst = []
+        for row in legends_lst:
+            legend_name = row[1]
+            skin_name = row[2]
+            color = row[3]
+            if color.capitalize() not in searched_color_lst and legend_name == legend and skin_name == skin:
+                searched_color_lst.append(color.capitalize())
+
+        # checking spaces between legend names for formatting
+        if legend_name.lower() in ['lordvraxx', 'queennai', 'sirroland']:
+            if legend_name.lower() == 'lordvraxx':
+                legend_name = 'Lord Vraxx'
+            elif legend_name.lower() == 'queennai':
+                legend_name = 'Queen Nai'
+            elif legend_name.lower() == 'sirroland':
+                legend_name = 'Sir Roland'
+
+        # if has no skins
+        if len(searched_color_lst) == 0:
+            await ctx.send(f"You do not have any colors for {skin.capitalize()} {legend.capitalize()}!")
+            return
+
+        description = '\n'.join(searched_color_lst)
+        embed = discord.Embed(title=f"Your colors for {skin.capitalize()} {legend.capitalize()}:", description=description, color=0x36393E)
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
 
     @commands.command(usage="<legend> / [skin] / [color]")
     async def select(self, ctx, *, msg):
@@ -292,7 +444,7 @@ class Brawlhalla:
                         WHERE ID = %s """, (str(ctx.author.id),))
         legends_lst = c.fetchone()[0]
         if legends_lst is None:
-            await ctx.send("You do not own any legends! Try \"w. store\".")
+            await ctx.send("You do not own any legends! Try \"w.store\".")
             conn.close()
             return
 
@@ -315,7 +467,7 @@ class Brawlhalla:
             conn.close()
             return
         elif select_legend_key is None:
-            await ctx.send("The legend/skin/color could not be found! Try \"w. inven legends\" or w. skin <legend>\" to see your legends/skins/colors.")
+            await ctx.send("The legend/skin/color could not be found! Try \"w.inven legends\" or w.skin <legend>\" to see your legends/skins/colors.")
             conn.close()
             return
 
@@ -396,11 +548,11 @@ class Brawlhalla:
         c.execute("""SELECT balance FROM users
                         WHERE ID = %s """, (str(ctx.author.id),))
         balance = c.fetchone()[0]
-        embed = discord.Embed(description="Welcome to the store!\nUse \"w. store stock [legend] / [skin]\" to view all purchasable legends/skins/colors!\nYou must buy the legend before you can buy other skin/color combinations.", color=0xD4AF37)
+        embed = discord.Embed(description="Welcome to the store!\nUse \"w.store stock [legend] / [skin]\" to view all purchasable legends/skins/colors!\nYou must buy the legend before you can buy other skin/color combinations.", color=0xD4AF37)
         embed.set_author(name=f"Your balance: {balance} Coins", icon_url=self.bot.user.avatar_url)
-        embed.add_field(name="Legend | 1,000 Coins", value="w. buy <legend>", inline=False)
-        embed.add_field(name="Odin's Chest | 3,000 Coins", value="w. buy chest", inline=False)
-        embed.add_field(name="Skin/Color | 8,000 Coins", value="w. buy <legend> / <skin> / <color>", inline=False)
+        embed.add_field(name="Legend | 1,000 Coins", value="w.buy <legend>", inline=False)
+        embed.add_field(name="Odin's Chest | 3,000 Coins", value="w.buy chest", inline=False)
+        embed.add_field(name="Skin/Color | 8,000 Coins", value="w.buy <legend> / <skin> / <color>", inline=False)
         embed.set_footer(text="Every skin/color combination is exclusive! Buying a color for one skin will not unlock the color for other skins!")
         await ctx.send(embed=embed)
 
@@ -460,7 +612,7 @@ class Brawlhalla:
                             WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
             row = c.fetchone()
             if row is None:
-                await ctx.send("Could not find legend. Try \"w. store stock\" to see the list of legends available.")
+                await ctx.send("Could not find legend. Try \"w.store stock\" to see the list of legends available.")
                 return
             legend_name = row[0]
             # get list of skins
@@ -481,7 +633,7 @@ class Brawlhalla:
                             WHERE name LIKE '%%'||%s||'%%'; """, (legend_input,))
             row = c.fetchone()
             if row is None:
-                await ctx.send("Could not find legend. Try \"w. store stock\" to see the list of legends available.")
+                await ctx.send("Could not find legend. Try \"w.store stock\" to see the list of legends available.")
                 return
             legend_name = row[0]
             # find skin matching input
@@ -491,7 +643,7 @@ class Brawlhalla:
             row = c.fetchone()
             if row is None:
                 if row is None:
-                    await ctx.send("Could not find skin. Try \"w. store stock [legend]\" to see the list of skins available for that legend.")
+                    await ctx.send("Could not find skin. Try \"w.store stock [legend]\" to see the list of skins available for that legend.")
                 return
             skin_name = row[0]
             # get list of colors
@@ -516,7 +668,7 @@ class Brawlhalla:
         w.buy <item to buy>
         '''
         if msg is None:
-            await ctx.send("You must specify what to buy from the store. Try \"w. store\".")
+            await ctx.send("You must specify what to buy from the store. Try \"w.store\".")
             return
 
         # Check that the user isn't already purchasing an item
@@ -678,7 +830,7 @@ class Brawlhalla:
 
             # if not found, send help message
             if found is False:
-                await ctx.send("Legend/skin/color not found! Use \"w. store stock [legend] / [skin]\" to see a list of available legends/skins/colors!")
+                await ctx.send("Legend/skin/color not found! Use \"w.store stock [legend] / [skin]\" to see a list of available legends/skins/colors!")
                 conn.close()
                 remove_status()
                 return
@@ -911,39 +1063,45 @@ class Brawlhalla:
             await ctx.send("Unknown error. Please tell Willa.")
             print(error)
 
-    # @commands.command()
-    # async def test(self, ctx):
-    #     '''
-    #     test
-    #     '''
+    @commands.command()
+    async def test(self, ctx):
+        '''
+        test
+        '''
 
-    #     def get_legend_url(legend_key, flip=False):
-    #         builder = imgix.UrlBuilder("willabot-assets.imgix.net")
-    #         if flip:
-    #             url = builder.create_url(legend_key, {
-    #                 'w': 500,
-    #                 'h': 500,
-    #                 'flip': 'h'
-    #                 })
-    #         else:
-    #             url = builder.create_url(legend_key, {
-    #                 'w': 500,
-    #                 'h': 500
-    #                 })
-    #         return url
+        def get_legend_url(legend_key, flip=False):
+            builder = imgix.UrlBuilder("willabot-assets.imgix.net")
+            slash_ind = legend_key.rfind('/')
+            underscore_ind = legend_key.find('_')
+            legend_name = legend_key[slash_ind+1:underscore_ind]
+            legends_to_reverse = ['scarlet', 'lucien']
+            if legend_name.lower() in legends_to_reverse:
+                flip = not flip
+            if flip:
+                url = builder.create_url(legend_key, {
+                    'w': 500,
+                    'h': 500,
+                    'flip': 'h'
+                    })
+            else:
+                url = builder.create_url(legend_key, {
+                    'w': 500,
+                    'h': 500
+                    })
+            return url
 
-    #     def get_legend_height_width(legend_key):
-    #         builder = imgix.UrlBuilder("willabot-assets.imgix.net")
-    #         url = builder.create_url(legend_key, {
-    #                 'fm': 'json'
-    #             })
-    #         json = requests.get(url).json()
-    #         height = json['PixelHeight']
-    #         width = json['PixelWidth']
-    #         return height, width
+        def get_legend_height_width(legend_key):
+            builder = imgix.UrlBuilder("willabot-assets.imgix.net")
+            url = builder.create_url(legend_key, {
+                    'fm': 'json'
+                })
+            json = requests.get(url).json()
+            height = json['PixelHeight']
+            width = json['PixelWidth']
+            return height, width
 
-    #     # get brawl battle img url through imgix
-    #     def get_brawl_img_url(legend_key1, legend_key2):
+        # get brawl battle img url through imgix
+        def get_brawl_img_url(legend_key1, legend_key2):
             player1_legend_url = get_legend_url(legend_key1)
             height1, width1 = get_legend_height_width(legend_key1)
             player2_legend_url = get_legend_url(legend_key2, True)
