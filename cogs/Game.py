@@ -5,7 +5,6 @@ import os
 import asyncio
 import discord
 from random_word import RandomWords
-import requests
 import gibberish
 
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -160,11 +159,11 @@ class Game:
         conn.commit()
         conn.close()
 
-    @commands.command(usage="<user> [bet amount]")
+    @commands.command(usage="<@user> [bet amount]")
     async def pw(self, ctx, user, bet_amount: int=None):
         '''
         The Peace War game.
-        w.pw <user> <bet amount>
+        w.pw <@user> <bet amount>
 
         https://en.wikipedia.org/wiki/Peace_war_game
         '''

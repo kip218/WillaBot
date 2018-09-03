@@ -1063,11 +1063,16 @@ class Brawlhalla:
             await ctx.send("Unknown error. Please tell Willa.")
             print(error)
 
-    # @commands.command()
-    # async def test(self, ctx):
+    # @commands.command(usage="<@user>")
+    # async def brawl(self, ctx, user: str=None):
     #     '''
-    #     test
+    #     Challenge someone to a brawl!
+    #     w.brawl <@user>
     #     '''
+    #     if user is None:
+    #         await ctx.send("You must mention a user to brawl!")
+    #         return
+    #     moves = ["Attack", "Dodge", "Jump", "Dash"]
 
     #     def get_legend_url(legend_key, flip=False):
     #         builder = imgix.UrlBuilder("willabot-assets.imgix.net")
@@ -1131,6 +1136,27 @@ class Brawlhalla:
     #                 'by': 0.8*background_height-height2
     #                 })
     #         return url
+
+    #     def get_player_legend_lst(player):
+    #         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    #         c = conn.cursor()
+    #         c.execute("""SELECT selected_legend_key FROM users
+    #                         WHERE ID = %s """, (str(player.id),))
+    #         selected_legend_key = c.fetchone()[0]
+    #         if selected_legend_key is None:
+    #             conn.close()
+    #             return None
+    #         # checking legends lst for selected legend
+    #         c.execute(""" SELECT legends_lst FROM users
+    #                         WHERE ID = %s """, (str(ctx.author.id),))
+    #         legends_lst = c.fetchone()[0]
+    #         conn.close()
+    #         # searching legend_lst for legend_key
+    #         for legend in legends_lst:
+    #             if legend[0] == selected_legend_key:
+    #                 return legend
+
+        
 
     # @b.command()
     # async def test(self, ctx):

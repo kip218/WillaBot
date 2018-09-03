@@ -10,7 +10,7 @@ DATABASE_URL = os.environ['DATABASE_URL']
 
 class General:
     '''
-    Commands for the bot owner.
+    General commands.
     '''
 
     def __init__(self, bot):
@@ -98,7 +98,7 @@ class General:
         conn.close()
         embed = discord.Embed(color=0x48d1cc)
         embed.set_author(name=embed_name, icon_url=self.bot.user.avatar_url)
-        embed.add_field(name="WillaBot Updates:", value="- Odin's Chest has arrived in \"w.b store\"!\n- Check out the new typeracer game! \"w.help typeracer\" for more info.")
+        embed.add_field(name="WillaBot Updates:", value="- Fun commands have been added. \"w.help Fun\" for more info.\n- Odin's Chest has arrived in \"w.b store\"!\n- Check out the new typeracer game! \"w.help typeracer\" for more info.")
         await ctx.send(embed=embed)
 
     @commands.command()
