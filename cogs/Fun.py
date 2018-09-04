@@ -22,6 +22,8 @@ class Fun:
         '''
         headers = {'Accept': 'text/plain'}
         joke = requests.get('https://icanhazdadjoke.com/', headers=headers).text
+        # quick fix for weird character error from website
+        joke = joke.replace("â", "'")
         await ctx.send(joke)
 
     @commands.command()

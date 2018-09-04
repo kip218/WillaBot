@@ -484,7 +484,7 @@ class Game:
         words_lst = r.get_random_words(limit=num_words, hasDictionaryDef="true")
 
         # removing strange characters
-        char_to_exclude = ['é', 'è', 'â', 'î', 'ô', 'ñ', 'ü', 'ï', 'ç']
+        char_to_exclude = ['é', 'è', 'â', 'î', 'ô', 'ñ', 'ü', 'ï', 'ç', 'æ']
         for i in range(len(words_lst)):
             if any(char in words_lst[i] for char in char_to_exclude):
                 new_word = get_new_word(char_to_exclude)
