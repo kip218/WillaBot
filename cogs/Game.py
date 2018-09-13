@@ -176,6 +176,9 @@ class Game:
         if opponent.bot:
             await ctx.send("You can't challenge a bot!")
             return
+        elif player == opponent:
+            await ctx.send("You can't challenge yourself!")
+            return
 
         if bet_amount is None:
             await ctx.send("You must specify a bet amount!")

@@ -1074,6 +1074,53 @@ class Brawlhalla:
     #         return
     #     moves = ["Attack", "Dodge", "Jump", "Dash"]
 
+    #     player = ctx.author
+    #     opponent = ctx.message.mentions[0]
+    #     if opponent.bot:
+    #         await ctx.send("You can't challenge a bot!")
+    #         return
+
+    #     # check that they're not already in a game of brawl
+    #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    #     c = conn.cursor()
+    #     c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(player.id), ))
+    #     player_status_lst = c.fetchone()[0]
+    #     c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(opponent.id), ))
+    #     opponent_status_lst = c.fetchone()[0]
+    #     if player_status_lst is not None and opponent_status_lst is not None:
+    #         if "brawl" in player_status_lst:
+    #             await ctx.send(f"{player.mention} is already in a brawl!")
+    #             conn.commit()
+    #             conn.close()
+    #             return
+    #         elif "brawl" in opponent_status_lst:
+    #             await ctx.send(f"{opponent.mention} is already in a brawl!")
+    #             conn.commit()
+    #             conn.close()
+    #             return
+    #     # if not, add 'brawl' to status_lst
+    #     c.execute(""" UPDATE users
+    #                 SET status = array_append(status, %s)
+    #                 WHERE ID = %s; """, ('brawl', str(player.id)))
+    #     c.execute(""" UPDATE users
+    #                 SET status = array_append(status, %s)
+    #                 WHERE ID = %s; """, ('brawl', str(opponent.id)))
+    #     conn.commit()
+    #     conn.close()
+
+    #     # remove brawl status from status_lst
+    #     def remove_status(player, opponent):
+    #         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    #         c = conn.cursor()
+    #         c.execute(""" UPDATE users
+    #                     SET status = array_remove(status, %s)
+    #                     WHERE ID = %s; """, ('brawl', str(player.id)))
+    #         c.execute(""" UPDATE users
+    #                     SET status = array_remove(status, %s)
+    #                     WHERE ID = %s; """, ('brawl', str(opponent.id)))
+    #         conn.commit()
+    #         conn.close()
+
     #     def get_legend_url(legend_key, flip=False):
     #         builder = imgix.UrlBuilder("willabot-assets.imgix.net")
     #         slash_ind = legend_key.rfind('/')
@@ -1148,7 +1195,7 @@ class Brawlhalla:
     #             return None
     #         # checking legends lst for selected legend
     #         c.execute(""" SELECT legends_lst FROM users
-    #                         WHERE ID = %s """, (str(ctx.author.id),))
+    #                         WHERE ID = %s """, (str(player.id),))
     #         legends_lst = c.fetchone()[0]
     #         conn.close()
     #         # searching legend_lst for legend_key
@@ -1156,7 +1203,40 @@ class Brawlhalla:
     #             if legend[0] == selected_legend_key:
     #                 return legend
 
-        
+    #     challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a brawl!\nType \"w.accept <@user>\" to accept!")
+
+    #     # checking if opponent accepts challenge
+    #     def check_accept(m):
+    #         return m.author == opponent and m.content.startswith('w.accept') and m.channel == ctx.channel
+    #     accepted = False
+    #     while accepted is False:
+    #         try:
+    #             accept = await self.bot.wait_for('message', check=check_accept, timeout=60)
+    #         except asyncio.TimeoutError:
+    #             await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
+    #             remove_status(player, opponent)
+    #             return
+    #         else:
+    #             if accept.content == 'w.accept':
+    #                 await ctx.send("You must specify the @user that challenged you!")
+    #             elif accept.content == f'w.accept {player.mention}':
+    #                 accepted = True
+
+    #     await ctx.send("Loading brawl...")
+
+    #     player_legend = get_player_legend_lst(player)
+    #     opponent_legend = get_player_legend_lst(opponent)
+    #     if player_legend is None and opponent_legend is None:
+    #         await ctx.send("Both players have not selected a legend yet!")
+    #     elif player_legend is None:
+    #         await ctx.send(f"{player.mention} has not selected a legend yet!")
+    #     elif opponent_legend is None:
+    #         await ctx.send(f"{opponent.mention} has not selected a legend yet!")
+    #     brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
+    #     embed = discord.Embed(title="Custom Game")
+    #     embed.set_image(url=brawl_img_url)
+    #     await ctx.send(embed=embed)
+
 
     # @b.command()
     # async def test(self, ctx):
