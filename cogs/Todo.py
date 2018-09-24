@@ -67,8 +67,13 @@ class Todo:
         def check(reaction, user):
                 return ctx.message.author == user and user.bot is False and (reaction.emoji == '\U0001F448' or reaction.emoji == '\U0001F449') and todo_page.id == reaction.message.id
 
+        embed_lst = []
+        for i in range(len(desc_lst)):
+            curr_embed = get_embed(i+1)
+            embed_lst.append(curr_embed)
+
         curr_page = 1
-        todo_page = await ctx.send(embed=get_embed(curr_page))
+        todo_page = await ctx.send(embed=embed_lst[curr_page-1])
         await todo_page.add_reaction(emoji='\U0001F448')
         await todo_page.add_reaction(emoji='\U0001F449')
         timeout = False
@@ -93,7 +98,7 @@ class Todo:
                         curr_page = 1
                     else:
                         curr_page += 1
-                await todo_page.edit(embed=get_embed(curr_page))
+                await todo_page.edit(embed=embed_lst[curr_page-1])
 
     @todo.command()
     async def add(self, ctx, *, task):
@@ -101,6 +106,10 @@ class Todo:
         Adds a task to your to-do list.
         w.todo add <task>
         '''
+        if len(task) > 1000:
+            await ctx.send("<task> must be less than 1000 characters!")
+            return
+
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
         c.execute(""" SELECT todo_list FROM users
