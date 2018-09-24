@@ -5,6 +5,7 @@ import os
 import asyncio
 import requests
 import imgix
+import math
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -1072,7 +1073,6 @@ class Brawlhalla:
     #     if user is None:
     #         await ctx.send("You must mention a user to brawl!")
     #         return
-    #     moves = ["Attack", "Dodge", "Jump", "Dash"]
 
     #     player = ctx.author
     #     opponent = ctx.message.mentions[0]
@@ -1081,32 +1081,32 @@ class Brawlhalla:
     #         return
 
     #     # check that they're not already in a game of brawl
-    #     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    #     c = conn.cursor()
-    #     c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(player.id), ))
-    #     player_status_lst = c.fetchone()[0]
-    #     c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(opponent.id), ))
-    #     opponent_status_lst = c.fetchone()[0]
-    #     if player_status_lst is not None and opponent_status_lst is not None:
-    #         if "brawl" in player_status_lst:
-    #             await ctx.send(f"{player.mention} is already in a brawl!")
-    #             conn.commit()
-    #             conn.close()
-    #             return
-    #         elif "brawl" in opponent_status_lst:
-    #             await ctx.send(f"{opponent.mention} is already in a brawl!")
-    #             conn.commit()
-    #             conn.close()
-    #             return
-    #     # if not, add 'brawl' to status_lst
-    #     c.execute(""" UPDATE users
-    #                 SET status = array_append(status, %s)
-    #                 WHERE ID = %s; """, ('brawl', str(player.id)))
-    #     c.execute(""" UPDATE users
-    #                 SET status = array_append(status, %s)
-    #                 WHERE ID = %s; """, ('brawl', str(opponent.id)))
-    #     conn.commit()
-    #     conn.close()
+    #     def check_status():
+    #         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    #         c = conn.cursor()
+    #         c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(player.id), ))
+    #         player_status_lst = c.fetchone()[0]
+    #         c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(opponent.id), ))
+    #         opponent_status_lst = c.fetchone()[0]
+    #         if player_status_lst is not None and opponent_status_lst is not None:
+    #             if "brawl" in player_status_lst:
+    #                 conn.commit()
+    #                 conn.close()
+    #                 return f"{player.mention} is already in a brawl!"
+    #             elif "brawl" in opponent_status_lst:
+    #                 conn.commit()
+    #                 conn.close()
+    #                 return f"{opponent.mention} is already in a brawl!"
+    #         # if not, add 'brawl' to status_lst
+    #         c.execute(""" UPDATE users
+    #                     SET status = array_append(status, %s)
+    #                     WHERE ID = %s; """, ('brawl', str(player.id)))
+    #         c.execute(""" UPDATE users
+    #                     SET status = array_append(status, %s)
+    #                     WHERE ID = %s; """, ('brawl', str(opponent.id)))
+    #         conn.commit()
+    #         conn.close()
+    #         return True
 
     #     # remove brawl status from status_lst
     #     def remove_status(player, opponent):
@@ -1203,6 +1203,51 @@ class Brawlhalla:
     #             if legend[0] == selected_legend_key:
     #                 return legend
 
+    #     def get_legend_stats_weapons(legend_key, stance):
+    #         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    #         c = conn.cursor()
+    #         c.execute("""SELECT stance_stats, weapons FROM legends
+    #                         WHERE key = %s """, (legend_key,))
+    #         row = c.fetchone()
+    #         stance_stats = row[0]
+    #         weapons = row[1]
+    #         stats = stance_stats[int(stance)]
+    #         return stats, weapons
+
+    #     def get_DM_prompt_embed(moves, opponent):
+    #         title = "The brawl has started! Select your move!"
+    #         moves_string = ""
+    #         for move in moves:
+    #             moves_string += f"- {move.capitalize()}\n"
+    #         embed = discord.Embed(title=title, description=f"Opponent: **{opponent}**", color=0x48d1cc)
+    #         embed.add_field(name="Moves", value=moves_string)
+    #         embed.set_footer(text="Type the move to use.")
+    #         return embed
+
+    #     # get stats, weapons, and img_url for embed
+    #     def get_brawl_embed():
+    #         stance_lst = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
+    #         brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
+    #         player_stocks = math.ceil(player_hp/(player_max_hp/3))
+    #         opponent_stocks = math.ceil(player_hp/(player_max_hp/3))
+    #         stock_emote = ":heart:"
+    #         embed = discord.Embed(title=f"{player.name} VS {opponent.name}",
+    #                               description=f"{player.name}'s {player_legend[1].capitalize()}: {stock_emote*player_stocks}\n{opponent.name}'s {opponent_legend[1].capitalize()}: {stock_emote*opponent_stocks}",
+    #                               color=0x48d1cc)
+    #         embed.add_field(name=f"{stance_lst[int(player_legend[4])]} Stance",
+    #                         value=f"**Str:** {player_stats[0]}\n**Dex:** {player_stats[1]}\n**Def:** {player_stats[2]}\n**Spd:** {player_stats[3]}",
+    #                         inline=True)
+    #         embed.add_field(name=f"{stance_lst[int(opponent_legend[4])]} Stance",
+    #                         value=f"**Str:** {opponent_stats[0]}\n**Dex:** {opponent_stats[1]}\n**Def:** {opponent_stats[2]}\n**Spd:** {opponent_stats[3]}",
+    #                         inline=True)
+    #         embed.set_image(url=brawl_img_url)
+    #         return embed
+
+    #     check_status = check_status()
+    #     if check_status is not True:
+    #         await ctx.send(check_status)
+    #         return
+
     #     challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a brawl!\nType \"w.accept <@user>\" to accept!")
 
     #     # checking if opponent accepts challenge
@@ -1222,8 +1267,7 @@ class Brawlhalla:
     #             elif accept.content == f'w.accept {player.mention}':
     #                 accepted = True
 
-    #     await ctx.send("Loading brawl...")
-
+    #     # if one player hasn't selected a legend
     #     player_legend = get_player_legend_lst(player)
     #     opponent_legend = get_player_legend_lst(opponent)
     #     if player_legend is None and opponent_legend is None:
@@ -1232,11 +1276,67 @@ class Brawlhalla:
     #         await ctx.send(f"{player.mention} has not selected a legend yet!")
     #     elif opponent_legend is None:
     #         await ctx.send(f"{opponent.mention} has not selected a legend yet!")
-    #     brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
-    #     embed = discord.Embed(title="Custom Game")
-    #     embed.set_image(url=brawl_img_url)
-    #     await ctx.send(embed=embed)
 
+    #     challenge_accepted = await ctx.send(f"{player.mention} {opponent.mention} Challenge accepted! Check your DMs!")
+
+    #     # possible moves & sending both players embed through DM
+    #     moves = ["attack", "dodge"]
+
+    #     await ctx.send("Loading custom brawl game...")
+
+    #     # calling function to get stats & weapons
+    #     player_stats, player_weapons = get_legend_stats_weapons(player_legend[0], player_legend[4])
+    #     opponent_stats, opponent_weapons = get_legend_stats_weapons(opponent_legend[0], opponent_legend[4])
+    #     player_str, player_dex, player_def, player_spd = int(player_stats[0]), int(player_stats[1]), int(player_stats[2]), int(player_stats[3])
+    #     opponent_str, opponent_dex, opponent_def, opponent_spd = int(opponent_stats[0]), int(opponent_stats[1]), int(opponent_stats[2]), int(opponent_stats[3])
+    #     player_max_hp, opponent_max_hp = player_hp, opponent_hp = player_def*3, opponent_def*3
+
+    #     # checking player's response
+    #     def check_player(m):
+    #         return m.author == player and m.content.lower() in moves
+
+    #     def check_opponent(m):
+    #         return m.author == opponent and m.content.lower() in moves
+
+    #     while player_hp > 0 or opponent_hp > 0:
+    #         await ctx.send(embed=get_brawl_embed())
+    #         player_prompt = await player.send(embed=get_DM_prompt_embed(moves, opponent))
+    #         opponent_prompt = await opponent.send(embed=get_DM_prompt_embed(moves, player))
+    #         # checking players' response
+    #         player_answered = False
+    #         opponent_answered = False
+    #         while player_answered is False or opponent_answered is False:
+    #             try:
+    #                 done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=60), self.bot.wait_for('message', check=check_opponent, timeout=60)], return_when=asyncio.FIRST_COMPLETED)
+    #                 msg = done.pop().result()
+    #             except asyncio.TimeoutError:
+    #                 player_prompt.embeds[0].set_footer(text="The game has timed out!")
+    #                 opponent_prompt.embeds[0].set_footer(text="The game has timed out!")
+    #                 await player_prompt.edit(embed=player_prompt.embeds[0])
+    #                 await opponent_prompt.edit(embed=opponent_prompt.embeds[0])
+    #                 await challenge_accepted.edit(content=f"{challenge_accepted.content}\n*The game has timed out!*")
+    #                 remove_status(player, opponent)
+    #                 return
+    #             else:
+    #                 if msg.author == player:
+    #                     player_move = msg.content.lower()
+    #                     player_answered = True
+    #                 elif msg.author == opponent:
+    #                     opponent_move = msg.content.lower()
+    #                     opponent_answered = True
+
+    #         if player_move == 'attack' and opponent_move == 'attack':
+    #             player_hp -= opponent_str
+    #             opponent_hp -= player_str
+    #             await ctx.send(f"{player.name}'s {player_legend[1].capitalize()} did {player_str} damage!")
+    #             await ctx.send(f"{opponent.name}'s {opponent_legend[1].capitalize()} did {opponent_str} damage!")
+    #         elif player_move == 'dodge' and opponent_move == 'attack':
+    #             pass
+
+    #     await ctx.send(embed=get_brawl_embed())
+    #     await ctx.send("Game over!")
+
+    #     remove_status(player, opponent)
 
     # @b.command()
     # async def test(self, ctx):

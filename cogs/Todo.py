@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import psycopg2
 import os
+import asyncio
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -41,17 +42,61 @@ class Todo:
         c.execute(""" SELECT todo_list FROM users
                     WHERE ID = %s; """, (str(ctx.author.id), ))
         todo_list = c.fetchone()[0]
+        conn.commit()
+        conn.close()
         if todo_list is None:
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
         else:
+            desc_lst = []
             description = ""
             for i in range(len(todo_list)):
-                description += "**" + str(i+1) + ")** " + todo_list[i] + "\n"
-            embed = discord.Embed(title=str(ctx.author.name) + "'s to-do list", description=description, color=ctx.author.color)
+                if len(description) > 1000:
+                    desc_lst.append(description)
+                    description = ""
+                    description += f"**{i+1})** {todo_list[i]}\n"
+                else:
+                    description += f"**{i+1})** {todo_list[i]}\n"
+            desc_lst.append(description)
+
+        def get_embed(page_number):
+            embed = discord.Embed(title=f"{ctx.author.name}'s to-do list", description=desc_lst[page_number-1], color=ctx.author.color)
             embed.set_thumbnail(url=ctx.author.avatar_url)
-            await ctx.send(embed=embed)
-        conn.commit()
-        conn.close()
+            embed.set_footer(text=f"Page {page_number} of {len(desc_lst)}")
+            return embed
+
+        def check(reaction, user):
+                return ctx.message.author == user and user.bot is False and (reaction.emoji == '\U0001F448' or reaction.emoji == '\U0001F449') and todo_page.id == reaction.message.id
+
+        curr_page = 1
+        todo_page = await ctx.send(embed=get_embed(curr_page))
+        await todo_page.add_reaction(emoji='\U0001F448')
+        await todo_page.add_reaction(emoji='\U0001F449')
+        timeout = False
+        while timeout is False:
+            try:
+                done, pending = await asyncio.wait([self.bot.wait_for('reaction_add', check=check, timeout=120), self.bot.wait_for('reaction_remove', check=check, timeout=120)], return_when=asyncio.FIRST_COMPLETED)
+                reaction = done.pop().result()[0]
+            except asyncio.TimeoutError:
+                timeout = True
+                todo_page_embed = todo_page.embeds[0]
+                todo_page_embed.set_footer(text="The to-do list has timed out!")
+                await todo_page.edit(embed=todo_page_embed)
+                return
+            else:
+                if reaction.emoji == '\U0001F448':
+                    if curr_page == 1:
+                        curr_page = len(desc_lst)
+                    else:
+                        curr_page -= 1
+                elif reaction.emoji == '\U0001F449':
+                    if curr_page == len(desc_lst):
+                        curr_page = 1
+                    else:
+                        curr_page += 1
+                await ctx.send("test")
+                await todo_page.edit(embed=get_embed(curr_page))
+                await ctx.send("WOOHOO")
+                print("YES")
 
     @todo.command()
     async def add(self, ctx, *, task):
@@ -142,7 +187,7 @@ class Todo:
     async def move(self, ctx, task_number: int, new_task_number: int):
         '''
         Moves a task to a new location on the list.
-        w.todo move <task number> <new_task_number>
+        w.todo move <task number> <new task number>
         '''
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()

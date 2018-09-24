@@ -122,14 +122,6 @@ async def on_connect():
     print("Connected")
     print("-------------------")
 
-    create_tournaments_table = """ CREATE TABLE IF NOT EXISTS tournaments (
-                                        ID text PRIMARY KEY,
-                                        url text NOT NULL,
-                                        name text NOT NULL,
-                                        creator_id text NOT NULL,
-                                        admin_list text[]
-                                        ); """
-
     create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                         ID text PRIMARY KEY,
                                         username text NOT NULL,
@@ -137,7 +129,6 @@ async def on_connect():
                                         balance text NOT NULL,
                                         selected_legend_key text,
                                         legends_lst text[][],
-                                        tournament_url_list text[],
                                         todo_list text[],
                                         daily_time timestamp,
                                         status text[]
@@ -162,7 +153,6 @@ async def on_connect():
     # conn = psycopg2.connect(database='willabot_db')
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
-    c.execute(create_tournaments_table)
     c.execute(create_users_table)
     c.execute(create_legends_table)
     c.execute(create_server_channel_table)
