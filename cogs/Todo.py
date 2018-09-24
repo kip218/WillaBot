@@ -93,10 +93,7 @@ class Todo:
                         curr_page = 1
                     else:
                         curr_page += 1
-                await ctx.send("test")
                 await todo_page.edit(embed=get_embed(curr_page))
-                await ctx.send("WOOHOO")
-                print("YES")
 
     @todo.command()
     async def add(self, ctx, *, task):
