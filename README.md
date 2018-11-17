@@ -1,4 +1,4 @@
 # WillaBot
-## A Discord Bot made using discord.py
+A Discord Bot made using discord.py
 
-### Work in Progress ###
+(Work in Progress)
