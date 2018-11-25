@@ -445,8 +445,8 @@ class Brawlhalla:
                         WHERE ID = %s """, (str(ctx.author.id),))
         legends_lst = c.fetchone()[0]
         if legends_lst is None:
-            await ctx.send("You do not own any legends! Try \"w.store\".")
             conn.close()
+            await ctx.send("You do not own any legends! Try \"w.store\".")
             return
 
         # iterate through legends to find the right legend/skin/color
@@ -464,12 +464,12 @@ class Brawlhalla:
 
         # legend/skin/color can only be selected if legend is owned
         if legend_owned is False and select_legend_key is not None:
-            await ctx.send("You must first own the legend before you can select the skin/color!")
             conn.close()
+            await ctx.send("You must first own the legend before you can select the skin/color!")
             return
         elif select_legend_key is None:
-            await ctx.send("The legend/skin/color could not be found! Try \"w.inven legends\" or w.skin <legend>\" to see your legends/skins/colors.")
             conn.close()
+            await ctx.send("The legend/skin/color could not be found! Try \"w.inven legends\" or w.skin <legend>\" to see your legends/skins/colors.")
             return
 
         # update selected_legend_key in database
