@@ -118,13 +118,14 @@ class Todo:
         if todo_list is not None:
             if task in todo_list:
                 await ctx.send("\"" + str(task) + "\" is already in your to-do list!")
+                conn.close()  # Do I need this?
                 return
         c.execute(""" UPDATE users
                     SET todo_list = array_append(todo_list, %s)
                     WHERE ID = %s; """, (str(task), str(ctx.author.id)))
         conn.commit()
-        conn.close()
         await ctx.send("Added task: \"" + str(task) + "\"")
+        conn.close()
 
     @todo.command(usage="<task number>")
     async def remove(self, ctx, task_number: int):
@@ -138,7 +139,6 @@ class Todo:
                     WHERE ID = %s; """, (str(ctx.author.id), ))
         todo_list = c.fetchone()[0]
         if todo_list is None:
-            conn.close()
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
         elif 1 <= task_number <= len(todo_list):
             task_to_remove = todo_list[task_number-1]
@@ -146,11 +146,10 @@ class Todo:
                         SET todo_list = array_remove(todo_list, %s)
                         WHERE ID = %s; """, (task_to_remove, str(ctx.author.id)))
             conn.commit()
-            conn.close()
             await ctx.send("Removed task: \"" + task_to_remove + "\"")
         else:
-            conn.close()
             await ctx.send("You must input <task number> as an integer between 1 and " + str(len(todo_list)))
+        conn.close()
 
     @todo.command(usage="<task number>")
     async def check(self, ctx, task_number: int):
@@ -213,6 +212,7 @@ class Todo:
                 c.execute(""" UPDATE users
                             SET todo_list = %s
                             WHERE ID = %s; """, (todo_list, str(ctx.author.id)))
+                conn.commit()
                 await ctx.send(f"Moved task: \"{task_to_move}\" to number {new_task_number} on the list")
             elif task_number > new_task_number:
                 todo_list.remove(task_to_move)
@@ -220,6 +220,7 @@ class Todo:
                 c.execute(""" UPDATE users
                             SET todo_list = %s
                             WHERE ID = %s; """, (todo_list, str(ctx.author.id)))
+                conn.commit()
                 await ctx.send(f"Moved task: \"{task_to_move}\" to number {new_task_number} on the list")
             else:
                 await ctx.send(f"Task is already in number {new_task_number} on the list!")
@@ -227,7 +228,6 @@ class Todo:
             await ctx.send("You must input <new task number> as an integer between 1 and " + str(len(todo_list)+1))
         else:
             await ctx.send("You must input <task number> as an integer between 1 and " + str(len(todo_list)))
-        conn.commit()
         conn.close()
 
     @move.error
@@ -249,8 +249,8 @@ class Todo:
         c.execute(""" UPDATE users
                     SET todo_list = Null
                     WHERE ID = %s; """, (str(ctx.author.id), ))
-        await ctx.send("Your to-do list has been cleaned.")
         conn.commit()
+        await ctx.send("Your to-do list has been cleaned.")
         conn.close()
 
 
