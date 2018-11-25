@@ -138,17 +138,19 @@ class Todo:
                     WHERE ID = %s; """, (str(ctx.author.id), ))
         todo_list = c.fetchone()[0]
         if todo_list is None:
+            conn.close()
             await ctx.send("Your to-do list is empty! You can add a task with \"w.todo add <task>\".")
         elif 1 <= task_number <= len(todo_list):
             task_to_remove = todo_list[task_number-1]
             c.execute(""" UPDATE users
                         SET todo_list = array_remove(todo_list, %s)
                         WHERE ID = %s; """, (task_to_remove, str(ctx.author.id)))
+            conn.commit()
+            conn.close()
             await ctx.send("Removed task: \"" + task_to_remove + "\"")
         else:
+            conn.close()
             await ctx.send("You must input <task number> as an integer between 1 and " + str(len(todo_list)))
-        conn.commit()
-        conn.close()
 
     @todo.command(usage="<task number>")
     async def check(self, ctx, task_number: int):
