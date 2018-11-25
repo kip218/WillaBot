@@ -65,6 +65,10 @@ async def on_message(message):
         # add user to database
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
+        c.execute(""" INSERT INTO users (ID, username, xp, balance)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (ID)
+                    DO NOTHING;""", (message.author.id, message.author.name, 0, 0))
         c.execute(""" UPDATE users SET username = %s
                     WHERE ID = %s
                     AND username != %s    ; """, (message.author.name, str(message.author.id), message.author.name))
@@ -74,7 +78,7 @@ async def on_message(message):
         if xp is not None:
             author_xp = int(xp[0])
             author_xp += random.randint(4, 8)
-            c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(author_xp), str(message.author.id)))
+        c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(author_xp), str(message.author.id)))
 
         # add channel to database
         c.execute(""" INSERT INTO channels (channel_id, channel_name, guild_id, guild_name)

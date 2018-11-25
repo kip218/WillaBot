@@ -120,11 +120,11 @@ class Todo:
                 await ctx.send("\"" + str(task) + "\" is already in your to-do list!")
                 return
         c.execute(""" UPDATE users
-                    SET todo_list = array_append(todo_list, %s) 
+                    SET todo_list = array_append(todo_list, %s)
                     WHERE ID = %s; """, (str(task), str(ctx.author.id)))
-        await ctx.send("Added task: \"" + str(task) + "\"")
         conn.commit()
         conn.close()
+        await ctx.send("Added task: \"" + str(task) + "\"")
 
     @todo.command(usage="<task number>")
     async def remove(self, ctx, task_number: int):
