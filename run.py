@@ -62,12 +62,6 @@ async def on_message(message):
     print(server + "| " + channel + "| " + user + ": " + msg)
 
     if not message.author.bot:
-        if message.content.lower() in ('what are you', 'what r u', 'wat are u', 'wat r you', 'what r you', 'what are u', 'wat are you', 'wat r u'):
-            await message.channel.send("AN IDIOT SANDWICH :bread::sob::bread:")
-
-        if "shrug" in message.content.lower():
-            await message.channel.send("¯\\_(ツ)_/¯")
-
         # add user to database
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         c = conn.cursor()
