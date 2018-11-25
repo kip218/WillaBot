@@ -171,15 +171,16 @@ class Todo:
                 c.execute(""" UPDATE users
                             SET todo_list = array_replace(todo_list, %s, %s)
                             WHERE ID = %s; """, (task_to_check, task_to_check[2:-2], str(ctx.author.id)))
+                conn.commit()
                 await ctx.send("Unchecked task: \"" + task_to_check[2:-2] + "\"")
             else:
                 c.execute(""" UPDATE users
                             SET todo_list = array_replace(todo_list, %s, %s)
                             WHERE ID = %s; """, (task_to_check, "~~"+task_to_check+"~~", str(ctx.author.id)))
+                conn.commit()
                 await ctx.send("Checked task: \"" + task_to_check + "\"")
         else:
             await ctx.send("You must input <task number> as an integer between 1 and " + str(len(todo_list)))
-        conn.commit()
         conn.close()
 
     @remove.error
