@@ -1087,7 +1087,7 @@ class Brawlhalla:
             return
 
         # check that they're not already in a game of brawl
-        def check_status():
+        def check_status(player, opponent):
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             c = conn.cursor()
             c.execute(""" SELECT status FROM users WHERE ID=%s;""", (str(player.id), ))
@@ -1096,14 +1096,17 @@ class Brawlhalla:
             opponent_status_lst = c.fetchone()[0]
             if player_status_lst is not None and opponent_status_lst is not None:
                 if "brawl" in player_status_lst:
-                    conn.commit()
                     conn.close()
                     return f"{player.mention} is already in a brawl!"
                 elif "brawl" in opponent_status_lst:
-                    conn.commit()
                     conn.close()
                     return f"{opponent.mention} is already in a brawl!"
-            # if not, add 'brawl' to status_lst
+            conn.close()
+            return True
+
+        def add_status(player, opponent):
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            c = conn.cursor()
             c.execute(""" UPDATE users
                         SET status = array_append(status, %s)
                         WHERE ID = %s; """, ('brawl', str(player.id)))
@@ -1112,7 +1115,6 @@ class Brawlhalla:
                         WHERE ID = %s; """, ('brawl', str(opponent.id)))
             conn.commit()
             conn.close()
-            return True
 
         # remove brawl status from status_lst
         def remove_status(player, opponent):
@@ -1256,7 +1258,7 @@ class Brawlhalla:
             embed.set_author(name="Game Over!", icon_url=self.bot.user.avatar_url)
             return embed
 
-        check_status = check_status()
+        check_status = check_status(player, opponent)
         if check_status is not True:
             await ctx.send(check_status)
             return
@@ -1272,7 +1274,6 @@ class Brawlhalla:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=60)
             except asyncio.TimeoutError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
-                remove_status(player, opponent)
                 return
             else:
                 if accept.content == 'w.accept':
@@ -1285,10 +1286,15 @@ class Brawlhalla:
         opponent_legend = get_player_legend_lst(opponent)
         if player_legend is None and opponent_legend is None:
             await ctx.send("Both players have not selected a legend yet!")
+            return
         elif player_legend is None:
             await ctx.send(f"{player.mention} has not selected a legend yet!")
+            return
         elif opponent_legend is None:
             await ctx.send(f"{opponent.mention} has not selected a legend yet!")
+            return
+
+        add_status(player, opponent)
 
         challenge_accepted = await ctx.send(f"{player.mention} {opponent.mention} Challenge accepted! Check your DMs!")
 
