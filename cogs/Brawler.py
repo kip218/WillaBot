@@ -14,7 +14,7 @@ class Brawler:
         self.skin = skin.capitalize()
         self.color = color.capitalize()
         self.key = key
-        self.hp = 100
+        self.hp = 50
         self.stocks = 3
         self.dodge_cooldown = 0
         self.jump_count = 0
@@ -37,9 +37,10 @@ class Brawler:
         opponent.hp -= final_dmg
         return final_dmg
 
-    def jump(self):
-        universal_dodge_chance = 50
-        final_dodge_chance = universal_dodge_chance + (self.spd * 2)
+    def jump(self, opponent):
+        universal_dodge_chance = 30
+        raw_dodge_chance = universal_dodge_chance + (self.spd * 1.5)
+        final_dodge_chance = raw_dodge_chance - (opponent.dex * 1.5)
         rand_num = randint(1, 100)
         if rand_num <= final_dodge_chance:
             return True
@@ -59,7 +60,14 @@ class Brawler:
             self.jump_count = 0
 
     def add_dodge_cooldown(self):
-        self.dodge_cooldown += 1
+        if self.jump_count == 0:
+            self.dodge_cooldown += 1
+            return "grounded"
+        elif self.jump_count > 0:
+            self.dodge_cooldown += 2
+            return "aerial"
 
     def add_jump_count(self):
         self.jump_count += 1
+        jumps_remaining = 3 - self.jump_count
+        return jumps_remaining
