@@ -1376,7 +1376,7 @@ class Brawlhalla:
 
             elif player_move == 'attack' and opponent_move == 'jump':
                 o_jumps = o_brawler.add_jump_count()
-                if o_brawler.jump():
+                if o_brawler.jump(p_brawler):
                     await ctx.send(f"{opponent.name} jumped (remaining jumps: {o_jumps}) over "
                                    f"{player.name}'s light attack!")
                 else:
@@ -1404,7 +1404,7 @@ class Brawlhalla:
 
             elif player_move == 'jump' and opponent_move == 'attack':
                 p_jumps = p_brawler.add_jump_count()
-                if p_brawler.jump():
+                if p_brawler.jump(o_brawler):
                     await ctx.send(f"{player.name} jumped (remaining jumps: {p_jumps}) over "
                                    f"{opponent.name}'s light attack!")
                 else:
