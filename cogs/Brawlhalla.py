@@ -1369,7 +1369,7 @@ class Brawlhalla:
             p_brawler.update_cooldown()
             o_brawler.update_cooldown()
 
-            # switch case?
+            ############################ OUTCOME ############################
             if player_move == 'attack' and opponent_move == 'attack':
                 p_dmg = p_brawler.clash(o_brawler)
                 o_dmg = o_brawler.clash(p_brawler)
@@ -1434,6 +1434,7 @@ class Brawlhalla:
                 o_jumps = o_brawler.add_jump_count()
                 await ctx.send(f"{player.name} jumped (remaining jumps: {p_jumps}).\n"
                                f"{opponent.name} jumped (remaining jumps: {o_jumps}).")
+            ############################ OUTCOME ############################
 
             # update stocks if hp <= 0
             if p_brawler.update_stocks():
