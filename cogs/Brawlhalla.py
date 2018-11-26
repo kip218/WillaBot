@@ -1286,12 +1286,15 @@ class Brawlhalla:
         opponent_legend = get_player_legend_lst(opponent)
         if player_legend is None and opponent_legend is None:
             await ctx.send("Both players have not selected a legend yet!")
+            await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
             return
         elif player_legend is None:
             await ctx.send(f"{player.mention} has not selected a legend yet!")
+            await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
             return
         elif opponent_legend is None:
             await ctx.send(f"{opponent.mention} has not selected a legend yet!")
+            await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
             return
 
         add_status(player, opponent)
@@ -1322,7 +1325,7 @@ class Brawlhalla:
         def check_opponent(m):
             return m.author == opponent and m.content.lower() in moves
 
-        await ctx.send(embed=get_brawl_embed())
+        brawl_embed = await ctx.send(embed=get_brawl_embed())
         while p_brawler.stocks > 0 and o_brawler.stocks > 0:
             player_prompt = await player.send(embed=get_DM_prompt_embed(moves, opponent))
             opponent_prompt = await opponent.send(embed=get_DM_prompt_embed(moves, player))
@@ -1336,6 +1339,7 @@ class Brawlhalla:
                 except asyncio.TimeoutError:
                     player_prompt.embeds[0].set_footer(text="The game has timed out!")
                     opponent_prompt.embeds[0].set_footer(text="The game has timed out!")
+                    brawl_embed.embeds[0].set_footer(text="The game has timed out!")
                     await player_prompt.edit(embed=player_prompt.embeds[0])
                     await opponent_prompt.edit(embed=opponent_prompt.embeds[0])
                     await challenge_accepted.edit(content=f"{challenge_accepted.content}\n*The game has timed out!*")
@@ -1359,7 +1363,7 @@ class Brawlhalla:
                         else:
                             opponent_answered = True
 
-            await ctx.send(embed=get_brawl_embed())
+            brawl_embed = await ctx.send(embed=get_brawl_embed())
 
             # update cooldowns
             p_brawler.update_cooldown()
@@ -1435,9 +1439,11 @@ class Brawlhalla:
             if p_brawler.update_stocks():
                 await ctx.send(f"{player.name}'s {p_brawler.skin} "
                                f"{p_brawler.name} lost a stock!")
+                await brawl_embed.edit(embed=get_brawl_embed())
             if o_brawler.update_stocks():
                 await ctx.send(f"{opponent.name}'s {o_brawler.skin} "
                                f"{o_brawler.name} lost a stock!")
+                await brawl_embed.edit(embed=get_brawl_embed())
 
         if p_brawler.stocks > 0 and o_brawler.stocks == 0:
             embed = get_game_over_embed(player, p_brawler.key, opponent, o_brawler.key)

@@ -14,7 +14,8 @@ class Brawler:
         self.skin = skin.capitalize()
         self.color = color.capitalize()
         self.key = key
-        self.hp = 25
+        # remember to update update_stocks(self) if changing total hp
+        self.hp = 30
         self.stocks = 3
         self.dodge_cooldown = 0
         self.jump_count = 0
@@ -54,7 +55,7 @@ class Brawler:
     def update_stocks(self):
         if self.hp <= 0:
             self.stocks -= 1
-            self.hp = 100
+            self.hp = 30
             return True
         return False
 
