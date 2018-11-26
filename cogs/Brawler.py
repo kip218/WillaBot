@@ -67,10 +67,10 @@ class Brawler:
 
     def add_dodge_cooldown(self):
         if self.jump_count == 0:
-            self.dodge_cooldown += 1
+            self.dodge_cooldown += 2
             return "grounded"
         elif self.jump_count > 0:
-            self.dodge_cooldown += 2
+            self.dodge_cooldown += 3
             return "aerial"
 
     def add_jump_count(self):

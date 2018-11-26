@@ -487,13 +487,18 @@ class Brawlhalla:
         conn.close()
 
     @commands.command()
-    async def stance(self, ctx, stance):
+    async def stance(self, ctx, stance: str=None):
         '''
         Change your legend stance.
         w.stance <stance>
 
         Available stances: Default, Strength, Dexterity, Defense, Speed.
         '''
+
+        if stance is None:
+            await ctx.send("You must specify the <stance>!")
+            return
+
         # finding the stance index for stance_lst
         stances = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
         found = False
@@ -1370,6 +1375,7 @@ class Brawlhalla:
             o_brawler.update_cooldown()
 
             ############################ OUTCOME ############################
+            ########## ATTACK ##########
             if player_move == 'attack' and opponent_move == 'attack':
                 p_dmg = p_brawler.clash(o_brawler)
                 o_dmg = o_brawler.clash(p_brawler)
@@ -1395,6 +1401,7 @@ class Brawlhalla:
                                    f"{opponent.name}'s jump (remaining jumps: {o_jumps}) "
                                    f"for **{p_dmg}** damage!")
 
+            ########## DODGE ##########
             elif player_move == 'dodge' and opponent_move == 'attack':
                 p_dodge_type = p_brawler.add_dodge_cooldown()
                 await ctx.send(f"{player.name} dodged ({p_dodge_type}) "
@@ -1412,6 +1419,7 @@ class Brawlhalla:
                 await ctx.send(f"{player.name} dodged ({p_dodge_type}).\n"
                                f"{opponent.name} jumped (remaining jumps: {o_jumps}).")
 
+            ########## JUMP ##########
             elif player_move == 'jump' and opponent_move == 'attack':
                 p_jumps = p_brawler.add_jump_count()
                 if p_brawler.jump(o_brawler):
