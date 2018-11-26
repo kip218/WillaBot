@@ -79,6 +79,7 @@ class General:
             c.execute(""" UPDATE users
                         SET daily_time = %s, balance = %s
                         WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
+            conn.commit()
             embed_name = "You got 200 Coins!"
         else:
             delta = datetime.utcnow() - timestamp
@@ -88,13 +89,13 @@ class General:
                 c.execute(""" UPDATE users
                             SET daily_time = %s, balance = %s
                             WHERE ID = %s; """, (timestamp, balance, str(ctx.message.author.id)))
+                conn.commit()
                 embed_name = "You got 200 Coins!"
             else:
                 time_remaining = 86400 - int(delta.total_seconds())
                 hours, remainder = divmod(int(time_remaining), 3600)
                 minutes, seconds = divmod(remainder, 60)
                 embed_name = f"You can claim daily coins again in {hours}h {minutes}m {seconds}s"
-        conn.commit()
         conn.close()
         embed = discord.Embed(color=0x48d1cc)
         embed.set_author(name=embed_name, icon_url=self.bot.user.avatar_url)
