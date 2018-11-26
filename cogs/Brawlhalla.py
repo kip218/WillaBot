@@ -1317,7 +1317,7 @@ class Brawlhalla:
             return m.author == opponent and m.content.lower() in moves
 
         await ctx.send(embed=get_brawl_embed())
-        while p_brawler.stocks > 0 or o_brawler.stocks > 0:
+        while p_brawler.stocks > 0 and o_brawler.stocks > 0:
             player_prompt = await player.send(embed=get_DM_prompt_embed(moves, opponent))
             opponent_prompt = await opponent.send(embed=get_DM_prompt_embed(moves, player))
             # checking players' response

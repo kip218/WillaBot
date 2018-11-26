@@ -14,7 +14,7 @@ class Brawler:
         self.skin = skin.capitalize()
         self.color = color.capitalize()
         self.key = key
-        self.hp = 50
+        self.hp = 30
         self.stocks = 3
         self.dodge_cooldown = 0
         self.jump_count = 0
@@ -26,6 +26,11 @@ class Brawler:
         final_dmg = raw_dmg - ((opponent.defe - 5) * 0.4)
         final_dmg = round(final_dmg, 1)
         opponent.hp -= final_dmg
+
+        # give jump if hit in the air
+        if opponent.jump_count != 0:
+            opponent.jump_count -= 1
+
         return final_dmg
 
     def clash(self, opponent):
