@@ -14,11 +14,12 @@ class Brawler:
         self.skin = skin.capitalize()
         self.color = color.capitalize()
         self.key = key
-        # remember to update update_stocks(self) if changing total hp
+        self.total_hp = 30
         self.hp = 30
         self.stocks = 3
         self.dodge_cooldown = 0
         self.jump_count = 0
+        # self.punish_chance = 0
 
     def attack(self, opponent):
         universal_dmg = 20
@@ -52,10 +53,13 @@ class Brawler:
             return True
         return False
 
+    # def win_priority(self, opponent):
+        
+
     def update_stocks(self):
         if self.hp <= 0:
             self.stocks -= 1
-            self.hp = 30
+            self.hp = self.total_hp
             return True
         return False
 
@@ -77,3 +81,6 @@ class Brawler:
         self.jump_count += 1
         jumps_remaining = 3 - self.jump_count
         return jumps_remaining
+
+    # def add_punish_chance(self):
+    #     self.punish_chance += 50

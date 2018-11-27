@@ -99,7 +99,7 @@ class General:
         conn.close()
         embed = discord.Embed(color=0x48d1cc)
         embed.set_author(name=embed_name, icon_url=self.bot.user.avatar_url)
-        embed.add_field(name="WillaBot Updates:", value="- Fun commands have been added. \"w.help Fun\" for more info.\n- Odin's Chest has arrived in \"w.store\"!\n- Check out the new typeracer game! \"w.help typeracer\" for more info.")
+        embed.add_field(name="WillaBot Updates:", value="- Brawl (beta) has been added! \"w.help brawl\" for more info.")
         await ctx.send(embed=embed)
 
     @commands.command()

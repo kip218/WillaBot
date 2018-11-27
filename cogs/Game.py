@@ -142,7 +142,7 @@ class Game:
                         xp = int(fetch[0])
                         balance = int(fetch[1])
                         xp_increase = random.randint(25, 40)
-                        balance_increase = random.randint(50, 80)
+                        balance_increase = random.randint(100, 160)
                         xp += xp_increase
                         balance += balance_increase
                         c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(ctx.author.id)))
@@ -185,8 +185,8 @@ class Game:
             return
 
         # checking if bet amount is less than limit
-        if bet_amount > 3000:
-            await ctx.send("Maximum bet amount is 3000 coins!")
+        if bet_amount > 5000:
+            await ctx.send("Maximum bet amount is 5000 coins!")
             return
 
         if bet_amount <= 0:
@@ -221,6 +221,7 @@ class Game:
                 await ctx.send(f"{opponent.name} does not have enough Coins to play.\nYou must have more than **triple** the bet amount to play the Peace War game.")
                 conn.close()
                 return
+        conn.close()
 
         challenge_msg = await ctx.send(f"{opponent.mention}! {player.mention} challenged you to a game of Peace/War!\nType \"w.accept <@user>\" to accept!\n**Bet amount:** {bet_amount}")
 
@@ -240,13 +241,13 @@ class Game:
         # checking if opponent accepts challenge
         def check_accept(m):
             return m.author == opponent and m.content.startswith('w.accept') and m.channel == ctx.channel
+
         accepted = False
         while accepted is False:
             try:
                 accept = await self.bot.wait_for('message', check=check_accept, timeout=60)
             except asyncio.TimeoutError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
-                remove_status(player, opponent)
                 return
             else:
                 if accept.content == 'w.accept':
@@ -431,7 +432,7 @@ class Game:
             balance_increase = 0
             for i in range(score):
                 xp_increase += random.randint(12, 20)
-                balance_increase += random.randint(25, 40)
+                balance_increase += random.randint(50, 80)
             xp += xp_increase
             balance += balance_increase
             c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(player.id)))
@@ -603,7 +604,7 @@ class Game:
             balance_increase = 0
             for i in range(score):
                 xp_increase += random.randint(12, 20)
-                balance_increase += random.randint(25, 40)
+                balance_increase += random.randint(50, 80)
             xp += xp_increase
             balance += balance_increase
             c.execute(""" UPDATE users SET xp = %s, balance = %s WHERE ID = %s; """, (xp, balance, str(player.id)))
