@@ -1310,7 +1310,6 @@ class Brawlhalla:
 
         # possible moves & sending both players embed through DM
         moves = ["attack", "dodge", "jump"]
-        moves_dict = {'1': 'attack', '2': 'dodge', '3', 'jump'}
 
         await ctx.send("Loading custom brawl game...")
 
@@ -1328,10 +1327,10 @@ class Brawlhalla:
 
         # checking player's response
         def check_player(m):
-            return m.author == player and (m.content.lower() in moves or m.content in moves_dict)
+            return m.author == player and m.content.lower() in moves
 
         def check_opponent(m):
-            return m.author == opponent and (m.content.lower() in moves m.content in moves_dict)
+            return m.author == opponent and m.content.lower() in moves
 
         brawl_embed = await ctx.send(embed=get_brawl_embed())
         while p_brawler.stocks > 0 and o_brawler.stocks > 0:
@@ -1356,21 +1355,14 @@ class Brawlhalla:
                 else:
                     if msg.author == player:
                         player_move = msg.content.lower()
-                        if player_move in moves_dict:
-                            player_move = moves_dict[player_move]
-
                         if player_move == 'dodge' and p_brawler.dodge_cooldown != 0:
                             await ctx.send(f"{player.mention}, your dodge is on cooldown!")
                         elif player_move == 'jump' and p_brawler.jump_count == 3:
                             await ctx.send(f"{player.mention}, you're out of jumps!")
                         else:
                             player_answered = True
-
                     elif msg.author == opponent:
                         opponent_move = msg.content.lower()
-                        if opponent_move in moves_dict:
-                            opponent_move = moves_dict[opponent_move]
-
                         if opponent_move == 'dodge' and o_brawler.dodge_cooldown != 0:
                             await ctx.send(f"{opponent.mention}, your dodge is on cooldown!")
                         elif opponent_move == 'jump' and o_brawler.jump_count == 3:
