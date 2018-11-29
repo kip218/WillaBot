@@ -1241,18 +1241,11 @@ class Brawlhalla:
 
         # get stats, weapons, and img_url for embed
         def get_brawl_embed():
-            stance_lst = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
             brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
             stock_emote = ":heart:"
             embed = discord.Embed(title=f"{player.name} VS {opponent.name}",
                                   description=f"{player.name}'s {player_legend[1].capitalize()}: {stock_emote*p_brawler.stocks}\n{opponent.name}'s {opponent_legend[1].capitalize()}: {stock_emote*o_brawler.stocks}",
                                   color=0x48d1cc)
-            embed.add_field(name=f"{stance_lst[int(player_legend[4])]} Stance",
-                            value=f"**Str:** {player_stats[0]}\n**Dex:** {player_stats[1]}\n**Def:** {player_stats[2]}\n**Spd:** {player_stats[3]}",
-                            inline=True)
-            embed.add_field(name=f"{stance_lst[int(opponent_legend[4])]} Stance",
-                            value=f"**Str:** {opponent_stats[0]}\n**Dex:** {opponent_stats[1]}\n**Def:** {opponent_stats[2]}\n**Spd:** {opponent_stats[3]}",
-                            inline=True)
             embed.set_image(url=brawl_img_url)
             return embed
 
@@ -1333,7 +1326,16 @@ class Brawlhalla:
         def check_opponent(m):
             return m.author == opponent and (m.content.lower() in moves or m.content in moves_dict)
 
-        brawl_embed = await ctx.send(embed=get_brawl_embed())
+
+        stance_lst = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
+        brawl_embed = get_brawl_embed()
+        brawl_embed.add_field(name=f"{stance_lst[int(player_legend[4])]} Stance",
+                              value=f"**Str:** {player_stats[0]}\n**Dex:** {player_stats[1]}\n**Def:** {player_stats[2]}\n**Spd:** {player_stats[3]}",
+                              inline=True)
+        brawl_embed.add_field(name=f"{stance_lst[int(opponent_legend[4])]} Stance",
+                              value=f"**Str:** {opponent_stats[0]}\n**Dex:** {opponent_stats[1]}\n**Def:** {opponent_stats[2]}\n**Spd:** {opponent_stats[3]}",
+                              inline=True)
+        brawl_embed = await ctx.send(embed=brawl_embed)
         while p_brawler.stocks > 0 and o_brawler.stocks > 0:
             player_prompt = await player.send(embed=get_DM_prompt_embed(moves, opponent))
             opponent_prompt = await opponent.send(embed=get_DM_prompt_embed(moves, player))
