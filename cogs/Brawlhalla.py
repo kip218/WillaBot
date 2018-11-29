@@ -613,7 +613,7 @@ class Brawlhalla:
                 legends_lst.append(f"`{legend}`")
             embed = discord.Embed(description=', '.join(legends_lst), color=0x36393E)
             embed.set_author(name="Available legends", icon_url=self.bot.user.avatar_url)
-            embed.set_footer(text="Isaiah, Jiro, Lin fei, and Zariel are currently unavailable.")
+            embed.set_footer(text="Legends released after Kaya are currently unavailable.")
             await ctx.send(embed=embed)
         elif skin_input is None:
             # find legend matching input
@@ -1362,8 +1362,10 @@ class Brawlhalla:
 
                         if player_move == 'dodge' and p_brawler.dodge_cooldown != 0:
                             await ctx.send(f"{player.mention}, your dodge is on cooldown!")
+                            await player.send(f"{player.mention}, your dodge is on cooldown!")
                         elif player_move == 'jump' and p_brawler.jump_count == 3:
                             await ctx.send(f"{player.mention}, you're out of jumps!")
+                            await player.send(f"{player.mention}, you're out of jumps!")
                         else:
                             player_answered = True
 
@@ -1374,8 +1376,10 @@ class Brawlhalla:
 
                         if opponent_move == 'dodge' and o_brawler.dodge_cooldown != 0:
                             await ctx.send(f"{opponent.mention}, your dodge is on cooldown!")
+                            await opponent.send(f"{opponent.mention}, your dodge is on cooldown!")
                         elif opponent_move == 'jump' and o_brawler.jump_count == 3:
                             await ctx.send(f"{opponent.mention}, you're out of jumps!")
+                            await opponent.send(f"{opponent.mention}, you're out of jumps!")
                         else:
                             opponent_answered = True
 
