@@ -183,6 +183,13 @@ def aAttack_charge(p, o):
            f"{o.username} gained 0 charge."
 
 
+def sAttack_sAttack(p, o):
+    p_dmg = p.signature_attack(o)
+    o_dmg = o.signature_attack(p)
+    return f"{p.username}'s signature attack hit {o.username} for **{p_dmg}** damage!\n"\
+           f"{o.username}'s signature attack hit {p.username} for **{o_dmg}** damage!"
+
+
 def sAttack_dodge(p, o):
     o.add_dodge_cooldown()
     punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 1.2
