@@ -1248,8 +1248,7 @@ class Brawlhalla:
                                   color=0x48d1cc)
             embed.set_image(url=brawl_img_url)
             return embed
-        # call get_brawl_img_url out of the function to only call it once
-        brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
+
 
         def get_game_over_embed(winner, winner_key, loser, loser_key):
             winner_url = get_legend_url(winner_key)
@@ -1345,7 +1344,11 @@ class Brawlhalla:
             return m.author == opponent and (m.content.lower() in moves or m.content in moves_dict)
 
         stance_lst = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
-        brawl_embed = get_brawl_embed()
+
+        # call get_brawl_img_url out of the function to only call it once
+        brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
+
+        brawl_embed = get_brawl_embed(brawl_img_url)
         brawl_embed.add_field(name=f"{stance_lst[int(player_legend[4])]} Stance",
                               value=f"**Str:** {player_stats[0]}\n**Dex:** {player_stats[1]}\n**Def:** {player_stats[2]}\n**Spd:** {player_stats[3]}",
                               inline=True)
@@ -1412,7 +1415,7 @@ class Brawlhalla:
             if o_brawler.update_stocks():
                 await ctx.send(f"{opponent.name}'s {o_brawler.skin} "
                                f"{o_brawler.name} lost a stock!")
-            await ctx.send(embed=get_brawl_embed())
+            await ctx.send(embed=get_brawl_embed(brawl_img_url))
 
         if p_brawler.stocks > 0 and o_brawler.stocks == 0:
             embed = get_game_over_embed(player, p_brawler.key, opponent, o_brawler.key)
@@ -1421,7 +1424,7 @@ class Brawlhalla:
             embed = get_game_over_embed(opponent, o_brawler.key, player, p_brawler.key)
             await ctx.send(embed=embed)
         else:
-            await ctx.send(embed=get_brawl_embed())
+            await ctx.send(embed=get_brawl_embed(brawl_img_url))
             await ctx.send("DRAW!")
 
         remove_status(player, opponent)
