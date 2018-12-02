@@ -6,7 +6,8 @@ import asyncio
 import requests
 import imgix
 import math
-from .Brawler import Brawler
+from ..Brawler import Brawler
+from ..BrawlHelper import *
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -1391,75 +1392,8 @@ class Brawlhalla:
             p_brawler.update_cooldown()
             o_brawler.update_cooldown()
 
-            ############################ OUTCOME ############################
-            ########## ATTACK ##########
-            if player_move == 'attack' and opponent_move == 'attack':
-                p_dmg = p_brawler.clash(o_brawler)
-                o_dmg = o_brawler.clash(p_brawler)
-                await ctx.send(f"CLASH!\n"
-                               f"{player.name}'s {p_brawler.skin} "
-                               f"{p_brawler.name} took **{o_dmg}** damage!\n"
-                               f"{opponent.name}'s {o_brawler.skin} "
-                               f"{o_brawler.name} took **{p_dmg}** damage!")
-
-            elif player_move == 'attack' and opponent_move == 'dodge':
-                o_dodge_type = o_brawler.add_dodge_cooldown()
-                await ctx.send(f"{opponent.name} dodged ({o_dodge_type}) "
-                               f"{player.name}'s light attack!")
-
-            elif player_move == 'attack' and opponent_move == 'jump':
-                o_jumps = o_brawler.add_jump_count()
-                if o_brawler.jump(p_brawler):
-                    await ctx.send(f"{opponent.name} jumped (remaining jumps: {o_jumps}) over "
-                                   f"{player.name}'s light attack!")
-                else:
-                    p_dmg = p_brawler.attack(o_brawler)
-                    await ctx.send(f"{player.name}'s light attack caught "
-                                   f"{opponent.name}'s jump (remaining jumps: {o_jumps}) "
-                                   f"for **{p_dmg}** damage!")
-
-            ########## DODGE ##########
-            elif player_move == 'dodge' and opponent_move == 'attack':
-                p_dodge_type = p_brawler.add_dodge_cooldown()
-                await ctx.send(f"{player.name} dodged ({p_dodge_type}) "
-                               f"{opponent.name}'s light attack!")
-
-            elif player_move == 'dodge' and opponent_move == 'dodge':
-                p_dodge_type = p_brawler.add_dodge_cooldown()
-                o_dodge_type = o_brawler.add_dodge_cooldown()
-                await ctx.send(f"{player.name} dodged ({p_dodge_type}).\n"
-                               f"{opponent.name} dodged ({o_dodge_type}).")
-
-            elif player_move == 'dodge' and opponent_move == 'jump':
-                p_dodge_type = p_brawler.add_dodge_cooldown()
-                o_jumps = o_brawler.add_jump_count()
-                await ctx.send(f"{player.name} dodged ({p_dodge_type}).\n"
-                               f"{opponent.name} jumped (remaining jumps: {o_jumps}).")
-
-            ########## JUMP ##########
-            elif player_move == 'jump' and opponent_move == 'attack':
-                p_jumps = p_brawler.add_jump_count()
-                if p_brawler.jump(o_brawler):
-                    await ctx.send(f"{player.name} jumped (remaining jumps: {p_jumps}) over "
-                                   f"{opponent.name}'s light attack!")
-                else:
-                    o_dmg = o_brawler.attack(p_brawler)
-                    await ctx.send(f"{opponent.name}'s light attack caught "
-                                   f"{player.name}'s jump (remaining jumps: {p_jumps}) "
-                                   f"for **{o_dmg}** damage!")
-
-            elif player_move == 'jump' and opponent_move == 'dodge':
-                p_jumps = p_brawler.add_jump_count()
-                o_dodge_type = o_brawler.add_dodge_cooldown()
-                await ctx.send(f"{player.name} jumped (remaining jumps: {p_jumps}).\n"
-                               f"{opponent.name} dodged ({o_dodge_type}).")
-
-            elif player_move == 'jump' and opponent_move == 'jump':
-                p_jumps = p_brawler.add_jump_count()
-                o_jumps = o_brawler.add_jump_count()
-                await ctx.send(f"{player.name} jumped (remaining jumps: {p_jumps}).\n"
-                               f"{opponent.name} jumped (remaining jumps: {o_jumps}).")
-            ############################ OUTCOME ############################
+            msg = do_move(player_move, opponent_move, p_brawler, o_brawler)
+            await ctx.send(msg)
 
             # update stocks if hp <= 0
             if p_brawler.update_stocks():
