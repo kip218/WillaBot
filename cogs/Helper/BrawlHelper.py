@@ -70,12 +70,28 @@ def gAttack_aAttack(p, o):
 
 def gAttack_dodge(p, o):
     o.add_dodge_cooldown()
-    return f"{o.username} dodged {p.username}'s ground attack!"
+    punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 1.2
+    rand = randint(1, 100)
+    if rand <= punish_chance:
+        dmg = o.attack(p)
+        return f"{o.username} dodged {p.username}'s ground attack "\
+               f"and punished it for {dmg} damage!"
+    else:
+        return f"{o.username} dodged {p.username}'s ground attack "\
+               f"but failed to punish the attack."
 
 
 def gAttack_jump(p, o):
     o.add_jump_count()
-    return f"{o.username} jumped over {p.username}'s ground attack!"
+    punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 0.7
+    rand = randint(1, 100)
+    if rand <= punish_chance:
+        dmg = o.attack(p)
+        return f"{o.username} jumped over {p.username}'s ground attack "\
+               f"and punished it for {dmg} damage!"
+    else:
+        return f"{o.username} jumped over {p.username}'s ground attack "\
+               f"but failed to punish the attack."
 
 
 def aAttack_aAttack(p, o):
@@ -84,7 +100,15 @@ def aAttack_aAttack(p, o):
 
 def aAttack_dodge(p, o):
     o.add_dodge_cooldown()
-    return f"{o.username} dodged {p.username}'s anti-air attack!"
+    punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 1.2
+    rand = randint(1, 100)
+    if rand <= punish_chance:
+        dmg = o.attack(p)
+        return f"{o.username} dodged {p.username}'s anti-air attack "\
+               f"and punished it for {dmg} damage!"
+    else:
+        return f"{o.username} dodged {p.username}'s anti-air attack "\
+               f"but failed to punish the attack."
 
 
 def aAttack_jump(p, o):

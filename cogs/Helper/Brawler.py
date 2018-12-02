@@ -19,6 +19,7 @@ class Brawler:
         self.hp = 50
         self.stocks = 3
         self.dodge_cooldown = 0
+        # self.combo_counter = 0
 
     def attack(self, opponent):
         universal_dmg = 20
@@ -39,6 +40,7 @@ class Brawler:
         return final_dmg
 
     def update_stocks(self):
+        self.dodge_cooldown = 0
         if self.hp <= 0:
             self.stocks -= 1
             self.hp = self.total_hp
