@@ -1241,8 +1241,9 @@ class Brawlhalla:
             return embed
 
         # get stats, weapons, and img_url for embed
-        def get_brawl_embed():
-            brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
+        # call get_brawl_img_url out of the function to only call it once
+        brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
+        def get_brawl_embed(brawl_img_url):
             stock_emote = ":heart:"
             embed = discord.Embed(title=f"{player.name} VS {opponent.name}",
                                   description=f"{player.name}'s {player_legend[1].capitalize()}: {stock_emote*p_brawler.stocks}\n{opponent.name}'s {opponent_legend[1].capitalize()}: {stock_emote*o_brawler.stocks}",
@@ -1317,9 +1318,9 @@ class Brawlhalla:
         challenge_accepted = await ctx.send(f"{player.mention} {opponent.mention} Challenge accepted! Check your DMs!")
 
         # possible moves & sending both players embed through DM
-        moves = ["ground attack", "anti-air attack", "dodge", "jump"]
+        moves = ["ground attack", "anti-air attack", "dodge", "jump", "charge"]
         moves_dict = {'1': 'ground attack', '2': 'anti-air attack',
-                      '3': 'dodge', '4': 'jump'}
+                      '3': 'dodge', '4': 'jump', '5': 'charge'}
 
         await ctx.send("Loading custom brawl game...")
 

@@ -105,7 +105,7 @@ class General:
     @commands.command()
     async def profile(self, ctx, *, user: str=None):
         '''
-        [user]'s profile. Sends your profile picture if [user] not specified.
+        [user]'s profile. Use this to check your balance.
         w.profile [user]
         '''
         def level_currxp_nextxp(xp):

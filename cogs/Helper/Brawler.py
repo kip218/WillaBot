@@ -19,7 +19,17 @@ class Brawler:
         self.hp = 50
         self.stocks = 3
         self.dodge_cooldown = 0
+        self.charges = 0
         # self.combo_counter = 0
+
+    def signature_attack(self, opponent):
+        universal_dmg = 30
+        raw_dmg = universal_dmg + ((self.str - 5) * 0.4)
+        raw_dmg *= uniform(0.8, 1.2)
+        final_dmg = raw_dmg - ((opponent.defe - 5) * 0.4)
+        final_dmg = round(final_dmg, 1)
+        opponent.hp -= final_dmg
+        return final_dmg
 
     def attack(self, opponent):
         universal_dmg = 20
@@ -53,3 +63,6 @@ class Brawler:
 
     def add_dodge_cooldown(self):
         self.dodge_cooldown += 3
+
+    def add_charge(self):
+        self.charges += 1
