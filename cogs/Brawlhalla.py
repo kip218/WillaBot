@@ -1243,12 +1243,16 @@ class Brawlhalla:
         # get stats, weapons, and img_url for embed
         def get_brawl_embed(brawl_img_url):
             stock_emote = ":heart:"
+            dodge_emote = ":white_circle:"
+            charge_emote = ":star:"
             embed = discord.Embed(title=f"{player.name} VS {opponent.name}",
-                                  description=f"{player.name}'s {player_legend[1].capitalize()}: {stock_emote*p_brawler.stocks}\n{opponent.name}'s {opponent_legend[1].capitalize()}: {stock_emote*o_brawler.stocks}",
+                                  description=f"{player.name}'s {player_legend[1].capitalize()}: {stock_emote*p_brawler.stocks}\n"\
+                                              f"Dodge cooldown: {dodge_emote*p_brawler.dodge_cooldown}\tCharges: {charge_emote*p_brawler.charges}"\
+                                              f"{opponent.name}'s {opponent_legend[1].capitalize()}: {stock_emote*o_brawler.stocks}"\
+                                              f"Dodge cooldown: {dodge_emote*o_brawler.dodge_cooldown}\tCharges: {charge_emote*o_brawler.charges}",
                                   color=0x48d1cc)
             embed.set_image(url=brawl_img_url)
             return embed
-
 
         def get_game_over_embed(winner, winner_key, loser, loser_key):
             winner_url = get_legend_url(winner_key)

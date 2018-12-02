@@ -80,11 +80,12 @@ async def on_message(message):
             author_xp += random.randint(4, 8)
         c.execute(""" UPDATE users SET xp = %s WHERE ID = %s; """, (str(author_xp), str(message.author.id)))
 
-        # add channel to database
-        c.execute(""" INSERT INTO channels (channel_id, channel_name, guild_id, guild_name)
-                    VALUES (%s, %s, %s, %s)
-                    ON CONFLICT (channel_id)
-                    DO NOTHING;""", (message.channel.id, message.channel.name, message.guild.id, message.guild.name))
+        if isinstance(message.channel, discord.TextChannel):
+            # add channel to database
+            c.execute(""" INSERT INTO channels (channel_id, channel_name, guild_id, guild_name)
+                        VALUES (%s, %s, %s, %s)
+                        ON CONFLICT (channel_id)
+                        DO NOTHING;""", (message.channel.id, message.channel.name, message.guild.id, message.guild.name))
         conn.commit()
         conn.close()
 
