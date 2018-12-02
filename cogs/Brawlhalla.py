@@ -1313,10 +1313,10 @@ class Brawlhalla:
         opponent_stats, opponent_weapons = get_legend_stats_weapons(opponent_legend[0], opponent_legend[4])
 
         # initialize two Brawler classes
-        p_brawler = Brawler(player_legend[1], player_stats,
+        p_brawler = Brawler(player.name, player_legend[1], player_stats,
                             player_weapons, player_legend[2],
                             player_legend[3], player_legend[0])
-        o_brawler = Brawler(opponent_legend[1], opponent_stats,
+        o_brawler = Brawler(opponent.name, opponent_legend[1], opponent_stats,
                             opponent_weapons, opponent_legend[2],
                             opponent_legend[3], opponent_legend[0])
 

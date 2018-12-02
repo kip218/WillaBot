@@ -4,7 +4,8 @@ from random import randint
 
 
 class Brawler:
-    def __init__(self, name, stats, weapons, skin, color, key):
+    def __init__(self, username, name, stats, weapons, skin, color, key):
+        self.username = username
         self.name = name.capitalize()
         self.str = int(stats[0])
         self.dex = int(stats[1])
