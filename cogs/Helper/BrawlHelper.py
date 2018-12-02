@@ -11,15 +11,15 @@ def do_move(p_mv, o_mv, p, o):
         msg = gAttack_dodge(p, o)
     elif p_mv == 'ground attack' and o_mv == 'jump':
         msg = gAttack_jump(p, o)
-    elif p.mv == 'ground attack' and o_mv == 'anti-air attack':
+    elif p_mv == 'ground attack' and o_mv == 'anti-air attack':
         msg = gAttack_aAttack(p, o)
-    elif p.mv == 'anti-air attack' and o_mv == 'ground attack':
+    elif p_mv == 'anti-air attack' and o_mv == 'ground attack':
         msg = gAttack_aAttack(o, p)
-    elif p.mv == 'anti-air attack' and o_mv == 'anti-air attack':
+    elif p_mv == 'anti-air attack' and o_mv == 'anti-air attack':
         msg = aAttack_aAttack(p, o)
-    elif p.mv == 'anti-air attack' and o_mv == 'dodge':
+    elif p_mv == 'anti-air attack' and o_mv == 'dodge':
         msg = aAttack_dodge(p, o)
-    elif p.mv == 'anti-air attack' and o_mv == 'jump':
+    elif p_mv == 'anti-air attack' and o_mv == 'jump':
         msg = aAttack_jump(p, o)
     elif p_mv == 'dodge' and o_mv == 'ground attack':
         msg = gAttack_dodge(o, p)

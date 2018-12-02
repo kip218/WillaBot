@@ -1259,6 +1259,20 @@ class Brawlhalla:
             embed.set_author(name="Game Over!", icon_url=self.bot.user.avatar_url)
             return embed
 
+        def get_move_embed(user, brawler, move):
+            hp_ratio = brawler.hp / brawler.total_hp * 100
+            if hp_ratio == 100:
+                color = 0xffffff
+            elif hp_ratio >= 66:
+                color = 0xfff200
+            elif hp_ratio >= 33:
+                color = 0xfa6304
+            else:
+                color = 0xed2939
+            embed = discord.Embed(title=f"{user.mention} used {move}!",
+                                  color=color)
+            return embed
+
         check_status = check_status(player, opponent)
         if check_status is not True:
             await ctx.send(check_status)
@@ -1393,6 +1407,8 @@ class Brawlhalla:
             p_brawler.update_cooldown()
             o_brawler.update_cooldown()
 
+            await ctx.send(embed=get_move_embed(player, p_brawler, player_move))
+            await ctx.send(embed=get_move_embed(opponent, o_brawler, opponent_move))
             msg = do_move(player_move, opponent_move, p_brawler, o_brawler)
             await ctx.send(msg)
 
