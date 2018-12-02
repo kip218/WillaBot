@@ -1269,7 +1269,7 @@ class Brawlhalla:
                 color = 0xfa6304
             else:
                 color = 0xed2939
-            embed = discord.Embed(title=f"{user.mention} used {move}!",
+            embed = discord.Embed(description=f"{user.mention} used **{move}**!",
                                   color=color)
             return embed
 
@@ -1342,7 +1342,6 @@ class Brawlhalla:
         def check_opponent(m):
             return m.author == opponent and (m.content.lower() in moves or m.content in moves_dict)
 
-
         stance_lst = ['Default', 'Strength', 'Dexterity', 'Defense', 'Speed']
         brawl_embed = get_brawl_embed()
         brawl_embed.add_field(name=f"{stance_lst[int(player_legend[4])]} Stance",
@@ -1381,9 +1380,6 @@ class Brawlhalla:
                         if player_move == 'dodge' and p_brawler.dodge_cooldown != 0:
                             await ctx.send(f"{player.mention}, your dodge is on cooldown!")
                             await player.send(f"{player.mention}, your dodge is on cooldown!")
-                        elif player_move == 'jump' and p_brawler.jump_count == 3:
-                            await ctx.send(f"{player.mention}, you're out of jumps!")
-                            await player.send(f"{player.mention}, you're out of jumps!")
                         else:
                             player_answered = True
 
@@ -1395,13 +1391,8 @@ class Brawlhalla:
                         if opponent_move == 'dodge' and o_brawler.dodge_cooldown != 0:
                             await ctx.send(f"{opponent.mention}, your dodge is on cooldown!")
                             await opponent.send(f"{opponent.mention}, your dodge is on cooldown!")
-                        elif opponent_move == 'jump' and o_brawler.jump_count == 3:
-                            await ctx.send(f"{opponent.mention}, you're out of jumps!")
-                            await opponent.send(f"{opponent.mention}, you're out of jumps!")
                         else:
                             opponent_answered = True
-
-            brawl_embed = await ctx.send(embed=get_brawl_embed())
 
             # update cooldowns
             p_brawler.update_cooldown()
@@ -1416,11 +1407,10 @@ class Brawlhalla:
             if p_brawler.update_stocks():
                 await ctx.send(f"{player.name}'s {p_brawler.skin} "
                                f"{p_brawler.name} lost a stock!")
-                await brawl_embed.edit(embed=get_brawl_embed())
             if o_brawler.update_stocks():
                 await ctx.send(f"{opponent.name}'s {o_brawler.skin} "
                                f"{o_brawler.name} lost a stock!")
-                await brawl_embed.edit(embed=get_brawl_embed())
+            await ctx.send(embed=get_brawl_embed())
 
         if p_brawler.stocks > 0 and o_brawler.stocks == 0:
             embed = get_game_over_embed(player, p_brawler.key, opponent, o_brawler.key)
