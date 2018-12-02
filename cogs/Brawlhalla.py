@@ -1303,8 +1303,9 @@ class Brawlhalla:
         challenge_accepted = await ctx.send(f"{player.mention} {opponent.mention} Challenge accepted! Check your DMs!")
 
         # possible moves & sending both players embed through DM
-        moves = ["attack", "dodge", "jump"]
-        moves_dict = {'1': 'attack', '2': 'dodge', '3': 'jump'}
+        moves = ["ground attack", "anti-air attack", "dodge", "jump"]
+        moves_dict = {'1': 'ground attack', '2': 'anti-air attack',
+                      '3': 'dodge', '4': 'jump'}
 
         await ctx.send("Loading custom brawl game...")
 

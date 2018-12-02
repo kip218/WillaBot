@@ -20,7 +20,6 @@ class Brawler:
         self.stocks = 3
         self.dodge_cooldown = 0
         self.jump_count = 0
-        # self.punish_chance = 0
 
     def attack(self, opponent):
         universal_dmg = 20
@@ -29,11 +28,6 @@ class Brawler:
         final_dmg = raw_dmg - ((opponent.defe - 5) * 0.4)
         final_dmg = round(final_dmg, 1)
         opponent.hp -= final_dmg
-
-        # give jump if hit in the air
-        if opponent.jump_count != 0:
-            opponent.jump_count -= 1
-
         return final_dmg
 
     def clash(self, opponent):
@@ -44,18 +38,6 @@ class Brawler:
         final_dmg = round(final_dmg, 1)
         opponent.hp -= final_dmg
         return final_dmg
-
-    def jump(self, opponent):
-        universal_dodge_chance = 30
-        raw_dodge_chance = universal_dodge_chance + (self.spd * 1.5)
-        final_dodge_chance = raw_dodge_chance - (opponent.dex * 1.5)
-        rand_num = randint(1, 100)
-        if rand_num <= final_dodge_chance:
-            return True
-        return False
-
-    # def win_priority(self, opponent):
-        
 
     def update_stocks(self):
         if self.hp <= 0:
@@ -71,17 +53,9 @@ class Brawler:
             self.jump_count = 0
 
     def add_dodge_cooldown(self):
-        if self.jump_count == 0:
-            self.dodge_cooldown += 2
-            return "grounded"
-        elif self.jump_count > 0:
-            self.dodge_cooldown += 3
-            return "aerial"
+        self.dodge_cooldown += 3
 
     def add_jump_count(self):
         self.jump_count += 1
         jumps_remaining = 3 - self.jump_count
         return jumps_remaining
-
-    # def add_punish_chance(self):
-    #     self.punish_chance += 50

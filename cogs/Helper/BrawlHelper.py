@@ -4,21 +4,35 @@ from .Brawler import Brawler
 
 
 def do_move(p_mv, o_mv, p, o):
-    # moves = ["attack", "dodge", "jump"]
-    if p_mv == 'attack' and o_mv == 'attack':
-        msg = attack_attack(p, o)
-    elif p_mv == 'attack' and o_mv == 'dodge':
-        msg = attack_dodge(p, o)
-    elif p_mv == 'attack' and o_mv == 'jump':
-        msg = attack_jump(p, o)
-    elif p_mv == 'dodge' and o_mv == 'attack':
-        msg = attack_dodge(o, p)
+    # moves = ["ground attack", "anti-air attack", dodge", "jump"]
+    if p_mv == 'ground attack' and o_mv == 'ground attack':
+        msg = gAttack_gAttack(p, o)
+    elif p_mv == 'ground attack' and o_mv == 'dodge':
+        msg = gAttack_dodge(p, o)
+    elif p_mv == 'ground attack' and o_mv == 'jump':
+        msg = gAttack_jump(p, o)
+    elif p.mv == 'ground attack' and o_mv == 'anti-air attack':
+        msg = gAttack_aAttack(p, o)
+    elif p.mv == 'anti-air attack' and o_mv == 'ground attack':
+        msg = gAttack_aAttack(o, p)
+    elif p.mv == 'anti-air attack' and o_mv == 'anti-air attack':
+        msg = aAttack_aAttack(p, o)
+    elif p.mv == 'anti-air attack' and o_mv == 'dodge':
+        msg = aAttack_dodge(p, o)
+    elif p.mv == 'anti-air attack' and o_mv == 'jump':
+        msg = aAttack_jump(p, o)
+    elif p_mv == 'dodge' and o_mv == 'ground attack':
+        msg = gAttack_dodge(o, p)
+    elif msg == 'dodge' and o_mv == 'anti-air attack':
+        msg = aAttack_dodge(o, p)
     elif p_mv == 'dodge' and o_mv == 'dodge':
         msg = dodge_dodge(p, o)
     elif p_mv == 'dodge' and o_mv == 'jump':
         msg = dodge_jump(p, o)
-    elif p_mv == 'jump' and o_mv == 'attack':
-        msg = attack_jump(o, p)
+    elif p_mv == 'jump' and o_mv == 'ground attack':
+        msg = gAttack_jump(o, p)
+    elif p_mv == 'jump' and o_mv == 'anti-air attack':
+        msg = aAttack_jump(o, p)
     elif p_mv == 'jump' and o_mv == 'dodge':
         msg = dodge_jump(o, p)
     elif p_mv == 'jump' and o_mv == 'jump':
@@ -26,9 +40,9 @@ def do_move(p_mv, o_mv, p, o):
     return msg
 
 
-def attack_attack(p, o):
-    p_chance = ((p.spd + p.dex) / (p.spd + p.dex + o.spd + o.dex)) * 100
-    o_chance = ((o.spd + o.dex) / (o.spd + o.dex + p.spd + p.dex)) * 100
+def gAttack_gAttack(p, o):
+    p_chance = 75 + (p.dex + p.spd - 10) * 2
+    o_chance = 75 + (o.dex + o.spd - 10) * 2
     p_rand = randint(1, 100)
     o_rand = randint(1, 100)
     if p_rand <= p_chance and o_rand <= o_chance:
@@ -46,22 +60,36 @@ def attack_attack(p, o):
         return f"{p.username} missed! "\
                f"{o.username} hit {p.username} for **{dmg}** damage!"
     else:
-        return f"Both players missed their attack!"
+        return f"Both players missed their ground attack!"
 
 
-def attack_dodge(p, o):
+def gAttack_aAttack(p, o):
+    dmg = p.attack(o)
+    return f"{p.username} hit {o.username} for **{dmg}** damage!"
+
+
+def gAttack_dodge(p, o):
     o.add_dodge_cooldown()
     return f"{o.username} dodged {p.username}'s ground attack!"
 
 
-def attack_jump(p, o):
+def gAttack_jump(p, o):
     o.add_jump_count()
-    if o.jump(p):
-        return f"{o.username} jumped over {p.username}'s ground attack!"
-    else:
-        dmg = p.attack(o)
-        return f"{p.username}'s light attack caught "\
-               f"{o.username}'s jump for **{dmg}** damage!"
+    return f"{o.username} jumped over {p.username}'s ground attack!"
+
+
+def aAttack_aAttack(p, o):
+    return f"Both players missed their anti-air attack!"
+
+
+def aAttack_dodge(p, o):
+    o.add_dodge_cooldown()
+    return f"{o.username} dodged {p.username}'s anti-air attack!"
+
+
+def aAttack_jump(p, o):
+    dmg = p.attack(o)
+    return f"{p.username}'s anti-air attack caught {o.username} for **{dmg}** damage!"
 
 
 def dodge_dodge(p, o):
