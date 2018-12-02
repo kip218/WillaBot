@@ -6,8 +6,8 @@ import asyncio
 import requests
 import imgix
 import math
-from ..Brawler import Brawler
-from ..BrawlHelper import *
+from .Helper.Brawler import Brawler
+from .Helper.BrawlHelper import *
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
