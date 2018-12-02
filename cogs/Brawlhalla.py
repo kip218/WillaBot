@@ -1241,8 +1241,6 @@ class Brawlhalla:
             return embed
 
         # get stats, weapons, and img_url for embed
-        # call get_brawl_img_url out of the function to only call it once
-        brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
         def get_brawl_embed(brawl_img_url):
             stock_emote = ":heart:"
             embed = discord.Embed(title=f"{player.name} VS {opponent.name}",
@@ -1250,6 +1248,8 @@ class Brawlhalla:
                                   color=0x48d1cc)
             embed.set_image(url=brawl_img_url)
             return embed
+        # call get_brawl_img_url out of the function to only call it once
+        brawl_img_url = get_brawl_img_url(player_legend[0], opponent_legend[0])
 
         def get_game_over_embed(winner, winner_key, loser, loser_key):
             winner_url = get_legend_url(winner_key)
