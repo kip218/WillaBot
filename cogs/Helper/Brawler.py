@@ -29,6 +29,7 @@ class Brawler:
         final_dmg = raw_dmg - ((opponent.defe - 5) * 0.4)
         final_dmg = round(final_dmg, 1)
         opponent.hp -= final_dmg
+        self.charges -= 1
         return final_dmg
 
     def attack(self, opponent):
