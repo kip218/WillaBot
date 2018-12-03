@@ -236,8 +236,11 @@ def jump_jump(p, o):
 
 
 def jump_charge(p, o):
+    o.add_charge()
     return f"{o.username} gained 1 charge!"
 
 
 def charge_charge(p, o):
+    p.add_charge()
+    o.add_charge()
     return f"Both players gained 1 charge!"

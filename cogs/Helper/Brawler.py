@@ -15,8 +15,8 @@ class Brawler:
         self.skin = skin.capitalize()
         self.color = color.capitalize()
         self.key = key
-        self.total_hp = 50
-        self.hp = 50
+        self.total_hp = 40
+        self.hp = 40
         self.stocks = 3
         self.dodge_cooldown = 0
         self.charges = 0
