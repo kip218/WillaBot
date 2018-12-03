@@ -46,7 +46,7 @@ def do_move(p_mv, o_mv, p, o):
 
     elif p_mv == 'dodge' and o_mv == 'ground attack':
         msg = gAttack_dodge(o, p)
-    elif msg == 'dodge' and o_mv == 'anti-air attack':
+    elif p_mv == 'dodge' and o_mv == 'anti-air attack':
         msg = aAttack_dodge(o, p)
     elif p_mv == 'dodge' and o_mv == 'signature attack':
         msg = sAttack_dodge(o, p)

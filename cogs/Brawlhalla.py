@@ -403,11 +403,15 @@ class Brawlhalla:
         await ctx.send(embed=embed)
 
     @commands.command(usage="<legend> / [skin] / [color]")
-    async def select(self, ctx, *, msg):
+    async def select(self, ctx, *, msg: str=None):
         '''
         Select a main legend.
         w.select <legend> / [skin] / [color]
         '''
+        if msg is None:
+            await ctx.send("You must specify a legend to select! Try \"w.select <legend> / [skin] / [color]\".")
+            return
+
         # clean user input
         def clean_input(msg):
             if msg is not None:
@@ -470,7 +474,7 @@ class Brawlhalla:
             conn.close()
             return
         elif select_legend_key is None:
-            await ctx.send("The legend/skin/color could not be found! Try \"w.inven legends\" or w.skin <legend>\" to see your legends/skins/colors.")
+            await ctx.send("The legend/skin/color could not be found! Try \"w.inven legends\" or \"w.inven skins <legend>\" to see your legends/skins/colors.")
             conn.close()
             return
 
@@ -1306,15 +1310,15 @@ class Brawlhalla:
         player_legend = get_player_legend_lst(player)
         opponent_legend = get_player_legend_lst(opponent)
         if player_legend is None and opponent_legend is None:
-            await ctx.send("Both players have not selected a legend yet!")
+            await ctx.send("Both players have not selected a legend yet! Use \"w.select\" to select a legend. Use \"w.select\" to select a legend.")
             await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
             return
         elif player_legend is None:
-            await ctx.send(f"{player.mention} has not selected a legend yet!")
+            await ctx.send(f"{player.mention} has not selected a legend yet! Use \"w.select\" to select a legend.")
             await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
             return
         elif opponent_legend is None:
-            await ctx.send(f"{opponent.mention} has not selected a legend yet!")
+            await ctx.send(f"{opponent.mention} has not selected a legend yet! Use \"w.select\" to select a legend.")
             await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
             return
 
