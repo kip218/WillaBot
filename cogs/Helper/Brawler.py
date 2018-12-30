@@ -51,10 +51,10 @@ class Brawler:
         return final_dmg
 
     def update_stocks(self):
-        self.dodge_cooldown = 0
         if self.hp <= 0:
             self.stocks -= 1
             self.hp = self.total_hp
+            self.dodge_cooldown = 0
             return True
         return False
 

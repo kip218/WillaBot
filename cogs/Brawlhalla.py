@@ -1366,11 +1366,7 @@ class Brawlhalla:
                               value=f"**Str:** {opponent_stats[0]}\n**Dex:** {opponent_stats[1]}\n**Def:** {opponent_stats[2]}\n**Spd:** {opponent_stats[3]}",
                               inline=True)
         brawl_embed = await ctx.send(embed=brawl_embed)
-        i = 0
         while p_brawler.stocks > 0 and o_brawler.stocks > 0:
-            print(f"{i}: p_brawler.dodge_cooldown = {p_brawler.dodge_cooldown}")
-            print(f"{i}: o_brawler.dodge_cooldown = {o_brawler.dodge_cooldown}")
-            i += 1
             player_prompt = await player.send(embed=get_DM_prompt_embed(moves, opponent))
             opponent_prompt = await opponent.send(embed=get_DM_prompt_embed(moves, player))
             # checking players' response
