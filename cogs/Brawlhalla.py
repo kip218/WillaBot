@@ -1387,7 +1387,7 @@ class Brawlhalla:
                     remove_status(player, opponent)
                     return
                 else:
-                    if msg.author == player:
+                    if msg.author == player and player_answered is True:
                         player_move = msg.content.lower()
                         if player_move in moves_dict:
                             player_move = moves_dict[player_move]
@@ -1401,7 +1401,7 @@ class Brawlhalla:
                         else:
                             player_answered = True
 
-                    elif msg.author == opponent:
+                    elif msg.author == opponent and opponent_answered is False:
                         opponent_move = msg.content.lower()
                         if opponent_move in moves_dict:
                             opponent_move = moves_dict[opponent_move]
