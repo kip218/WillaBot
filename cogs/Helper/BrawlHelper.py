@@ -192,6 +192,8 @@ def sAttack_sAttack(p, o):
 
 def sAttack_dodge(p, o):
     o.add_dodge_cooldown()
+    # subtracting 1 charge for missing signature attack
+    p.charges -= 1
     punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 1.2
     rand = randint(1, 100)
     if rand <= punish_chance:
