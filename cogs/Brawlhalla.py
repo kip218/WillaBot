@@ -1366,7 +1366,11 @@ class Brawlhalla:
                               value=f"**Str:** {opponent_stats[0]}\n**Dex:** {opponent_stats[1]}\n**Def:** {opponent_stats[2]}\n**Spd:** {opponent_stats[3]}",
                               inline=True)
         brawl_embed = await ctx.send(embed=brawl_embed)
+        i = 0
         while p_brawler.stocks > 0 and o_brawler.stocks > 0:
+            print(f"{i}: p_brawler.dodge_cooldown = {p_brawler.dodge_cooldown}")
+            print(f"{i}: o_brawler.dodge_cooldown = {o_brawler.dodge_cooldown}")
+            i += 1
             player_prompt = await player.send(embed=get_DM_prompt_embed(moves, opponent))
             opponent_prompt = await opponent.send(embed=get_DM_prompt_embed(moves, player))
             # checking players' response
@@ -1374,7 +1378,7 @@ class Brawlhalla:
             opponent_answered = False
             while player_answered is False or opponent_answered is False:
                 try:
-                    done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=60), self.bot.wait_for('message', check=check_opponent, timeout=60)], return_when=asyncio.FIRST_COMPLETED)
+                    done, pending = await asyncio.wait([self.bot.wait_for('message', check=check_player, timeout=120), self.bot.wait_for('message', check=check_opponent, timeout=60)], return_when=asyncio.FIRST_COMPLETED)
                     msg = done.pop().result()
                 except asyncio.TimeoutError:
                     player_prompt.embeds[0].set_footer(text="The game has timed out!")
@@ -1383,12 +1387,11 @@ class Brawlhalla:
                     await player_prompt.edit(embed=player_prompt.embeds[0])
                     await opponent_prompt.edit(embed=opponent_prompt.embeds[0])
                     await challenge_accepted.edit(content=f"{challenge_accepted.content}\n*The game has timed out!*")
-                    await brawl_embed.edit(embed=brawl_embed)
+                    await brawl_embed.edit(embed=brawl_embed.embeds[0])
                     remove_status(player, opponent)
                     return
                 else:
                     if msg.author == player:
-
                         player_move = msg.content.lower()
                         if player_move in moves_dict:
                             player_move = moves_dict[player_move]
