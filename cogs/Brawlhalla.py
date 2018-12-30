@@ -1387,7 +1387,7 @@ class Brawlhalla:
                     remove_status(player, opponent)
                     return
                 else:
-                    if msg.author == player and player_answered is True:
+                    if msg.author == player and player_answered is False:
                         player_move = msg.content.lower()
                         if player_move in moves_dict:
                             player_move = moves_dict[player_move]
