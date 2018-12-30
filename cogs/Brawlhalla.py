@@ -1250,11 +1250,11 @@ class Brawlhalla:
             dodge_emote = ":white_circle:"
             charge_emote = ":star:"
             embed = discord.Embed(title=f"{player.name} VS {opponent.name}",
-                                  description=f"{player.name}'s {player_legend[1].capitalize()}: {stock_emote*p_brawler.stocks}\n"\
-                                              f"Dodge cooldown: {dodge_emote*p_brawler.dodge_cooldown}\t"\
-                                              f"Charges: {charge_emote*p_brawler.charges}\n"\
-                                              f"{opponent.name}'s {opponent_legend[1].capitalize()}: {stock_emote*o_brawler.stocks}\n"\
-                                              f"Dodge cooldown: {dodge_emote*o_brawler.dodge_cooldown}\t"\
+                                  description=f"{player.name}'s {player_legend[1].capitalize()}: {stock_emote*p_brawler.stocks}\n"
+                                              f"Dodge cooldown: {dodge_emote*p_brawler.dodge_cooldown}\t"
+                                              f"Charges: {charge_emote*p_brawler.charges}\n"
+                                              f"{opponent.name}'s {opponent_legend[1].capitalize()}: {stock_emote*o_brawler.stocks}\n"
+                                              f"Dodge cooldown: {dodge_emote*o_brawler.dodge_cooldown}\t"
                                               f"Charges: {charge_emote*o_brawler.charges}",
                                   color=0x48d1cc)
             embed.set_image(url=brawl_img_url)
@@ -1383,6 +1383,7 @@ class Brawlhalla:
                     await player_prompt.edit(embed=player_prompt.embeds[0])
                     await opponent_prompt.edit(embed=opponent_prompt.embeds[0])
                     await challenge_accepted.edit(content=f"{challenge_accepted.content}\n*The game has timed out!*")
+                    await brawl_embed.edit(embed=brawl_embed)
                     remove_status(player, opponent)
                     return
                 else:
@@ -1431,7 +1432,7 @@ class Brawlhalla:
             if o_brawler.update_stocks():
                 await ctx.send(f"{opponent.name}'s {o_brawler.skin} "
                                f"{o_brawler.name} lost a stock!")
-            await ctx.send(embed=get_brawl_embed(brawl_img_url))
+            brawl_embed = await ctx.send(embed=get_brawl_embed(brawl_img_url))
 
         if p_brawler.stocks > 0 and o_brawler.stocks == 0:
             embed = get_game_over_embed(player, p_brawler.key, opponent, o_brawler.key)
