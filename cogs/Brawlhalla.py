@@ -311,7 +311,7 @@ class Brawlhalla:
         await ctx.send(embed=embed)
 
     @inven.command(usage="<legend> / <skin>")
-    async def colors(self, ctx, legend_skin: str=None):
+    async def colors(self, ctx, *, legend_skin: str=None):
         '''
         Lists the colors that you own for the skin.
         w.inven colors <legend> / <skin>
@@ -1296,7 +1296,7 @@ class Brawlhalla:
         accepted = False
         while accepted is False:
             try:
-                accept = await self.bot.wait_for('message', check=check_accept, timeout=60)
+                accept = await self.bot.wait_for('message', check=check_accept, timeout=120)
             except asyncio.TimeoutError:
                 await challenge_msg.edit(content=challenge_msg.content + "\n*The challenge has timed out!*")
                 return
