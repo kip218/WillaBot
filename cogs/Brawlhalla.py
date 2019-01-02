@@ -1394,10 +1394,8 @@ class Brawlhalla:
 
                         if player_move == 'dodge' and p_brawler.dodge_cooldown != 0:
                             await ctx.send(f"{player.mention}, your dodge is on cooldown!")
-                            await player.send(f"{player.mention}, your dodge is on cooldown!")
-                        elif player_move == 'signature attack' and p_brawler.charges == 0:
+                        elif player_move == 'signature attack' and p_brawler.charges <= 0:
                             await ctx.send(f"{player.mention}, you don't have enough charges for a signature attack!")
-                            await player.send(f"{player.mention}, you don't have enough charges for a signature attack!")
                         else:
                             player_answered = True
 
@@ -1408,10 +1406,8 @@ class Brawlhalla:
 
                         if opponent_move == 'dodge' and o_brawler.dodge_cooldown != 0:
                             await ctx.send(f"{opponent.mention}, your dodge is on cooldown!")
-                            await opponent.send(f"{opponent.mention}, your dodge is on cooldown!")
-                        elif opponent_move == 'signature attack' and o_brawler.charges == 0:
+                        elif opponent_move == 'signature attack' and o_brawler.charges <= 0:
                             await ctx.send(f"{opponent.mention}, you don't have enough charges for a signature attack!")
-                            await opponent.send(f"{opponent.mention}, you don't have enough charges for a signature attack!")
                         else:
                             opponent_answered = True
 
