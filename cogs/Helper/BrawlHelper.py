@@ -126,6 +126,7 @@ def gAttack_dodge(p, o):
     if rand <= punish_chance:
         # using signature attack for punish
         dmg = o.signature_attack(p)
+        o.charges += 1
         return f"{o.username} dodged {p.username}'s ground attack "\
                f"and punished it for **{dmg}** damage with a combo!"
     else:
@@ -140,6 +141,7 @@ def gAttack_jump(p, o):
     if rand <= punish_chance:
         # using signature attack for punish
         dmg = o.signature_attack(p)
+        o.charges += 1
         return f"{o.username} jumped over {p.username}'s ground attack "\
                f"and punished it for **{dmg}** damage with a combo!"
     else:
@@ -170,6 +172,7 @@ def aAttack_dodge(p, o):
     if rand <= punish_chance:
         # using signature attack for punish
         dmg = o.signature_attack(p)
+        o.charges += 1
         return f"{o.username} dodged {p.username}'s anti-air attack "\
                f"and punished it for **{dmg}** damage with a combo!"
     else:
@@ -205,6 +208,7 @@ def sAttack_dodge(p, o):
     if rand <= punish_chance:
         # using signature attack for punish
         dmg = o.signature_attack(p)
+        o.charges += 1
         return f"{o.username} dodged {p.username}'s signature attack "\
                f"and punished it for **{dmg}** damage with a combo!"
     else:
