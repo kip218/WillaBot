@@ -124,24 +124,28 @@ def gAttack_dodge(p, o):
     punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 1.2
     rand = randint(1, 100)
     if rand <= punish_chance:
+        # using signature attack for punish
+        dmg = o.signature_attack(p)
+        return f"{o.username} dodged {p.username}'s ground attack "\
+               f"and punished it for **{dmg}** damage with a combo!"
+    else:
         dmg = o.attack(p)
         return f"{o.username} dodged {p.username}'s ground attack "\
-               f"and punished it for **{dmg}** damage!"
-    else:
-        return f"{o.username} dodged {p.username}'s ground attack "\
-               f"but failed to punish the attack."
+               f"and punished it for **{dmg}** damage with a single attack!"
 
 
 def gAttack_jump(p, o):
     punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 0.7
     rand = randint(1, 100)
     if rand <= punish_chance:
+        # using signature attack for punish
+        dmg = o.signature_attack(p)
+        return f"{o.username} jumped over {p.username}'s ground attack "\
+               f"and punished it for **{dmg}** damage with a combo!"
+    else:
         dmg = o.attack(p)
         return f"{o.username} jumped over {p.username}'s ground attack "\
-               f"and punished it for **{dmg}** damage!"
-    else:
-        return f"{o.username} jumped over {p.username}'s ground attack "\
-               f"but failed to punish the attack."
+               f"and punished it for **{dmg}** damage with a single attack!"
 
 
 def gAttack_charge(p, o):
@@ -164,12 +168,14 @@ def aAttack_dodge(p, o):
     punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 1.2
     rand = randint(1, 100)
     if rand <= punish_chance:
+        # using signature attack for punish
+        dmg = o.signature_attack(p)
+        return f"{o.username} dodged {p.username}'s anti-air attack "\
+               f"and punished it for **{dmg}** damage with a combo!"
+    else:
         dmg = o.attack(p)
         return f"{o.username} dodged {p.username}'s anti-air attack "\
-               f"and punished it for **{dmg}** damage!"
-    else:
-        return f"{o.username} dodged {p.username}'s anti-air attack "\
-               f"but failed to punish the attack."
+               f"and punished it for **{dmg}** damage with a single attack!"
 
 
 def aAttack_jump(p, o):
@@ -197,12 +203,14 @@ def sAttack_dodge(p, o):
     punish_chance = ((o.dex + o.spd) / (p.dex + p.spd + o.dex + o.spd)) * 100 * 1.2
     rand = randint(1, 100)
     if rand <= punish_chance:
+        # using signature attack for punish
+        dmg = o.signature_attack(p)
+        return f"{o.username} dodged {p.username}'s signature attack "\
+               f"and punished it for **{dmg}** damage with a combo!"
+    else:
         dmg = o.attack(p)
         return f"{o.username} dodged {p.username}'s signature attack "\
-               f"and punished it for **{dmg}** damage!"
-    else:
-        return f"{o.username} dodged {p.username}'s signature attack "\
-               f"but failed to punish the attack."
+               f"and punished it for **{dmg}** damage with a single attack!"
 
 
 def sAttack_jump(p, o):
