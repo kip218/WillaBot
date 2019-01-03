@@ -1247,14 +1247,14 @@ class Brawlhalla:
         def get_stocks_emote(brawler):
             hp_ratio = brawler.hp / brawler.total_hp * 100
             if hp_ratio == 100:
-                hp_emote = ":green_heart:"
+                hp_emote = "<:white_heart:530324812380241931>"
             elif hp_ratio >= 66:
-                hp_emote = ":yellow_heart:"
+                hp_emote = "<:yellow_heart:530324820546551808>"
             elif hp_ratio >= 33:
-                hp_emote = ":heart:"
+                hp_emote = "<:orange_heart:530324827634925568>"
             else:
-                hp_emote = ":black_heart:"
-            res = ":green_heart:"*(brawler.stocks-1)
+                hp_emote = "<:red_heart:530324834073444352>"
+            res = "<:white_heart:530324812380241931>"*(brawler.stocks-1)
             if brawler.stocks > 0:
                 res += hp_emote
             return res
