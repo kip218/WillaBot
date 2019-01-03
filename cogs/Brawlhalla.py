@@ -1382,9 +1382,9 @@ class Brawlhalla:
                               value=f"**Str:** {opponent_stats[0]}\n**Dex:** {opponent_stats[1]}\n**Def:** {opponent_stats[2]}\n**Spd:** {opponent_stats[3]}",
                               inline=True)
         brawl_embed = await ctx.send(embed=brawl_embed)
+        player_prompt = await player.send(embed=get_DM_prompt_embed(moves, opponent))
+        opponent_prompt = await opponent.send(embed=get_DM_prompt_embed(moves, player))
         while p_brawler.stocks > 0 and o_brawler.stocks > 0:
-            player_prompt = await player.send(embed=get_DM_prompt_embed(moves, opponent))
-            opponent_prompt = await opponent.send(embed=get_DM_prompt_embed(moves, player))
             # checking players' response
             player_answered = False
             opponent_answered = False
@@ -1414,7 +1414,7 @@ class Brawlhalla:
                             await ctx.send(f"{player.mention}, you don't have enough charges for a signature attack!")
                         else:
                             if not isinstance(msg.channel, discord.DMChannel):
-                                msg.delete()
+                                await msg.delete()
                             player_answered = True
 
                     elif msg.author == opponent and opponent_answered is False:
@@ -1428,7 +1428,7 @@ class Brawlhalla:
                             await ctx.send(f"{opponent.mention}, you don't have enough charges for a signature attack!")
                         else:
                             if not isinstance(msg.channel, discord.DMChannel):
-                                msg.delete()
+                                await msg.delete()
                             opponent_answered = True
 
             # update cooldowns
