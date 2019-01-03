@@ -1244,17 +1244,33 @@ class Brawlhalla:
             embed.set_footer(text="Type the move or move number to use.")
             return embed
 
+        def get_stocks_emote(brawler):
+            hp_ratio = brawler.hp / brawler.total_hp * 100
+            if hp_ratio == 100:
+                hp_emote = ":green_heart:"
+            elif hp_ratio >= 66:
+                hp_emote = ":yellow_heart:"
+            elif hp_ratio >= 33:
+                hp_emote = ":heart:"
+            else:
+                hp_emote = ":black_heart:"
+            res = ":green_heart:"*(brawler.stocks-1)
+            if brawler.stocks > 0:
+                res += hp_emote
+            return res
+
         # get stats, weapons, and img_url for embed
         def get_brawl_embed(brawl_img_url):
-            stock_emote = ":heart:"
+            p_stocks = get_stocks_emote(p_brawler)
+            o_stocks = get_stocks_emote(o_brawler)
             dodge_emote = ":white_circle:"
             charge_emote = ":star:"
             embed = discord.Embed(title=f"{player.name} VS {opponent.name}",
-                                  description=f"{player.name}'s {player_legend[1].capitalize()}: {stock_emote*p_brawler.stocks}\n"
-                                              f"Dodge cooldown: {dodge_emote*p_brawler.dodge_cooldown}\t"
+                                  description=f"{player.name}'s {player_legend[1].capitalize()}: {p_stocks}\n"
+                                              f"Dodge: {dodge_emote*p_brawler.dodge_cooldown}\t"
                                               f"Charges: {charge_emote*p_brawler.charges}\n"
-                                              f"{opponent.name}'s {opponent_legend[1].capitalize()}: {stock_emote*o_brawler.stocks}\n"
-                                              f"Dodge cooldown: {dodge_emote*o_brawler.dodge_cooldown}\t"
+                                              f"{opponent.name}'s {opponent_legend[1].capitalize()}: {o_stocks}\n"
+                                              f"Dodge: {dodge_emote*o_brawler.dodge_cooldown}\t"
                                               f"Charges: {charge_emote*o_brawler.charges}",
                                   color=0x48d1cc)
             embed.set_image(url=brawl_img_url)
@@ -1397,6 +1413,8 @@ class Brawlhalla:
                         elif player_move == 'signature attack' and p_brawler.charges <= 0:
                             await ctx.send(f"{player.mention}, you don't have enough charges for a signature attack!")
                         else:
+                            if not isinstance(msg.channel, discord.DMChannel):
+                                msg.delete()
                             player_answered = True
 
                     elif msg.author == opponent and opponent_answered is False:
@@ -1409,6 +1427,8 @@ class Brawlhalla:
                         elif opponent_move == 'signature attack' and o_brawler.charges <= 0:
                             await ctx.send(f"{opponent.mention}, you don't have enough charges for a signature attack!")
                         else:
+                            if not isinstance(msg.channel, discord.DMChannel):
+                                msg.delete()
                             opponent_answered = True
 
             # update cooldowns
