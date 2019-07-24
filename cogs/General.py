@@ -99,7 +99,8 @@ class General:
         conn.close()
         embed = discord.Embed(color=0x48d1cc)
         embed.set_author(name=embed_name, icon_url=self.bot.user.avatar_url)
-        embed.add_field(name="WillaBot Updates:", value="- Brawl (beta) has been added!\nTry it out and give feedback using \"w.report\"!\n\"w.help brawl\" for more info.")
+        embed.add_field(name="WillaBot Updates:", value="-WillaBot development will discontinue for a long while, but thanks for using it anyways!\n\
+                                                         -Legend images will not display anymore for w.brawl commands.")
         await ctx.send(embed=embed)
 
     @commands.command()
