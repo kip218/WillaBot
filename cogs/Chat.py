@@ -1,8 +1,9 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 
 
-class Chat:
+class Chat(Cog):
     '''
     Chat related commands.
     '''

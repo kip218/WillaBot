@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 import os
 import requests
 
@@ -8,7 +9,7 @@ mashape_key = os.environ['mashape_key']
 weather_key = os.environ['weather_key']
 
 
-class Fun:
+class Fun(Cog):
     '''
     Commands for fun.
     '''

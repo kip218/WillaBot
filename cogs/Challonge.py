@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 import challonge
 from settings import challonge_token
 import datetime
@@ -15,7 +16,7 @@ DATABASE_URL = os.environ['DATABASE_URL']
 challonge.set_credentials("WillaBot", challonge_token)
 
 
-class Challonge:
+class Challonge(Cog):
     '''
     Challonge commands for managing tournaments.
     '''

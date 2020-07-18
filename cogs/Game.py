@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 import random
 import psycopg2
 import os
@@ -10,7 +11,7 @@ import gibberish
 DATABASE_URL = os.environ['DATABASE_URL']
 
 
-class Game:
+class Game(Cog):
     '''
     Game commands.
     '''

@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 import psycopg2
 import os
 import asyncio
@@ -7,7 +8,7 @@ import asyncio
 DATABASE_URL = os.environ['DATABASE_URL']
 
 
-class Todo:
+class Todo(Cog):
     '''
     Commands for the to-do list.
     '''

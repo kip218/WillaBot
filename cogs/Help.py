@@ -1,11 +1,13 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 import asyncio
 
 
 def format_help_page(bot, cog_name, curr_page, max_page):
-            lst_commands = bot.get_cog_commands(cog_name)
+            lst_commands = bot.cogs[cog_name].get_commands()
             embed = discord.Embed(
+                name="\\u200",
                 title=cog_name + " commands",
                 description=f"Page {curr_page} of {max_page}. React with :point_left: or :point_right: below to view other pages.\n\"w.help [command]\" for info on a specific command.",
                 color=0x48d1cc
@@ -27,7 +29,7 @@ def format_help_page(bot, cog_name, curr_page, max_page):
             return embed
 
 
-class Help:
+class Help(Cog):
     '''
     Help commands.
     '''

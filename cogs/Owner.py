@@ -1,5 +1,6 @@
 import psycopg2
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 import random
 import os
 import challonge
@@ -7,7 +8,7 @@ import challonge
 DATABASE_URL = os.environ['DATABASE_URL']
 
 
-class Owner:
+class Owner(Cog):
     '''
     Commands for the bot owner.
     '''

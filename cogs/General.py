@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 import psycopg2
 import os
 from datetime import datetime
@@ -8,7 +9,7 @@ import asyncio
 DATABASE_URL = os.environ['DATABASE_URL']
 
 
-class General:
+class General(Cog):
     '''
     General commands.
     '''

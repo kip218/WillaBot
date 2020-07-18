@@ -1,12 +1,13 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 from datetime import datetime
 import random
 
 launch_time = datetime.utcnow()
 
 
-class Bot:
+class Bot(Cog):
     '''
     Bot related commands.
     '''

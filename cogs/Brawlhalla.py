@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.cog import Cog
 import psycopg2
 import os
 import asyncio
@@ -23,7 +24,7 @@ def level_currxp_nextxp(xp):
     return level, curr_xp, next_level_xp
 
 
-class Brawlhalla:
+class Brawlhalla(Cog):
     '''
     Commands for Brawlhalla.
     '''
