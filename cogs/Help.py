@@ -7,10 +7,7 @@ def format_help_page(bot, cog_name, curr_page, max_page):
             lst_commands = bot.get_cog_commands(cog_name)
             embed = discord.Embed(
                 title=cog_name + " commands",
-                description=f"Page {curr_page} of {max_page}. React with :point_left: or :point_right: below to view other pages.\n\
-                              \"w.help [command]\" for info on a specific command.\n\
-                              -WillaBot development will discontinue for a long while, but thanks for using it anyways!\n\
-                              -Legend images will not display anymore for w.brawl commands.",
+                description=f"Page {curr_page} of {max_page}. React with :point_left: or :point_right: below to view other pages.\n\"w.help [command]\" for info on a specific command.",
                 color=0x48d1cc
                 )
             embed.set_author(name="WillaBot", icon_url="https://cdn.discordapp.com/avatars/161774631303249921/a049f60a2696129e0f9cc2714b27403e.webp?size=1024")

@@ -184,7 +184,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print("-------------------")
-    game = discord.Game("w.help (unmaintained)")
+    game = discord.Game("w.help (beta version)")
     await bot.change_presence(status=discord.Status.online, activity=game)
 
 
