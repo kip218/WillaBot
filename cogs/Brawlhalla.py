@@ -1084,7 +1084,7 @@ class Brawlhalla(Cog):
         Challenge someone to a brawl!
         w.brawl <@user>
         '''
-        if user is None:
+        if user is None or len(ctx.message.mentions) == 0:
             await ctx.send("You must mention a user to brawl!")
             return
 

@@ -193,7 +193,7 @@ class General(Cog):
     @commands.command(usage="<user> <amount>")
     async def pay(self, ctx, user, amount: int=None):
         '''
-        Pay another use <amount> of coins.
+        Pay another user <amount> of coins.
         w.pay <@user> <amount>
         '''
         # checking if user has sufficient balance
