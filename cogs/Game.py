@@ -654,8 +654,10 @@ class Game(Cog):
 
         scoreboard_dict = {}
         for i in range(len(words_lst)):
-            word = words_lst[i]
-            word_display = "`" + word.replace("", "\u200B") + "`"
+            word = words_lst[i] #word.replace("", "\u200B") +
+            word_display = "`" + word[0] + "\u200B" + word[1:] + "`"
+            print(word_display)
+            print(word)
             embed = discord.Embed(title="The word is:", description=word_display, color=0xF5DE50)
             embed.set_author(
                         name="Type the word!",
@@ -664,7 +666,7 @@ class Game(Cog):
             msg = await ctx.send(embed=embed)
 
             def check(m):
-                return not m.author.bot and (m.content == word or (m.content == 'w.stop' and (m.author == ctx.author or m.author.permissions_in(ctx.channel).administrator))) and m.channel == ctx.channel
+                return not m.author.bot and (m.content == word or m.content == word_display or (m.content == 'w.stop' and (m.author == ctx.author or m.author.permissions_in(ctx.channel).administrator))) and m.channel == ctx.channel
 
             try:
                 answer = await self.bot.wait_for('message', check=check, timeout=25)
@@ -681,6 +683,10 @@ class Game(Cog):
                 await msg.edit(embed=embed)
                 break
             else:
+                print("answer.content", answer.content)
+                print("word_display", word_display)
+                if answer.content == word.display:
+                    print("SAME SAEMA SMEA")
                 if answer.content == word:
                     embed = discord.Embed(
                                     title="The word was:",
@@ -697,7 +703,8 @@ class Game(Cog):
                         scoreboard_dict[answer.author] += 1
                     else:
                         scoreboard_dict[answer.author] = 1
-                elif answer.content == word.replace("", "\u200B"):
+                elif answer.content == word_display:
+                    print("YES")
                     await ctx.send(answer.author.mention + " Don't even try to ctrl+C ctrl+V!")
                 elif answer.content == 'w.stop':
                     embed = discord.Embed(
