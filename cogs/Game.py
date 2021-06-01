@@ -482,7 +482,7 @@ class Game(Cog):
                         pass
                     else:
                         new_word_found = True
-            return new_word
+            return new_word.lower()
 
         await ctx.send("*The race has started!\nThe word to type is...*")
         # getting list of words
@@ -544,6 +544,8 @@ class Game(Cog):
                         scoreboard_dict[answer.author] += 1
                     else:
                         scoreboard_dict[answer.author] = 1
+                elif answer.content == word.replace("", "\u200B"):
+                    await ctx.send(answer.author.mention + " Don't even try to ctrl+C ctrl+V!")
                 elif answer.content == 'w.stop':
                     embed = discord.Embed(
                                     title="The word was:",
@@ -695,6 +697,8 @@ class Game(Cog):
                         scoreboard_dict[answer.author] += 1
                     else:
                         scoreboard_dict[answer.author] = 1
+                elif answer.content == word.replace("", "\u200B"):
+                    await ctx.send(answer.author.mention + " Don't even try to ctrl+C ctrl+V!")
                 elif answer.content == 'w.stop':
                     embed = discord.Embed(
                                     title="The word was:",
