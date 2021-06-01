@@ -22,14 +22,10 @@ class Bot(Cog):
         w.servers
         '''
         num = len(self.bot.guilds)
-        id_name_dict = {}
         total_users = 0
         for guild in self.bot.guilds:
-            for member in guild.members:
-                if member.id not in id_name_dict:
-                    id_name_dict[member.id] = member.name
-        total_users = len(id_name_dict)
-        await ctx.send(f"WillaBot is currently exploring {num} different servers with {total_users} unique users!")
+            total_users += guild.member_count
+        await ctx.send(f"WillaBot is currently exploring {num} different servers with {total_users} users!")
 
     @commands.command(usage="[server name]")
     async def server(self, ctx, *, server_name: str=None):

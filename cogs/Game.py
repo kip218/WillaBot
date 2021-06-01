@@ -6,7 +6,7 @@ import os
 import asyncio
 import discord
 from random_word import RandomWords
-import gibberish
+from gibberish import Gibberish
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -647,7 +647,8 @@ class Game(Cog):
 
         await ctx.send("*The race has started!\nThe word to type is...*")
         # getting list of words
-        words_lst = gibberish.generate_words(num_words)
+        gib = Gibberish()
+        words_lst = gib.generate_words(num_words)
 
         scoreboard_dict = {}
         for i in range(len(words_lst)):
