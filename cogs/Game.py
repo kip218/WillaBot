@@ -495,6 +495,7 @@ class Game(Cog):
                 if not 32 <= ord(char) <= 122:
                     new_word = get_new_word()
                     words_lst[i] = new_word
+            words_lst[i] = words_lst[i].lower()
 
         # shuffling words_lst
         random.shuffle(words_lst)
