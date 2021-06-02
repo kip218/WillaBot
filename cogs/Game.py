@@ -476,7 +476,7 @@ class Game(Cog):
         def get_new_word():
             new_word_found = False
             while new_word_found is False:
-                new_word = r.get_random_word(hasDictionaryDef="true")
+                new_word = r.get_random_word(limit=num_words, hasDictionaryDef="true")
                 for char in new_word:
                     if not 32 <= ord(char) <= 122:
                         pass
