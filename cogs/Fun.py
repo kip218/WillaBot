@@ -3,9 +3,9 @@ from discord.ext import commands
 from discord.ext.commands.cog import Cog
 import os
 import requests
+from quoters import Quote
 
 DATABASE_URL = os.environ['DATABASE_URL']
-mashape_key = os.environ['mashape_key']
 weather_key = os.environ['weather_key']
 
 
@@ -35,15 +35,7 @@ class Fun(Cog):
         Random quote.
         w.quote
         '''
-        headers = {
-                "X-Mashape-Key": mashape_key,
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "application/json"
-                }
-        response = requests.get("https://andruxnet-random-famous-quotes.p.mashape.com/?count=1", headers=headers).json()[0]
-        quote = response['quote']
-        author = response['author']
-        await ctx.send(f"*\"{quote}\"*\n- {author}")
+        await ctx.send(Quote.print())
 
     @commands.cooldown(rate=10, per=60, type=commands.BucketType.user)
     @commands.command()
