@@ -21,7 +21,11 @@ initial_extensions = ['cogs.Chat',
                       'cogs.Fun',
                       'cogs.Help']
 
-bot = commands.Bot(command_prefix='w.')
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
+
+bot = commands.Bot(command_prefix='w.', intents=intents)
 bot.remove_command("help")
 
 
