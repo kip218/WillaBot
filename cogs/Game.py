@@ -186,8 +186,8 @@ class Game(Cog):
             return
 
         # checking if bet amount is less than limit
-        if bet_amount > 5000:
-            await ctx.send("Maximum bet amount is 5000 coins!")
+        if bet_amount > 10000:
+            await ctx.send("Maximum bet amount is 10000 coins!")
             return
 
         if bet_amount <= 0:
