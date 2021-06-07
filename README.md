@@ -6,6 +6,5 @@ Using discord.py API to interface with more than 20 servers.
 Python async functions for handling multiple user requests.  
 PostgreSQL to store user data.  
 AWS S3 to store media assets.  
-Hosted on Heroku since July, 2018.  
-
-Invite link: https://discord.com/oauth2/authorize?client_id=463398601553346581&scope=bot&permissions=1077275729
+Hosted on Heroku since July, 2018.
+Discontinued on June, 2021.
